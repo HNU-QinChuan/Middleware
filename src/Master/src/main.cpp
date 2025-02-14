@@ -3,7 +3,7 @@
 //
 #include "Acceptor.hpp"
 #include<spdlog/spdlog.h>
-
+#include "MiddlewareManager.hpp"
 
 int main() {
   spdlog::set_pattern("[%Y-%m-%d %H:%M:%S] [Hnu Middleware Master] %v");
@@ -11,4 +11,5 @@ int main() {
   spdlog::debug("Hello, Middleware-Master");
   Hnu::Middleware::Acceptor acceptor;
   acceptor.run();
+  Hnu::Middleware::MiddlewareManager::run();
 }

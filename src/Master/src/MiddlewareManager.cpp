@@ -9,11 +9,32 @@ namespace Hnu::Middleware {
     static MiddlewareManager middlewareManager;
     return middlewareManager;
   }
-  bool MiddlewareManager::addNode(const std::string& name) {
-    if (getInstance().m_nodes.contains(name)) {
+  boost::asio::io_context& MiddlewareManager::getIoc() {
+    return getInstance().m_ioc;
+  }
+  void MiddlewareManager::run() {
+    getInstance().m_ioc.run();
+  }
+  bool MiddlewareManager::addNode(const std::string& node,int pid) {
+    if (getInstance().m_nodes.contains(node)) {
       return false;
 
     }
-    getInstance().m_nodes[name]=std::make_shared<Node>(name);
+    getInstance().m_nodes[node]=std::make_shared<Node>(node,pid);
+    return true;
+  }
+  bool MiddlewareManager::addPublish(const std::string& node,const std::string& topic,int eventfd){
+    MiddlewareManager &middlewareManager = getInstance();
+    if(!middlewareManager.m_nodes.contains(node)){
+      return false;
+    }
+    if(middlewareManager.m_nodes[node]->containsPublish(topic)){
+      return false;
+    }
+    auto publish=std::make_shared<Publish>(topic,eventfd);
+    middlewareManager.m_nodes[node]->addPublish(publish);
+    middlewareManager.m_publishes[topic].push_back(publish);
+    publish->run();
+    return true;
   }
 }

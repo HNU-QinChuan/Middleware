@@ -7,9 +7,10 @@
 #define SUBSCRIBE_HPP
 #include <memory>
 #include<string>
-#include"Node.hpp"
+// #include"Node.hpp"
 
 namespace Hnu::Middleware {
+  class Node;
   //TODO: 不使用共享指针
   class Subscribe : public std::enable_shared_from_this<Subscribe> {
   private:

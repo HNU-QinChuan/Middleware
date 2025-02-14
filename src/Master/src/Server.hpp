@@ -16,7 +16,7 @@ namespace Hnu::Middleware {
   using local_stream=beast::basic_stream<asio::local::stream_protocol, asio::any_io_executor, beast::unlimited_rate_policy>;
   class Server :public std::enable_shared_from_this<Server> {
   public:
-    explicit Server(asio::io_context& ioc);
+    explicit Server();
     void run();
     local_stream::socket_type& socket();
   private:

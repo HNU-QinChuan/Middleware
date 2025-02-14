@@ -3,11 +3,11 @@
 //
 
 #include "Server.hpp"
-
+#include"MiddlewareManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
-  Server::Server(asio::io_context& ioc):m_ioc(ioc),m_stream(ioc) {
+  Server::Server():m_ioc(MiddlewareManager::getIoc()),m_stream(m_ioc) {
   }
 
   local_stream::socket_type& Server::socket() {
@@ -54,6 +54,25 @@ namespace Hnu::Middleware {
     }
   }
   void Server::handleCreateNode() {
+    pid_t pid = std::stoi(std::string(m_request["pid"]));
+    std::string name = std::string(m_request["node"]);
+    if (MiddlewareManager::addNode(name, pid)) {
+      m_response.result(beast::http::status::ok);
+    } else {
+      m_response.result(beast::http::status::bad_request);
+    }
+  }
+  void Server::handleCreatePublish() {
+    int eventfd = std::stoi(std::string(m_request["eventfd"]));
+    std::string topic = std::string(m_request["pub"]);
+    std::string node = std::string(m_request["node"]);
+    if (MiddlewareManager::addPublish(node, topic, eventfd)) {
+      m_response.result(beast::http::status::ok);
+    } else {
+      m_response.result(beast::http::status::bad_request);
+    }
+  }
+  void Server::handleCreateSubscribe() {
   }
 
 
