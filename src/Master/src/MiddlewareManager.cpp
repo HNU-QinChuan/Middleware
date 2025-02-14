@@ -18,7 +18,6 @@ namespace Hnu::Middleware {
   bool MiddlewareManager::addNode(const std::string& node,int pid) {
     if (getInstance().m_nodes.contains(node)) {
       return false;
-
     }
     getInstance().m_nodes[node]=std::make_shared<Node>(node,pid);
     return true;
