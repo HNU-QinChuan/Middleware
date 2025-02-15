@@ -32,8 +32,13 @@ namespace Hnu::Middleware {
     }
     auto publish=std::make_shared<Publish>(topic,eventfd);
     middlewareManager.m_nodes[node]->addPublish(publish);
+    if(!publish->run()){
+      //TODO: middlewareManager.m_nodes[node]->removePublish(topic);
+      return false;
+    }
+
     middlewareManager.m_publishes[topic].push_back(publish);
-    publish->run();
+    
     return true;
   }
 }

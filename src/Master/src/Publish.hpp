@@ -28,7 +28,7 @@ namespace Hnu::Middleware {
   class Publish:public std::enable_shared_from_this<Publish> {
   public:
     Publish(const std::string& name,int eventfd);
-    void run();
+    bool run();
     std::string getName();
     void setNode(std::shared_ptr<Node> node);
   private:
@@ -38,6 +38,7 @@ namespace Hnu::Middleware {
     int m_eventfd;
     interprocess::managed_shared_memory m_shm;
     lock_free_queue* queue;
+    std::unique_ptr<asio::posix::stream_descriptor> m_eventfdStream;
 
   };
 
