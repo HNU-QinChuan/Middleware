@@ -21,6 +21,6 @@ namespace Hnu::Middleware {
   }
   void Node::addPublish(std::shared_ptr<Publish> publish) {
     m_publishes[publish->getName()]=publish;
-    publish->setNode(shared_from_this());
+    // publish->setNode(shared_from_this());
   }
 }

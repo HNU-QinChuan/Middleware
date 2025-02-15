@@ -27,8 +27,7 @@ namespace Hnu::Middleware {
     m_acceptor.async_accept(server->socket(),std::bind_front(&Acceptor::onAccept, this, server));
   }
   void Acceptor::onAccept(std::shared_ptr<Server> acceptServer, const boost::system::error_code& ec) {
-    auto server=std::make_shared<Server>();
-    m_acceptor.async_accept(server->socket(),std::bind_front(&Acceptor::onAccept, this, server));
+    doAccept();
     if (ec) {
       spdlog::error("Accept Error: {}", ec.message());
       return;

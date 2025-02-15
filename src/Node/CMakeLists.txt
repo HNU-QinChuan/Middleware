@@ -6,4 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(include)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_library(${PROJECT_NAME} SHARED
+        src/Node.cpp
+        include/Node.hpp)
+
+add_executable(${PROJECT_NAME}_test src/main.cpp)
+target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
