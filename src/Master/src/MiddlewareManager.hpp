@@ -22,6 +22,7 @@ namespace Hnu::Middleware {
     static MiddlewareManager& getInstance();
 
 
+
     static bool addNode(const std::string& name);
   private:
     MiddlewareManager()=default;
