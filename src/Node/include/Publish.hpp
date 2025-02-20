@@ -7,7 +7,7 @@
 
 #include"Publish.decl.hpp"
 #include<spdlog/spdlog.h>
-#include <google/protobuf/message.h>
+// #include <google/protobuf/message.h>
 
 
 
@@ -37,7 +37,7 @@ namespace Hnu::Middleware {
     request.method(beast::http::verb::post);
     request.set("pub",m_topic_name);
     request.set("node",m_node_name);
-    request.set("event_fd",std::to_string(m_event_fd));
+    request.set("eventfd",std::to_string(m_event_fd));
     request.prepare_payload();
     ec.clear();
     beast::http::write(m_socket,request,ec);
@@ -74,11 +74,14 @@ namespace Hnu::Middleware {
   }
   template <typename Message>
   void Publish<Message>::publish(const Message& message){
-    string serialized_message(m_shm.get_segment_manager());
-    serialized_message.reserve(message.ByteSizeLong());
-    message.SerializeToArray(serialized_message.data(),serialized_message.capacity());
+    std::string serialized_message;
+    // serialized_message.reserve(message.ByteSizeLong());
+    message.SerializeToString(&serialized_message);
+    spdlog::debug("serialized message {}",serialized_message);
     if (queue->write_available()) {
-      queue->push(serialized_message);
+      queue->push(string(serialized_message.c_str(),m_shm.get_segment_manager()));
+      uint64_t one=1;
+      m_eventfdStream->write_some(asio::buffer(&one,sizeof(one)));
     }
   }
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(Middleware-Master)
-
+#sudo setcap cap_sys_ptrace+ep
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(spdlog REQUIRED)

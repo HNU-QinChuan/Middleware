@@ -21,10 +21,12 @@ namespace Hnu::Middleware {
   bool Publish::run() {
     auto pidfd = syscall(SYS_pidfd_open, m_node.lock()->getPid(), 0);
     if(pidfd==-1){
+      spdlog::error("pidfd open error: {}",strerror(errno));
       return false;
     }
     m_eventfd= syscall(SYS_pidfd_getfd, pidfd, m_eventfd, 0);
     if(m_eventfd==-1){
+      spdlog::error("pidfd getfd error: {}",strerror(errno));
       return false;
     }
     std::string shmName=m_node.lock()->getName()+"."+m_topic_name;
@@ -51,7 +53,7 @@ namespace Hnu::Middleware {
     }
     string message(m_shm.get_segment_manager());
     queue->pop(message);
-    spdlog::info("Publish: {}",message);
+    spdlog::debug("Publish: {}",message);
   }
 
 }

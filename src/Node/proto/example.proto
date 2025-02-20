@@ -1,0 +1,8 @@
+// example.proto
+syntax = "proto3";
+
+message Person {
+  string name = 1;  // name 字段，字段编号为 1
+  int32 id = 2;     // id 字段，字段编号为 2
+  string email = 3; // email 字段，字段编号为 3
+}

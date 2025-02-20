@@ -3,6 +3,7 @@
 //
 
 #include "MiddlewareManager.hpp"
+#include <spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
   MiddlewareManager& MiddlewareManager::getInstance() {
@@ -19,6 +20,7 @@ namespace Hnu::Middleware {
     if (getInstance().m_nodes.contains(node)) {
       return false;
     }
+    spdlog::debug("add node: {}",node);
     getInstance().m_nodes[node]=std::make_shared<Node>(node,pid);
     return true;
   }
