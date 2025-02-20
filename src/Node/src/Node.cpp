@@ -6,5 +6,7 @@
 
 
 namespace Hnu::Middleware {
+  Node::Node(const std::string &name) : name(name) {
+  }
 } // Middleware
 // Hnu

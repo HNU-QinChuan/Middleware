@@ -10,10 +10,10 @@
 #include "MiddlewareManager.hpp"
 
 namespace Hnu::Middleware {
-  Publish::Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node):m_ioc(MiddlewareManager::getIoc()),m_name(name),m_eventfd(eventfd) ,m_node(node){
+  Publish::Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node):m_ioc(MiddlewareManager::getIoc()),m_topic_name(name),m_eventfd(eventfd) ,m_node(node){
   }
   std::string Publish::getName() {
-    return m_name;
+    return m_topic_name;
   }
   void Publish::setNode(std::shared_ptr<Node> node) {
     m_node=node;
@@ -27,7 +27,7 @@ namespace Hnu::Middleware {
     if(m_eventfd==-1){
       return false;
     }
-    std::string shmName=m_node.lock()->getName()+"."+m_name;
+    std::string shmName=m_node.lock()->getName()+"."+m_topic_name;
     try{
       interprocess::shared_memory_object::remove(shmName.c_str());
       m_shm=interprocess::managed_shared_memory(interprocess::create_only,shmName.c_str(),SHM_SIZE);

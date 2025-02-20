@@ -36,7 +36,7 @@ namespace Hnu::Middleware {
     void onEventfdRead(const boost::system::error_code& ec,std::size_t bytes);
 
     asio::io_context& m_ioc;
-    std::string m_name;
+    std::string m_topic_name;
     std::weak_ptr<Node> m_node;
     int m_eventfd;
     interprocess::managed_shared_memory m_shm;
