@@ -16,7 +16,10 @@ int main() {
   person.set_name("yc");
   person.set_id(1);
   person.set_email("1422776724");
+  int i=0;
   while (true) {
+    i++;
+    person.set_id(i);
     publisher->publish(person);
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }

@@ -49,7 +49,7 @@ namespace Hnu::Middleware {
       handleCreateNode();
     }else if (target=="/node/pub"&&m_request.method()==beast::http::verb::post) {
       handleCreatePublish();
-    }else if (target=="node/sub"&&m_request.method()==beast::http::verb::post) {
+    }else if (target=="/node/sub"&&m_request.method()==beast::http::verb::post) {
       handleCreateSubscribe();
     }
   }
@@ -73,6 +73,15 @@ namespace Hnu::Middleware {
     }
   }
   void Server::handleCreateSubscribe() {
+    int eventfd = std::stoi(std::string(m_request["eventfd"]));
+    std::string topic = std::string(m_request["sub"]);
+    std::string node = std::string(m_request["node"]);
+    spdlog::debug("handle create Sub node: {}, topic: {}, eventfd: {}", node, topic, eventfd);
+    if (MiddlewareManager::addSubscrie(node, topic, eventfd)) {
+      m_response.result(beast::http::status::ok);
+    } else {
+      m_response.result(beast::http::status::bad_request);
+    }
   }
 
 

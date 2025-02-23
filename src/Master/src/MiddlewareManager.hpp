@@ -21,8 +21,11 @@ namespace Hnu::Middleware {
     MiddlewareManager& operator=(const MiddlewareManager&)=delete;
     MiddlewareManager& operator=(MiddlewareManager&&)=delete;
 
+
     static bool addNode(const std::string& node,int pid);
     static bool addPublish(const std::string& node,const std::string& topic,int eventfd);
+    static bool addSubscrie(const std::string& node, const std::string& topic, int eventfd);
+    static void transferMessage(const std::string& topic,const std::string& message);
     static boost::asio::io_context& getIoc();
     static void run();
   private:

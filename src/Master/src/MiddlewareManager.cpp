@@ -41,4 +41,30 @@ namespace Hnu::Middleware {
     
     return true;
   }
+  bool MiddlewareManager::addSubscrie(const std::string& node, const std::string& topic, int eventfd) {
+    MiddlewareManager& middlewareManager = getInstance();
+    if (!middlewareManager.m_nodes.contains(node)) {
+      return false;
+    }
+    if (middlewareManager.m_nodes[node]->containsSubscribe(topic)) {
+      return false;
+    }
+    auto subscribe = std::make_shared<Subscribe>(topic, eventfd, middlewareManager.m_nodes[node]);
+    if (!subscribe->run()) {
+      return false;
+    }
+    middlewareManager.m_nodes[node]->addSubscribe(subscribe);
+    middlewareManager.m_subscribes[topic].push_back(subscribe);
+    return true;
+  }
+  void MiddlewareManager::transferMessage(const std::string& topic, const std::string& message) {
+    auto iter=getInstance().m_subscribes.find(topic);
+    if(iter==getInstance().m_subscribes.end()){
+      return;
+    }
+    for (auto subscribe:iter->second) {
+      subscribe->publish2Node(message);
+    }
+  }
+
 }

@@ -4,6 +4,7 @@
 
 #include "Node.hpp"
 #include "Publish.hpp"
+#include "Subscribe.hpp"
 
 namespace Hnu::Middleware {
   Node::Node(const std::string& name,int pid):m_name(name),m_pid(pid) {
@@ -23,5 +24,9 @@ namespace Hnu::Middleware {
   void Node::addPublish(std::shared_ptr<Publish> publish) {
     m_publishes[publish->getName()]=publish;
     // publish->setNode(shared_from_this());
+  }
+  void Node::addSubscribe(std::shared_ptr<Subscribe> subscribe) {
+    m_subscribes[subscribe->getName()]=subscribe;
+    // subscribe->setNode(shared_from_this());
   }
 }

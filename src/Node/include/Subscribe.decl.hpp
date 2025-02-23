@@ -32,7 +32,7 @@ namespace Hnu::Middleware {
     bool run(const std::function<void(std::shared_ptr<Message>)>& callback);
     // void createSubscribe(const std::function<void(std::shared_ptr<Message> message)>& callback);
   private:
-    void onRead(boost::system::error_code ec,std::size_t bytes_transferred);
+    void onRead(const boost::system::error_code& ec,std::size_t bytes_transferred);
 
     asio::io_context& m_ioc;
     local_stream m_socket;

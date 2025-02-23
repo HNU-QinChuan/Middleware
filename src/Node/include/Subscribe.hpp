@@ -55,6 +55,7 @@ namespace Hnu::Middleware {
       return false;
     }
     std::string shmName=m_node.lock()->getName()+"."+m_topic_name;
+
     try {
       m_shm=interprocess::managed_shared_memory(interprocess::open_only,shmName.c_str());
     }catch (const interprocess::interprocess_exception& e){
@@ -68,11 +69,11 @@ namespace Hnu::Middleware {
     }
     queue=res.first;
     m_callback=callback;
-    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscribe::onRead,shared_from_this()));
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscribe::onRead,std::static_pointer_cast<Subscribe<Message>>(shared_from_this())));
     return true;
   }
   template<typename Message>
-  void Subscribe<Message>::onRead(boost::system::error_code ec, std::size_t bytes_transferred) {
+  void Subscribe<Message>::onRead(const boost::system::error_code& ec, std::size_t bytes_transferred) {
     if(ec){
       spdlog::error("read error: {}",ec.message());
       return;
@@ -86,8 +87,7 @@ namespace Hnu::Middleware {
       }
     }
     // m_eventfdValue=0;
-    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscribe::onRead,shared_from_this()));
-
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscribe::onRead,std::static_pointer_cast<Subscribe<Message>>(shared_from_this())));
 
   }
 }

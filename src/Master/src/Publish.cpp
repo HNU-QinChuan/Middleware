@@ -46,14 +46,18 @@ namespace Hnu::Middleware {
     m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Publish::onEventfdRead,shared_from_this()));
   }
   void Publish::onEventfdRead(const boost::system::error_code& ec,std::size_t bytes) {
-    doEventfdRead();
+
     if(ec){
       spdlog::error("Eventfd Read Error: {}",ec.message());
       return;
     }
-    string message(m_shm.get_segment_manager());
-    queue->pop(message);
-    spdlog::debug("Publish: {}",message);
+    for (int i=0;i<m_eventfdValue;++i) {
+      string message(m_shm.get_segment_manager());
+      queue->pop(message);
+      std::string messageStr(message.c_str());
+      MiddlewareManager::transferMessage(m_topic_name,messageStr);
+    }
+    doEventfdRead();
   }
 
 }

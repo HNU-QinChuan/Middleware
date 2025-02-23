@@ -22,7 +22,7 @@ namespace Hnu::Middleware {
     bool containsPublish(const std::string& topic);
     bool containsSubscribe(const std::string& topic);
     void addPublish(std::shared_ptr<Publish> publish) ;
-    // void addSubscribe(std::shared_ptr<Subscribe> subscribe);
+    void addSubscribe(std::shared_ptr<Subscribe> subscribe);
     //TODO: 实现删除发布和订阅
     // void removePublish(std::string topic);
     // void removeSubscribe(std::string topic);

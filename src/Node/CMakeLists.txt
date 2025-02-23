@@ -21,6 +21,10 @@ add_library(${PROJECT_NAME} SHARED
 )
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog protobuf::libprotobuf)
 
-add_executable(${PROJECT_NAME}_test test/main.cpp test/proto/example.pb.cc)
-target_include_directories(${PROJECT_NAME}_test PRIVATE test)
-target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+add_executable(pub test/pub.cpp test/proto/example.pb.cc)
+target_include_directories(pub PRIVATE test)
+target_link_libraries(pub ${PROJECT_NAME})
+
+add_executable(sub test/sub.cpp test/proto/example.pb.cc)
+target_include_directories(sub PRIVATE test)
+target_link_libraries(sub ${PROJECT_NAME})

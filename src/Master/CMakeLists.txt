@@ -21,6 +21,7 @@ add_executable(${PROJECT_NAME} src/main.cpp
         src/MiddlewareManager.hpp
         src/Node.cpp
         src/Node.hpp
+        src/Define.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
