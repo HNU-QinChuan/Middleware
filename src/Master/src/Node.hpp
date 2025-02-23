@@ -7,13 +7,12 @@
 #define NODE_HPP
 
 #include <memory>
-#include <map>
-
-#include"Subscribe.hpp"
-#include"Publish.hpp"
+#include <unordered_map>
 
 
 namespace Hnu::Middleware {
+  class Publish;
+  class Subscribe;
   //TODO: 不使用共享指针
   class Node:std::enable_shared_from_this<Node> {
   public:
@@ -31,8 +30,8 @@ namespace Hnu::Middleware {
     std::string m_name;
     pid_t m_pid;
     //目前不能一个节点针对一个topic创建多个发布者或订阅者
-    std::map<std::string,std::shared_ptr<Publish>> m_publishes;
-    std::map<std::string,std::shared_ptr<Subscribe>> m_subscribes;
+    std::unordered_map<std::string,std::shared_ptr<Publish>> m_publishes;
+    std::unordered_map<std::string,std::shared_ptr<Subscribe>> m_subscribes;
   };
 
 }

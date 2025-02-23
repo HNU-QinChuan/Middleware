@@ -3,6 +3,7 @@
 //
 
 #include "Node.hpp"
+#include "Publish.hpp"
 
 namespace Hnu::Middleware {
   Node::Node(const std::string& name,int pid):m_name(name),m_pid(pid) {

@@ -12,9 +12,9 @@
 #include<boost/interprocess/containers/string.hpp>
 #include<boost/lockfree/spsc_queue.hpp>
 #include<boost/asio.hpp>
-// #include"Node.hpp"
 
 namespace Hnu::Middleware {
+  class Node;
   constexpr std::size_t SHM_SIZE=1024*1024;
   constexpr std::size_t QUEUE_SIZE=10;
   namespace interprocess=boost::interprocess;
@@ -23,7 +23,7 @@ namespace Hnu::Middleware {
   using char_allocator = interprocess::allocator<char, interprocess::managed_shared_memory::segment_manager>;
   using string = interprocess::basic_string<char, std::char_traits<char>, char_allocator>;
   using lock_free_queue=lockfree::spsc_queue<string,lockfree::capacity<QUEUE_SIZE>>;
-  class Node;
+
   //TODO: 不使用共享指针
   class Publish:public std::enable_shared_from_this<Publish> {
   public:

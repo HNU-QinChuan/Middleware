@@ -1,20 +1,16 @@
 //
-// Created by yc on 25-2-19.
+// Created by yc on 25-2-23.
 //
 
-#ifndef PUBLISH_DECL_HPP
-#define PUBLISH_DECL_HPP
-
-
+#ifndef SUBSCRIBE_DECL_HPP
+#define SUBSCRIBE_DECL_HPP
+#include "SubscribeInterface.hpp"
 #include<string>
 #include<boost/asio.hpp>
 #include<boost/lockfree/spsc_queue.hpp>
 #include<boost/beast.hpp>
 #include<boost/interprocess/containers/string.hpp>
 #include<boost/interprocess/managed_shared_memory.hpp>
-#include "PublishInterface.hpp"
-
-
 namespace Hnu::Middleware {
   class Node;
   namespace asio = boost::asio;
@@ -30,13 +26,13 @@ namespace Hnu::Middleware {
   using local_stream=beast::basic_stream<asio::local::stream_protocol>;
 
   template<typename Message>
-  class Publish :public PublishInterface {
+  class Subscribe:public SubscribeInterface {
   public:
-    Publish(asio::io_context& ioc,std::shared_ptr<Node> node,const std::string& topic_name);
-    bool run();
-    void publish(const Message& message);
+    Subscribe(asio::io_context& ioc,std::shared_ptr<Node> node,const std::string& topic_name);
+    bool run(const std::function<void(std::shared_ptr<Message>)>& callback);
+    // void createSubscribe(const std::function<void(std::shared_ptr<Message> message)>& callback);
   private:
-
+    void onRead(boost::system::error_code ec,std::size_t bytes_transferred);
 
     asio::io_context& m_ioc;
     local_stream m_socket;
@@ -46,10 +42,10 @@ namespace Hnu::Middleware {
     std::unique_ptr<asio::posix::stream_descriptor> m_eventfdStream;
     interprocess::managed_shared_memory m_shm;
     lock_free_queue* queue;
+    std::function<void(std::shared_ptr<Message> message)> m_callback;
+    uint64_t m_eventfdValue;
   };
 
-} // Middleware
-// Hnu
+}
 
-
-#endif //PUBLISH_DECL_HPP
+#endif //SUBSCRIBE_DECL_HPP

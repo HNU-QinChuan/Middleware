@@ -8,7 +8,7 @@
 #include"Publish.hpp"
 #include"Subscribe.hpp"
 #include"Node.hpp"
-#include<map>
+#include<unordered_map>
 #include<vector>
 
 
@@ -29,9 +29,9 @@ namespace Hnu::Middleware {
     MiddlewareManager()=default;
     static MiddlewareManager& getInstance();
     boost::asio::io_context m_ioc;
-    std::map<std::string,std::shared_ptr<Node>> m_nodes;
-    std::map<std::string,std::vector<std::shared_ptr<Publish>>> m_publishes;
-    std::map<std::string,std::vector<std::shared_ptr<Subscribe>>> m_subscribes;
+    std::unordered_map<std::string,std::shared_ptr<Node>> m_nodes;
+    std::unordered_map<std::string,std::vector<std::shared_ptr<Publish>>> m_publishes;
+    std::unordered_map<std::string,std::vector<std::shared_ptr<Subscribe>>> m_subscribes;
   };
 
 }

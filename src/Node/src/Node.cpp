@@ -5,7 +5,6 @@
 #include "Node.hpp"
 #include <spdlog/spdlog.h>
 
-
 namespace Hnu::Middleware {
   Node::Node(const std::string &name) : m_name(name) , m_socket(m_ioc), m_pid(getpid()){
     boost::system::error_code ec;
@@ -44,6 +43,9 @@ namespace Hnu::Middleware {
   void Node::run(){
     asio::io_context::work work(m_ioc);
     m_ioc.run();
+  }
+  std::string Node::getName(){
+    return m_name;
   }
 } // Middleware
 // Hnu

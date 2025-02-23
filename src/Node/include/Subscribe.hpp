@@ -1,23 +1,21 @@
 //
-// Created by yc on 25-2-19.
+// Created by yc on 25-2-23.
 //
 
-#ifndef PUBLISH_HPP
-#define PUBLISH_HPP
+#ifndef SUBSCRIBE_HPP
+#define SUBSCRIBE_HPP
 
-#include"Publish.decl.hpp"
+#include"Subscribe.decl.hpp"
 #include"Node.hpp"
 #include<spdlog/spdlog.h>
 
-
-
 namespace Hnu::Middleware {
-  template <typename Message>
-  Publish<Message>::Publish(asio::io_context& ioc, std::shared_ptr<Node> node, const std::string& topic_name)
-    :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name){
+  template<typename Message>
+  Subscribe<Message>::Subscribe(asio::io_context& ioc, std::shared_ptr<Node> node, const std::string& topic_name)
+    :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name),m_eventfdValue(0){
   }
-  template <typename Message>
-  bool Publish<Message>::run(){
+  template<typename Message>
+  bool Subscribe<Message>::run(const std::function<void(std::shared_ptr<Message>)>& callback) {
     m_event_fd=eventfd(0,0);
     if(m_event_fd==-1){
       spdlog::error("eventfd create error");
@@ -32,9 +30,9 @@ namespace Hnu::Middleware {
       return false;
     }
     beast::http::request<beast::http::empty_body> request;
-    request.target("/node/pub");
+    request.target("/node/sub");
     request.method(beast::http::verb::post);
-    request.set("pub",m_topic_name);
+    request.set("sub",m_topic_name);
     request.set("node",m_node.lock()->getName());
     request.set("eventfd",std::to_string(m_event_fd));
     request.prepare_payload();
@@ -69,23 +67,29 @@ namespace Hnu::Middleware {
       return false;
     }
     queue=res.first;
+    m_callback=callback;
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscribe::onRead,shared_from_this()));
     return true;
   }
-  template <typename Message>
-  void Publish<Message>::publish(const Message& message){
-    string serialized_message(m_shm.get_segment_manager());
-    serialized_message.resize(message.ByteSizeLong());
-    message.SerializeToArray(serialized_message.data(),message.ByteSizeLong());
-    spdlog::debug("serialized message {}",serialized_message);
-    if (queue->write_available()) {
-      queue->push(serialized_message);
-      uint64_t one=1;
-      m_eventfdStream->write_some(asio::buffer(&one,sizeof(one)));
+  template<typename Message>
+  void Subscribe<Message>::onRead(boost::system::error_code ec, std::size_t bytes_transferred) {
+    if(ec){
+      spdlog::error("read error: {}",ec.message());
+      return;
     }
+    for (int i=0;i<m_eventfdValue;++i) {
+      auto message=std::make_shared<Message>();
+      string data{m_shm.get_segment_manager()};
+      if(queue->pop(data)){
+        message->ParseFromArray(data.data(),data.size());
+        m_callback(message);
+      }
+    }
+    // m_eventfdValue=0;
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscribe::onRead,shared_from_this()));
+
+
   }
-
-
-
 }
 
-#endif //PUBLISH_HPP
+#endif //SUBSCRIBE_HPP

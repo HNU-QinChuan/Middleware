@@ -4,17 +4,22 @@
 
 #include<iostream>
 #include "Node.hpp"
+#include "Publish.hpp"
 #include "proto/example.pb.h"
 
 int main() {
   spdlog::set_level(spdlog::level::debug);
-  Hnu::Middleware::Node node("node1");
+  auto node=std::make_shared<Hnu::Middleware::Node>("node1");
+
   Person person;
-  auto publisher = node.createPublish<Person>("topic1");
+  auto publisher = node->createPublish<Person>("topic1");
   person.set_name("yc");
   person.set_id(1);
   person.set_email("1422776724");
-  publisher->publish(person);
-  node.run();
+  while (true) {
+    publisher->publish(person);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+  node->run();
   return 0;
 }
