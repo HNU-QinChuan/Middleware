@@ -29,7 +29,7 @@ namespace Hnu::Middleware {
       spdlog::error("pidfd getfd error: {}",strerror(errno));
       return false;
     }
-    std::string shmName=m_node.lock()->getName()+"."+m_topic_name;
+    std::string shmName="pub."+m_node.lock()->getName()+"."+m_topic_name;
     try{
       interprocess::shared_memory_object::remove(shmName.c_str());
       m_shm=interprocess::managed_shared_memory(interprocess::create_only,shmName.c_str(),SHM_SIZE);
@@ -54,7 +54,7 @@ namespace Hnu::Middleware {
     for (int i=0;i<m_eventfdValue;++i) {
       string message(m_shm.get_segment_manager());
       queue->pop(message);
-      std::string messageStr(message.c_str());
+      std::string messageStr(message.data(),message.size());
       MiddlewareManager::transferMessage(m_topic_name,messageStr);
     }
     doEventfdRead();

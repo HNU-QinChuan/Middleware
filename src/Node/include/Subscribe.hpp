@@ -54,7 +54,7 @@ namespace Hnu::Middleware {
       spdlog::error("error on server side");
       return false;
     }
-    std::string shmName=m_node.lock()->getName()+"."+m_topic_name;
+    std::string shmName="sub."+m_node.lock()->getName()+"."+m_topic_name;
 
     try {
       m_shm=interprocess::managed_shared_memory(interprocess::open_only,shmName.c_str());

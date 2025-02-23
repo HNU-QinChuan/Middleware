@@ -37,6 +37,7 @@ namespace Hnu::Middleware {
       spdlog::error("error on server side");
       throw std::runtime_error("error on server side");
     }
+    spdlog::debug("Create Node:{}",m_name);
 
 
   }

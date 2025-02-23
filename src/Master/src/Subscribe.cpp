@@ -28,8 +28,7 @@ namespace Hnu::Middleware {
       spdlog::error("pidfd getfd error: {}",strerror(errno));
       return false;
     }
-    std::string shmName=m_node.lock()->getName()+"."+m_topic_name;
-    spdlog::debug("shmName: {}",shmName);
+    std::string shmName="sub."+m_node.lock()->getName()+"."+m_topic_name;
     try{
       interprocess::shared_memory_object::remove(shmName.c_str());
       m_shm=interprocess::managed_shared_memory(interprocess::create_only,shmName.c_str(),SHM_SIZE);
@@ -42,7 +41,7 @@ namespace Hnu::Middleware {
     return true;
   }
   void Subscribe::publish2Node(const std::string& message) {
-    if (queue->push(string(message.c_str(),m_shm.get_segment_manager()))) {
+    if (queue->push(string(message.data(),message.size(),m_shm.get_segment_manager()))) {
       uint64_t value=1;
       m_eventfdStream->write_some(asio::buffer(&value,sizeof(value)));
     }

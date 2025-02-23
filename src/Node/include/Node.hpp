@@ -37,7 +37,7 @@ namespace Hnu::Middleware {
         // return nullptr;
       }
       m_publishes[topic]=publish;
-      spdlog::debug("create publish: {}",topic);
+      spdlog::debug("Create publish: {}",topic);
       return publish;
     }
     template <typename Message>
@@ -52,7 +52,7 @@ namespace Hnu::Middleware {
         // return nullptr;
       }
       m_subscribes[topic]=subscribe;
-      spdlog::debug("create subscribe: {}",topic);
+      spdlog::debug("Create subscribe: {}",topic);
       return subscribe;
     }
     std::string getName();

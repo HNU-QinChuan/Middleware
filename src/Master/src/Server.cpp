@@ -76,7 +76,6 @@ namespace Hnu::Middleware {
     int eventfd = std::stoi(std::string(m_request["eventfd"]));
     std::string topic = std::string(m_request["sub"]);
     std::string node = std::string(m_request["node"]);
-    spdlog::debug("handle create Sub node: {}, topic: {}, eventfd: {}", node, topic, eventfd);
     if (MiddlewareManager::addSubscrie(node, topic, eventfd)) {
       m_response.result(beast::http::status::ok);
     } else {

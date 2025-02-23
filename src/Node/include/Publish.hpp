@@ -56,7 +56,7 @@ namespace Hnu::Middleware {
       spdlog::error("error on server side");
       return false;
     }
-    std::string shmName=m_node.lock()->getName()+"."+m_topic_name;
+    std::string shmName="pub."+m_node.lock()->getName()+"."+m_topic_name;
     try {
       m_shm=interprocess::managed_shared_memory(interprocess::open_only,shmName.c_str());
     }catch (const interprocess::interprocess_exception& e){
@@ -75,8 +75,7 @@ namespace Hnu::Middleware {
   void Publish<Message>::publish(const Message& message){
     string serialized_message(m_shm.get_segment_manager());
     serialized_message.resize(message.ByteSizeLong());
-    message.SerializeToArray(serialized_message.data(),message.ByteSizeLong());
-    spdlog::debug("serialized message {}",serialized_message);
+    message.SerializeToArray(serialized_message.data(),serialized_message.size());
     if (queue->write_available()) {
       queue->push(serialized_message);
       uint64_t one=1;
