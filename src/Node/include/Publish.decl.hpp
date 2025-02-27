@@ -2,8 +2,8 @@
 // Created by yc on 25-2-19.
 //
 
-#ifndef PUBLISH_DECL_HPP
-#define PUBLISH_DECL_HPP
+#pragma once
+
 
 
 #include<string>
@@ -52,4 +52,4 @@ namespace Hnu::Middleware {
 // Hnu
 
 
-#endif //PUBLISH_DECL_HPP
+

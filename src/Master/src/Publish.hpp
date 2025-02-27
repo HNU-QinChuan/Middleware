@@ -3,8 +3,8 @@
 //
 
 
-#ifndef PUBLISH_HPP
-#define PUBLISH_HPP
+#pragma once
+
 
 #include <memory>
 #include<string>
@@ -36,4 +36,4 @@ namespace Hnu::Middleware {
 
 }
 
-#endif //PUBLISH_HPP
+

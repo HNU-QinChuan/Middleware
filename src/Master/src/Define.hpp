@@ -1,9 +1,8 @@
 //
 // Created by yc on 25-2-23.
 //
+#pragma once
 
-#ifndef DEFINE_HPP
-#define DEFINE_HPP
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/string.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
@@ -22,4 +21,4 @@ namespace Hnu::Middleware {
 
 }
 
-#endif //DEFINE_HPP
+

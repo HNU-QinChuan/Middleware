@@ -2,8 +2,8 @@
 // Created by yc on 25-2-23.
 //
 
-#ifndef SUBSCRIBE_DECL_HPP
-#define SUBSCRIBE_DECL_HPP
+#pragma once
+
 #include "SubscribeInterface.hpp"
 #include<string>
 #include<boost/asio.hpp>
@@ -48,4 +48,4 @@ namespace Hnu::Middleware {
 
 }
 
-#endif //SUBSCRIBE_DECL_HPP
+

@@ -2,8 +2,8 @@
 // Created by yc on 25-2-22.
 //
 
-#ifndef PUBLISHINTERFACE_HPP
-#define PUBLISHINTERFACE_HPP
+#pragma once
+
 #include <memory>
 
 namespace Hnu::Middleware {
@@ -14,4 +14,4 @@ namespace Hnu::Middleware {
 }
 
 
-#endif //PUBLISHINTERFACE_HPP
+

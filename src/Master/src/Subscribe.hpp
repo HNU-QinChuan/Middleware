@@ -3,8 +3,8 @@
 //
 
 
-#ifndef SUBSCRIBE_HPP
-#define SUBSCRIBE_HPP
+#pragma once
+
 #include <memory>
 #include<string>
 #include"Define.hpp"
@@ -34,4 +34,4 @@ namespace Hnu::Middleware {
 } // Middleware
 // Hnu
 
-#endif //SUBSCRIBE_HPP
+

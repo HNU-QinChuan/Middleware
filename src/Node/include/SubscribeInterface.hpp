@@ -2,8 +2,8 @@
 // Created by yc on 25-2-23.
 //
 
-#ifndef SUBSCRIBEINTERFACE_HPP
-#define SUBSCRIBEINTERFACE_HPP
+#pragma once
+
 #include <memory>
 
 namespace Hnu::Middleware {
@@ -12,4 +12,4 @@ namespace Hnu::Middleware {
     virtual ~SubscribeInterface()=default;
   };
 }
-#endif //SUBSCRIBEINTERFACE_HPP
+

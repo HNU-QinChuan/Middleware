@@ -2,8 +2,7 @@
 // Created by yc on 25-2-14.
 //
 
-#ifndef ACCEPTOR_HPP
-#define ACCEPTOR_HPP
+#pragma once
 
 #include<boost/asio.hpp>
 
@@ -30,4 +29,4 @@ namespace Hnu::Middleware {
 }
 
 
-#endif //ACCEPTOR_HPP
+

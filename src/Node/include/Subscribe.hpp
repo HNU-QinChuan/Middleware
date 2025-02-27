@@ -2,8 +2,8 @@
 // Created by yc on 25-2-23.
 //
 
-#ifndef SUBSCRIBE_HPP
-#define SUBSCRIBE_HPP
+#pragma once
+
 
 #include"Subscribe.decl.hpp"
 #include"Node.hpp"
@@ -92,4 +92,4 @@ namespace Hnu::Middleware {
   }
 }
 
-#endif //SUBSCRIBE_HPP
+

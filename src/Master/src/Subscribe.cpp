@@ -39,7 +39,7 @@ namespace Hnu::Middleware {
       m_shm=interprocess::managed_shared_memory(interprocess::create_only,shmName.c_str(),SHM_SIZE);
       queue=m_shm.construct<lock_free_queue>(shmName.c_str())();
     }catch (const interprocess::interprocess_exception& e){
-      spdlog::error("publish create shm error: {}",e.what());
+      spdlog::error("subscribe create shm error: {}",e.what());
       return false;
     }
     m_eventfdStream=std::make_unique<asio::posix::stream_descriptor>(m_ioc,m_eventfd);

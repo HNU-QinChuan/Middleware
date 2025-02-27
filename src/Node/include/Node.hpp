@@ -3,8 +3,8 @@
 //
 
 
-#ifndef NODE_HPP
-#define NODE_HPP
+#pragma once
+
 #include <memory>
 #include<boost/asio.hpp>
 #include<boost/beast.hpp>
@@ -69,4 +69,4 @@ namespace Hnu::Middleware {
 } // Middleware
 // Hnu
 
-#endif //NODE_HPP
+

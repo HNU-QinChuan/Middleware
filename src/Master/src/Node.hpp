@@ -3,8 +3,8 @@
 //
 
 
-#ifndef NODE_HPP
-#define NODE_HPP
+#pragma once
+
 
 #include <memory>
 #include <unordered_map>
@@ -36,4 +36,4 @@ namespace Hnu::Middleware {
 
 }
 
-#endif //NODE_HPP
+

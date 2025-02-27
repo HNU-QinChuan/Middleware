@@ -3,8 +3,8 @@
 //
 
 
-#ifndef MIDDLEWAREMANAGER_HPP
-#define MIDDLEWAREMANAGER_HPP
+#pragma once
+
 #include"Publish.hpp"
 #include"Subscribe.hpp"
 #include"Node.hpp"
@@ -39,4 +39,3 @@ namespace Hnu::Middleware {
 
 }
 
-#endif //MIDDLEWAREMANAGER_HPP

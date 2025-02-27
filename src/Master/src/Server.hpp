@@ -3,8 +3,8 @@
 //
 
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#pragma once
+
 #include <memory>
 #include<boost/asio.hpp>
 #include<boost/beast.hpp>
@@ -40,4 +40,4 @@ namespace Hnu::Middleware {
 } // Middleware
 // Hnu
 
-#endif //SERVER_HPP
+
