@@ -17,7 +17,6 @@ namespace Hnu::Middleware {
   class SubscriberInterface;
   template<typename Message>
   class Subscriber;
-
   namespace asio=boost::asio;
   namespace beast=boost::beast;
   using local_stream=beast::basic_stream<asio::local::stream_protocol>;
@@ -57,10 +56,10 @@ namespace Hnu::Middleware {
     }
     std::string getName();
   private:
+    struct Impl;
     std::string m_name;
     asio::io_context m_ioc;
-    local_stream m_socket;
-    pid_t m_pid;
+    Impl* m_impl;
     std::unordered_map<std::string,std::shared_ptr<PublisherInterface>> m_publishes;
     std::unordered_map<std::string,std::shared_ptr<SubscriberInterface>> m_subscribes;
 
