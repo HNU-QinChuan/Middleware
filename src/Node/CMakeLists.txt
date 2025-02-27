@@ -19,7 +19,7 @@ add_library(${PROJECT_NAME} SHARED
         include/Subscribe.decl.hpp
         include/Subscribe.hpp
 )
-target_link_libraries(${PROJECT_NAME} spdlog::spdlog protobuf::libprotobuf)
+target_link_libraries(${PROJECT_NAME} spdlog::spdlog protobuf::libprotobuf rt)
 
 add_executable(pub test/pub.cpp test/proto/example.pb.cc)
 target_include_directories(pub PRIVATE test)

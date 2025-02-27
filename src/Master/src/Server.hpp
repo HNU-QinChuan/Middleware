@@ -13,7 +13,7 @@
 namespace Hnu::Middleware {
   namespace asio=boost::asio;
   namespace beast=boost::beast;
-  using local_stream=beast::basic_stream<asio::local::stream_protocol, asio::any_io_executor, beast::unlimited_rate_policy>;
+  using local_stream=beast::basic_stream<asio::local::stream_protocol>;
   class Server :public std::enable_shared_from_this<Server> {
   public:
     explicit Server();

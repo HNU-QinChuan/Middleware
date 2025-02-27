@@ -24,7 +24,7 @@ add_executable(${PROJECT_NAME} src/main.cpp
         src/Define.hpp
 )
 
-target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt)
 
 add_custom_command(
     TARGET ${PROJECT_NAME}

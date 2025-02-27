@@ -5,9 +5,14 @@
 #include "Publish.hpp"
 
 #include <spdlog/spdlog.h>
-
+#include <sys/syscall.h>
 #include "Node.hpp"
 #include "MiddlewareManager.hpp"
+
+
+#ifndef SYS_pidfd_getfd
+#define SYS_pidfd_getfd 438
+#endif
 
 namespace Hnu::Middleware {
   Publish::Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node):m_ioc(MiddlewareManager::getIoc()),m_topic_name(name),m_eventfd(eventfd) ,m_node(node){
