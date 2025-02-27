@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SubscribeInterface.hpp"
+#include "SubscriberInterface.hpp"
 #include<string>
 #include<boost/asio.hpp>
 #include<boost/lockfree/spsc_queue.hpp>
@@ -26,9 +26,9 @@ namespace Hnu::Middleware {
   using local_stream=beast::basic_stream<asio::local::stream_protocol>;
 
   template<typename Message>
-  class Subscribe:public SubscribeInterface {
+  class Subscriber:public SubscriberInterface {
   public:
-    Subscribe(asio::io_context& ioc,std::shared_ptr<Node> node,const std::string& topic_name);
+    Subscriber(asio::io_context& ioc,std::shared_ptr<Node> node,const std::string& topic_name);
     bool run(const std::function<void(std::shared_ptr<Message>)>& callback);
     // void createSubscribe(const std::function<void(std::shared_ptr<Message> message)>& callback);
   private:

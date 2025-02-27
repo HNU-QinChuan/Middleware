@@ -5,7 +5,7 @@
 #pragma once
 
 
-#include"Publish.decl.hpp"
+#include"Publisher.decl.hpp"
 #include"Node.hpp"
 #include<spdlog/spdlog.h>
 
@@ -13,11 +13,11 @@
 
 namespace Hnu::Middleware {
   template <typename Message>
-  Publish<Message>::Publish(asio::io_context& ioc, std::shared_ptr<Node> node, const std::string& topic_name)
+  Publisher<Message>::Publisher(asio::io_context& ioc, std::shared_ptr<Node> node, const std::string& topic_name)
     :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name){
   }
   template <typename Message>
-  bool Publish<Message>::run(){
+  bool Publisher<Message>::run(){
     m_event_fd=eventfd(0,0);
     if(m_event_fd==-1){
       spdlog::error("eventfd create error");
@@ -72,7 +72,7 @@ namespace Hnu::Middleware {
     return true;
   }
   template <typename Message>
-  void Publish<Message>::publish(const Message& message){
+  void Publisher<Message>::publish(const Message& message){
     string serialized_message(m_shm.get_segment_manager());
     serialized_message.resize(message.ByteSizeLong());
     message.SerializeToArray(serialized_message.data(),serialized_message.size());

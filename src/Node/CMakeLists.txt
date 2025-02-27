@@ -14,12 +14,12 @@ include_directories(include)
 add_library(${PROJECT_NAME} SHARED
         src/Node.cpp
         include/Node.hpp
-        include/Publish.decl.hpp
-        include/Publish.hpp
-        include/PublishInterface.hpp
-        include/SubscribeInterface.hpp
-        include/Subscribe.decl.hpp
-        include/Subscribe.hpp
+        include/Publisher.decl.hpp
+        include/Publisher.hpp
+        include/PublisherInterface.hpp
+        include/SubscriberInterface.hpp
+        include/Subscriber.decl.hpp
+        include/Subscriber.hpp
 )
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog protobuf::libprotobuf rt)
 

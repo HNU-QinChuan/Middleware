@@ -5,17 +5,17 @@
 #pragma once
 
 
-#include"Subscribe.decl.hpp"
+#include"Subscriber.decl.hpp"
 #include"Node.hpp"
 #include<spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
   template<typename Message>
-  Subscribe<Message>::Subscribe(asio::io_context& ioc, std::shared_ptr<Node> node, const std::string& topic_name)
+  Subscriber<Message>::Subscriber(asio::io_context& ioc, std::shared_ptr<Node> node, const std::string& topic_name)
     :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name),m_eventfdValue(0){
   }
   template<typename Message>
-  bool Subscribe<Message>::run(const std::function<void(std::shared_ptr<Message>)>& callback) {
+  bool Subscriber<Message>::run(const std::function<void(std::shared_ptr<Message>)>& callback) {
     m_event_fd=eventfd(0,0);
     if(m_event_fd==-1){
       spdlog::error("eventfd create error");
@@ -69,11 +69,11 @@ namespace Hnu::Middleware {
     }
     queue=res.first;
     m_callback=callback;
-    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscribe::onRead,std::static_pointer_cast<Subscribe<Message>>(shared_from_this())));
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscriber::onRead,std::static_pointer_cast<Subscriber<Message>>(shared_from_this())));
     return true;
   }
   template<typename Message>
-  void Subscribe<Message>::onRead(const boost::system::error_code& ec, std::size_t bytes_transferred) {
+  void Subscriber<Message>::onRead(const boost::system::error_code& ec, std::size_t bytes_transferred) {
     if(ec){
       spdlog::error("read error: {}",ec.message());
       return;
@@ -87,7 +87,7 @@ namespace Hnu::Middleware {
       }
     }
     // m_eventfdValue=0;
-    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscribe::onRead,std::static_pointer_cast<Subscribe<Message>>(shared_from_this())));
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscriber::onRead,std::static_pointer_cast<Subscriber<Message>>(shared_from_this())));
 
   }
 }

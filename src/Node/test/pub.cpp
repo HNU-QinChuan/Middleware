@@ -4,7 +4,7 @@
 
 #include<iostream>
 #include "Node.hpp"
-#include "Publish.hpp"
+#include "Publisher.hpp"
 #include "proto/example.pb.h"
 
 int main() {
@@ -12,7 +12,7 @@ int main() {
   auto node=std::make_shared<Hnu::Middleware::Node>("node1");
 
   Person person;
-  auto publisher = node->createPublish<Person>("topic1");
+  auto publisher = node->createPublisher<Person>("topic1");
   person.set_name("yc");
   person.set_id(1);
   person.set_email("1422776724");

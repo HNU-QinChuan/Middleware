@@ -11,12 +11,12 @@
 #include <spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
-  class PublishInterface;
+  class PublisherInterface;
   template<typename Message>
-  class Publish;
-  class SubscribeInterface;
+  class Publisher;
+  class SubscriberInterface;
   template<typename Message>
-  class Subscribe;
+  class Subscriber;
 
   namespace asio=boost::asio;
   namespace beast=boost::beast;
@@ -26,11 +26,11 @@ namespace Hnu::Middleware {
     Node(const std::string &name);
     void run();
     template <typename Message>
-    std::shared_ptr<Publish<Message>> createPublish(const std::string& topic){
+    std::shared_ptr<Publisher<Message>> createPublisher(const std::string& topic){
       if (m_publishes.contains(topic)) {
-        return std::static_pointer_cast<Publish<Message>>(m_publishes[topic]);
+        return std::static_pointer_cast<Publisher<Message>>(m_publishes[topic]);
       }
-      auto publish=std::make_shared<Publish<Message>>(m_ioc,shared_from_this(),topic);
+      auto publish=std::make_shared<Publisher<Message>>(m_ioc,shared_from_this(),topic);
       if(!publish->run()){
         spdlog::error("error on create publish: {}",topic);
         throw std::runtime_error("error on create publish");
@@ -41,11 +41,11 @@ namespace Hnu::Middleware {
       return publish;
     }
     template <typename Message>
-    std::shared_ptr<Subscribe<Message>> createSubscribe(const std::string& topic,const std::function<void(std::shared_ptr<Message>)>& callback){
+    std::shared_ptr<Subscriber<Message>> createSubscriber(const std::string& topic,const std::function<void(std::shared_ptr<Message>)>& callback){
       if (m_subscribes.contains(topic)) {
-        return std::static_pointer_cast<Subscribe<Message>>(m_subscribes[topic]);
+        return std::static_pointer_cast<Subscriber<Message>>(m_subscribes[topic]);
       }
-      auto subscribe=std::make_shared<Subscribe<Message>>(m_ioc,shared_from_this(),topic);
+      auto subscribe=std::make_shared<Subscriber<Message>>(m_ioc,shared_from_this(),topic);
       if(!subscribe->run(callback)){
         spdlog::error("error on create subscribe: {}",topic);
         throw std::runtime_error("error on create subscribe");
@@ -61,8 +61,8 @@ namespace Hnu::Middleware {
     asio::io_context m_ioc;
     local_stream m_socket;
     pid_t m_pid;
-    std::unordered_map<std::string,std::shared_ptr<PublishInterface>> m_publishes;
-    std::unordered_map<std::string,std::shared_ptr<SubscribeInterface>> m_subscribes;
+    std::unordered_map<std::string,std::shared_ptr<PublisherInterface>> m_publishes;
+    std::unordered_map<std::string,std::shared_ptr<SubscriberInterface>> m_subscribes;
 
   };
 

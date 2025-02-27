@@ -12,7 +12,7 @@
 #include<boost/beast.hpp>
 #include<boost/interprocess/containers/string.hpp>
 #include<boost/interprocess/managed_shared_memory.hpp>
-#include "PublishInterface.hpp"
+#include "PublisherInterface.hpp"
 
 
 namespace Hnu::Middleware {
@@ -30,9 +30,9 @@ namespace Hnu::Middleware {
   using local_stream=beast::basic_stream<asio::local::stream_protocol>;
 
   template<typename Message>
-  class Publish :public PublishInterface {
+  class Publisher :public PublisherInterface {
   public:
-    Publish(asio::io_context& ioc,std::shared_ptr<Node> node,const std::string& topic_name);
+    Publisher(asio::io_context& ioc,std::shared_ptr<Node> node,const std::string& topic_name);
     bool run();
     void publish(const Message& message);
   private:
