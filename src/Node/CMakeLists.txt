@@ -3,6 +3,8 @@ project(Middleware-Node)
 
 set(CMAKE_CXX_STANDARD 20)
 
+file(GLOB PROTO_FILES "${CMAKE_SOURCE_DIR}/src/Node/proto/*.proto")
+execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/test -I=${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(spdlog REQUIRED)
 find_package(Protobuf REQUIRED)
