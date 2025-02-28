@@ -2,8 +2,8 @@
 // Created by yc on 25-2-14.
 //
 
-#include "Server.hpp"
-#include"MiddlewareManager.hpp"
+#include "core/Server.hpp"
+#include"core/MiddlewareManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
