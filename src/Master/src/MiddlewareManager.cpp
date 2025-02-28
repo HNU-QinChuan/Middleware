@@ -6,26 +6,27 @@
 #include <spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
-  MiddlewareManager& MiddlewareManager::getInstance() {
-    static MiddlewareManager middlewareManager;
-    return middlewareManager;
-  }
+  MiddlewareManager MiddlewareManager::middlewareManager;
+  // MiddlewareManager& MiddlewareManager::getInstance() {
+  //   // static MiddlewareManager middlewareManager;
+  //   return middlewareManager;
+  // }
   boost::asio::io_context& MiddlewareManager::getIoc() {
-    return getInstance().m_ioc;
+    return middlewareManager.m_ioc;
   }
   void MiddlewareManager::run() {
-    getInstance().m_ioc.run();
+    middlewareManager.m_ioc.run();
   }
   bool MiddlewareManager::addNode(const std::string& node,int pid) {
-    if (getInstance().m_nodes.contains(node)) {
+    if (middlewareManager.m_nodes.contains(node)) {
       return false;
     }
-    getInstance().m_nodes[node]=std::make_shared<Node>(node,pid);
+    middlewareManager.m_nodes[node]=std::make_shared<Node>(node,pid);
     spdlog::debug("Add Node: {}",node);
     return true;
   }
   bool MiddlewareManager::addPublish(const std::string& node,const std::string& topic,int eventfd){
-    MiddlewareManager &middlewareManager = getInstance();
+    // MiddlewareManager &middlewareManager = getInstance();
     if(!middlewareManager.m_nodes.contains(node)){
       return false;
     }
@@ -42,7 +43,7 @@ namespace Hnu::Middleware {
     return true;
   }
   bool MiddlewareManager::addSubscrie(const std::string& node, const std::string& topic, int eventfd) {
-    MiddlewareManager& middlewareManager = getInstance();
+    // MiddlewareManager& middlewareManager = getInstance();
     if (!middlewareManager.m_nodes.contains(node)) {
       return false;
     }
@@ -59,8 +60,8 @@ namespace Hnu::Middleware {
     return true;
   }
   void MiddlewareManager::transferMessage(const std::string& topic, const std::string& message) {
-    auto iter=getInstance().m_subscribes.find(topic);
-    if(iter==getInstance().m_subscribes.end()){
+    auto iter=middlewareManager.m_subscribes.find(topic);
+    if(iter==middlewareManager.m_subscribes.end()){
       return;
     }
     for (auto subscribe:iter->second) {

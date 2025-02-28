@@ -30,7 +30,8 @@ namespace Hnu::Middleware {
     static void run();
   private:
     MiddlewareManager()=default;
-    static MiddlewareManager& getInstance();
+    static MiddlewareManager middlewareManager;
+    // static MiddlewareManager& getInstance();
     boost::asio::io_context m_ioc;
     std::unordered_map<std::string,std::shared_ptr<Node>> m_nodes;
     std::unordered_map<std::string,std::vector<std::shared_ptr<Publish>>> m_publishes;
