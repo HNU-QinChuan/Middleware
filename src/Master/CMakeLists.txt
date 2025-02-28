@@ -9,21 +9,22 @@ find_package(spdlog REQUIRED)
 include_directories(src)
 
 add_executable(${PROJECT_NAME} src/main.cpp
-        src/core/Acceptor.hpp
-        src/core/Acceptor.cpp
-        src/core/Server.hpp
-        src/core/Server.cpp
-        src/core/Subscribe.cpp
-        src/core/Subscribe.hpp
-        src/core/Publish.cpp
-        src/core/Publish.hpp
-        src/core/MiddlewareManager.cpp
-        src/core/MiddlewareManager.hpp
-        src/core/Node.cpp
-        src/core/Node.hpp
-        src/core/Define.hpp
-        src/core/UdsRouter.cpp
-        src/core/UdsRouter.hpp
+        src/shm/Acceptor.hpp
+        src/shm/Acceptor.cpp
+        src/shm/Server.hpp
+        src/shm/Server.cpp
+        src/shm/Subscribe.cpp
+        src/shm/Subscribe.hpp
+        src/shm/Publish.cpp
+        src/shm/Publish.hpp
+        src/MiddlewareManager.cpp
+        src/MiddlewareManager.hpp
+        src/shm/Node.cpp
+        src/shm/Node.hpp
+        src/shm/Define.hpp
+        src/shm/UdsRouter.cpp
+        src/shm/UdsRouter.hpp
+        src/shm/controller/NodeController.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt)

@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include"core/Publish.hpp"
-#include"core/Subscribe.hpp"
-#include"core/Node.hpp"
+#include "shm/Publish.hpp"
+#include "shm/Subscribe.hpp"
+#include "shm/Node.hpp"
 #include<unordered_map>
 #include<vector>
 

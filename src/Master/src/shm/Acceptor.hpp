@@ -6,7 +6,7 @@
 
 #include<boost/asio.hpp>
 
-#include "core/Server.hpp"
+#include "shm/Server.hpp"
 
 namespace Hnu::Middleware {
   namespace asio=boost::asio;

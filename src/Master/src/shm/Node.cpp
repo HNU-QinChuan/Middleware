@@ -2,9 +2,9 @@
 // Created by yc on 25-2-14.
 //
 
-#include "core/Node.hpp"
-#include "core/Publish.hpp"
-#include "core/Subscribe.hpp"
+#include "shm/Node.hpp"
+#include "shm/Publish.hpp"
+#include "shm/Subscribe.hpp"
 
 namespace Hnu::Middleware {
   Node::Node(const std::string& name,int pid):m_name(name),m_pid(pid) {

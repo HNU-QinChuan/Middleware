@@ -2,11 +2,11 @@
 // Created by yc on 25-2-14.
 //
 
-#include "core/Acceptor.hpp"
-#include "core/Server.hpp"
+#include "shm/Acceptor.hpp"
+#include "shm/Server.hpp"
 #include<spdlog/spdlog.h>
 #include<filesystem>
-#include "core/MiddlewareManager.hpp"
+#include "MiddlewareManager.hpp"
 
 
 namespace Hnu::Middleware {

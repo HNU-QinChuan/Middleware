@@ -2,7 +2,7 @@
 // Created by yc on 25-2-14.
 //
 
-#include "core/MiddlewareManager.hpp"
+#include "MiddlewareManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
@@ -11,7 +11,7 @@ namespace Hnu::Middleware {
   //   // static MiddlewareManager middlewareManager;
   //   return middlewareManager;
   // }
-  boost::asio::io_context& MiddlewareManager::getIoc() {
+  asio::io_context& MiddlewareManager::getIoc() {
     return middlewareManager.m_ioc;
   }
   void MiddlewareManager::run() {

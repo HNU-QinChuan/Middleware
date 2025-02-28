@@ -7,7 +7,7 @@
 
 #include <memory>
 #include<string>
-#include"core/Define.hpp"
+#include"shm/Define.hpp"
 
 namespace Hnu::Middleware {
   class Node;

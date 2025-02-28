@@ -6,5 +6,6 @@
 
 
 namespace Hnu::Middleware {
+  UdsRouter UdsRouter::udsRouter;
 } // Middleware
 // Hnu
