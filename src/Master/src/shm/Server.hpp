@@ -31,8 +31,8 @@ namespace Hnu::Middleware {
 
     asio::io_context& m_ioc;
     local_stream m_stream;
-    beast::http::request<beast::http::empty_body> m_request;
-    beast::http::response<beast::http::empty_body> m_response;
+    beast::http::request<beast::http::string_body> m_request;
+    beast::http::response<beast::http::string_body> m_response;
     beast::flat_buffer m_buffer;
 
   };

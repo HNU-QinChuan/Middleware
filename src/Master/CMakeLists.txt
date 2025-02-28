@@ -25,6 +25,8 @@ add_executable(${PROJECT_NAME} src/main.cpp
         src/shm/UdsRouter.cpp
         src/shm/UdsRouter.hpp
         src/shm/controller/NodeController.cpp
+        src/shm/controller/NodePubController.cpp
+        src/shm/controller/NodeSubController.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt)

@@ -2,15 +2,22 @@
 // Created by yc on 25-2-28.
 //
 
-#include "shm/interface/GetController.hpp"
+
 #include "shm/UdsRouter.hpp"
+#include "MiddlewareManager.hpp"
 
 namespace Hnu::Middleware {
-  class NodeGetController : public GetController {
+  class NodeController  {
   public:
-    void handle(Request& req, Response& res) override {
-      res.result(http::status::ok);
+    void handlePost(Request& req, Response& res)  {
+      pid_t pid = std::stoi(std::string(req["pid"]));
+      std::string name = std::string(req["node"]);
+      if (MiddlewareManager::addNode(name, pid)) {
+        res.result(http::status::ok);
+      } else {
+        res.result(http::status::bad_request);
+      }
     }
   };
-  CONTROLLER_REGISTER(NodeGetController, "/node", http::verb::get)
+  CONTROLLER_REGISTER(NodeController, "/node", http::verb::post,&NodeController::handlePost);
 } // Middleware

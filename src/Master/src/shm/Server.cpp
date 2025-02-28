@@ -5,6 +5,7 @@
 #include "shm/Server.hpp"
 #include "MiddlewareManager.hpp"
 #include <spdlog/spdlog.h>
+#include "shm/UdsRouter.hpp"
 
 namespace Hnu::Middleware {
   Server::Server():m_ioc(MiddlewareManager::getIoc()),m_stream(m_ioc) {
@@ -42,16 +43,17 @@ namespace Hnu::Middleware {
     }
   }
   void Server::handleRequest() {
-    beast::string_view target=m_request.target();
+    // beast::string_view target=m_request.target();
     //TODO: Add more routes
     //TODO: 使用策略模式优化
-    if (target=="/node"&&m_request.method()==beast::http::verb::post) {
-      handleCreateNode();
-    }else if (target=="/node/pub"&&m_request.method()==beast::http::verb::post) {
-      handleCreatePublish();
-    }else if (target=="/node/sub"&&m_request.method()==beast::http::verb::post) {
-      handleCreateSubscribe();
-    }
+    // if (target=="/node"&&m_request.method()==beast::http::verb::post) {
+    //   handleCreateNode();
+    // }else if (target=="/node/pub"&&m_request.method()==beast::http::verb::post) {
+    //   handleCreatePublish();
+    // }else if (target=="/node/sub"&&m_request.method()==beast::http::verb::post) {
+    //   handleCreateSubscribe();
+    // }
+    UdsRouter::handle(m_request,m_response);
   }
   void Server::handleCreateNode() {
     pid_t pid = std::stoi(std::string(m_request["pid"]));
