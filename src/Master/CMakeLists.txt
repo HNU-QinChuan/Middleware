@@ -34,6 +34,6 @@ target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt)
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND cat  ~/.local/passwd | sudo -S setcap cap_sys_ptrace+ep ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
+    COMMAND cat  ~/.local/passwd | sudo -S setcap cap_sys_ptrace+ep ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}
     COMMENT "运行ptrace附加到其他进程，使master创建其他进程的eventfd副本"
 )

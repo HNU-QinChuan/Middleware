@@ -3,9 +3,10 @@
 //
 
 #include<iostream>
-#include "Node.hpp"
-#include "Publisher.hpp"
+#include <hmw/Node.hpp>
+#include <hmw/Publisher.hpp>
 #include "proto/example.pb.h"
+
 
 int main() {
   spdlog::set_level(spdlog::level::debug);

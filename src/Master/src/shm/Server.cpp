@@ -29,7 +29,7 @@ namespace Hnu::Middleware {
       spdlog::error("Read Error: {}", ec.message());
       return;
     }
-    handleRequest();
+    UdsRouter::handle(m_request,m_response);
     doWrite();
   }
   void Server::doWrite() {
@@ -40,48 +40,6 @@ namespace Hnu::Middleware {
     if (ec) {
       spdlog::error("Write Error: {}", ec.message());
       return;
-    }
-  }
-  void Server::handleRequest() {
-    // beast::string_view target=m_request.target();
-    //TODO: Add more routes
-    //TODO: 使用策略模式优化
-    // if (target=="/node"&&m_request.method()==beast::http::verb::post) {
-    //   handleCreateNode();
-    // }else if (target=="/node/pub"&&m_request.method()==beast::http::verb::post) {
-    //   handleCreatePublish();
-    // }else if (target=="/node/sub"&&m_request.method()==beast::http::verb::post) {
-    //   handleCreateSubscribe();
-    // }
-    UdsRouter::handle(m_request,m_response);
-  }
-  void Server::handleCreateNode() {
-    pid_t pid = std::stoi(std::string(m_request["pid"]));
-    std::string name = std::string(m_request["node"]);
-    if (MiddlewareManager::addNode(name, pid)) {
-      m_response.result(beast::http::status::ok);
-    } else {
-      m_response.result(beast::http::status::bad_request);
-    }
-  }
-  void Server::handleCreatePublish() {
-    int eventfd = std::stoi(std::string(m_request["eventfd"]));
-    std::string topic = std::string(m_request["pub"]);
-    std::string node = std::string(m_request["node"]);
-    if (MiddlewareManager::addPublish(node, topic, eventfd)) {
-      m_response.result(beast::http::status::ok);
-    } else {
-      m_response.result(beast::http::status::bad_request);
-    }
-  }
-  void Server::handleCreateSubscribe() {
-    int eventfd = std::stoi(std::string(m_request["eventfd"]));
-    std::string topic = std::string(m_request["sub"]);
-    std::string node = std::string(m_request["node"]);
-    if (MiddlewareManager::addSubscrie(node, topic, eventfd)) {
-      m_response.result(beast::http::status::ok);
-    } else {
-      m_response.result(beast::http::status::bad_request);
     }
   }
 

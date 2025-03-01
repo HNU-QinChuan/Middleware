@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SubscriberInterface.hpp"
+#include "hmw/SubscriberInterface.hpp"
 #include<string>
 #include<boost/asio.hpp>
 #include<boost/lockfree/spsc_queue.hpp>

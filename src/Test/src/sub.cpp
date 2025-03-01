@@ -3,8 +3,8 @@
 //
 
 #include <spdlog/spdlog.h>
-#include "Node.hpp"
-#include "Subscriber.hpp"
+#include <hmw/Node.hpp>
+#include <hmw/Subscriber.hpp>
 #include "proto/example.pb.h"
 
 int main(){

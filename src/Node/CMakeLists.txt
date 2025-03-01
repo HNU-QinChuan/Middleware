@@ -3,30 +3,59 @@ project(Middleware-Node)
 
 set(CMAKE_CXX_STANDARD 20)
 
-file(GLOB PROTO_FILES "${CMAKE_SOURCE_DIR}/src/Node/proto/*.proto")
-execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/test -I=${CMAKE_CURRENT_SOURCE_DIR})
-
 find_package(spdlog REQUIRED)
 find_package(Protobuf REQUIRED)
 
-include_directories(include)
-
 add_library(${PROJECT_NAME} SHARED
         src/Node.cpp
-        include/Node.hpp
-        include/Publisher.decl.hpp
-        include/Publisher.hpp
-        include/PublisherInterface.hpp
-        include/SubscriberInterface.hpp
-        include/Subscriber.decl.hpp
-        include/Subscriber.hpp
+        include/hmw/Node.hpp
+        include/hmw/Publisher.decl.hpp
+        include/hmw/Publisher.hpp
+        include/hmw/PublisherInterface.hpp
+        include/hmw/SubscriberInterface.hpp
+        include/hmw/Subscriber.decl.hpp
+        include/hmw/Subscriber.hpp
+)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    # $<INSTALL_INTERFACE:include>  
 )
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog protobuf::libprotobuf rt)
 
-add_executable(pub test/pub.cpp test/proto/example.pb.cc)
-target_include_directories(pub PRIVATE test)
-target_link_libraries(pub ${PROJECT_NAME})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+export(TARGETS ${PROJECT_NAME} FILE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Targets.cmake NAMESPACE ${PROJECT_NAME}::)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
+    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    @ONLY)
 
-add_executable(sub test/sub.cpp test/proto/example.pb.cc)
-target_include_directories(sub PRIVATE test)
-target_link_libraries(sub ${PROJECT_NAME})
+
+# install(TARGETS ${PROJECT_NAME}
+#     EXPORT ${PROJECT_NAME}Targets
+#     LIBRARY DESTINATION lib
+#     ARCHIVE DESTINATION lib
+#     RUNTIME DESTINATION bin
+#     INCLUDES DESTINATION include
+# )
+
+# install(DIRECTORY include/ DESTINATION include/)
+
+# install(EXPORT ${PROJECT_NAME}Targets
+#     FILE ${PROJECT_NAME}Targets.cmake
+#     NAMESPACE ${PROJECT_NAME}::
+#     DESTINATION lib/cmake/${PROJECT_NAME}
+# )
+
+# include(CMakePackageConfigHelpers)
+# configure_package_config_file(
+#     cmake/${PROJECT_NAME}Config.cmake.in
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+#     INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
+# )
+
+# install(FILES
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+#     DESTINATION lib/cmake/${PROJECT_NAME}
+# )
+
+
+

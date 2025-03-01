@@ -24,10 +24,6 @@ namespace Hnu::Middleware {
     void onRead(const boost::system::error_code& ec,std::size_t bytes);
     void doWrite();
     void onWrite(const boost::system::error_code& ec,std::size_t bytes);
-    void handleRequest();
-    void handleCreateNode();
-    void handleCreatePublish();
-    void handleCreateSubscribe();
 
     asio::io_context& m_ioc;
     local_stream m_stream;

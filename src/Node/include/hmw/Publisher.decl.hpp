@@ -12,7 +12,7 @@
 #include<boost/beast.hpp>
 #include<boost/interprocess/containers/string.hpp>
 #include<boost/interprocess/managed_shared_memory.hpp>
-#include "PublisherInterface.hpp"
+#include "hmw/PublisherInterface.hpp"
 
 
 namespace Hnu::Middleware {
