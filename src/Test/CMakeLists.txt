@@ -6,8 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 file(GLOB PROTO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.proto")
 execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src -I=${CMAKE_CURRENT_SOURCE_DIR})
 
-set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
-
 
 find_package(Middleware-Node REQUIRED)
 find_package(Protobuf REQUIRED)
