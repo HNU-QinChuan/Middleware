@@ -10,9 +10,9 @@ execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_D
 find_package(Protobuf REQUIRED)
 
 
-aux_source_directory(src/Std Std)
+file(GLOB Std "${CMAKE_CURRENT_SOURCE_DIR}/src/Std/*.cc")
 
-add_library(Std  SHARED ${Std})
+add_library(Std SHARED ${Std})
 target_include_directories(Std PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(Std PUBLIC protobuf::libprotobuf)
 add_library(${PROJECT_NAME}::Std ALIAS Std)

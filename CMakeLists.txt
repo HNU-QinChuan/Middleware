@@ -9,8 +9,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
+
+add_subdirectory(src/Msgs)
 add_subdirectory(src/Master)
 add_subdirectory(src/Node)
-add_subdirectory(src/Msgs)
 add_subdirectory(src/Test)
 
