@@ -13,4 +13,5 @@ add_subdirectory(src/Msgs)
 add_subdirectory(src/Master)
 add_subdirectory(src/Node)
 add_subdirectory(src/Test)
+add_subdirectory(src/Dgps)
 
