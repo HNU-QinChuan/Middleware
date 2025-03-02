@@ -15,6 +15,7 @@ add_library(${PROJECT_NAME} SHARED
         include/hmw/SubscriberInterface.hpp
         include/hmw/Subscriber.decl.hpp
         include/hmw/Subscriber.hpp
+        include/hmw/Define.hpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt)
