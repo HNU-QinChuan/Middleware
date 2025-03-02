@@ -5,9 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src)
 file(GLOB PROTO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/proto/Std/*.proto")
-execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src -I=${CMAKE_CURRENT_SOURCE_DIR}/proto
-RESULT_VARIABLE result
-)
+execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src -I=${CMAKE_CURRENT_SOURCE_DIR}/proto)
 
 find_package(Protobuf REQUIRED)
 
