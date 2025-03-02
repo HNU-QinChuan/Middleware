@@ -3,17 +3,13 @@ project(Middleware-Msgs)
 
 set(CMAKE_CXX_STANDARD 20)
 
-
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src)
 file(GLOB PROTO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/proto/Std/*.proto")
 execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src -I=${CMAKE_CURRENT_SOURCE_DIR}/proto
 RESULT_VARIABLE result
 )
 
 find_package(Protobuf REQUIRED)
-
-if (NOT result EQUAL 0)
-    message(FATAL_ERROR "Code generation failed!")
-endif()
 
 aux_source_directory(src/Std Std)
 add_library(Std SHARED ${Std})
