@@ -60,6 +60,11 @@ namespace Hnu::Middleware {
   std::string Node::getName(){
     return m_name;
   }
+  std::shared_ptr<Timer> Node::createTimer(int interval, const std::function<void()>& callback) {
+    auto timer= std::make_shared<Timer>(m_ioc);
+    timer->run(callback, interval);
+    return timer;
+  }
 
 
 } // Middleware

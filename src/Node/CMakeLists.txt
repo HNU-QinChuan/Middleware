@@ -4,10 +4,11 @@ project(Middleware-Node)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(spdlog REQUIRED)
-# find_package(Protobuf REQUIRED)
+find_package(Protobuf REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
         src/Node.cpp
+        src/Timer.cpp
         include/hmw/Node.hpp
         include/hmw/Publisher.decl.hpp
         include/hmw/Publisher.hpp
@@ -16,9 +17,10 @@ add_library(${PROJECT_NAME} SHARED
         include/hmw/Subscriber.decl.hpp
         include/hmw/Subscriber.hpp
         include/hmw/Define.hpp
+        include/hmw/Timer.hpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt)
+target_link_libraries(${PROJECT_NAME} spdlog::spdlog protobuf::libprotobuf rt)
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 export(TARGETS ${PROJECT_NAME} FILE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Targets.cmake NAMESPACE ${PROJECT_NAME}::)

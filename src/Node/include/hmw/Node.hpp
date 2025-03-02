@@ -9,6 +9,7 @@
 #include<boost/asio.hpp>
 #include<boost/beast.hpp>
 #include <spdlog/spdlog.h>
+#include"hmw/Timer.hpp"
 
 namespace Hnu::Middleware {
   class PublisherInterface;
@@ -24,6 +25,7 @@ namespace Hnu::Middleware {
   public:
     Node(const std::string &name);
     void run();
+    std::shared_ptr<Timer> createTimer(int interval, const std::function<void()>& callback);
     template <typename Message>
     std::shared_ptr<Publisher<Message>> createPublisher(const std::string& topic){
       if (m_publishes.contains(topic)) {
