@@ -5,12 +5,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 
 file(GLOB PROTO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/proto/Std/*.proto")
-execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src -I=${CMAKE_CURRENT_SOURCE_DIR}/proto)
+execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src -I=${CMAKE_CURRENT_SOURCE_DIR}/proto
+RESULT_VARIABLE result
+)
 
 find_package(Protobuf REQUIRED)
 
 
-file(GLOB Std "${CMAKE_CURRENT_SOURCE_DIR}/src/Std/*.cc")
+aux_source_directory(src/Std Std)
 
 add_library(Std SHARED ${Std})
 target_include_directories(Std PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
