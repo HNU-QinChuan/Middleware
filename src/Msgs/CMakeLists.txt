@@ -11,9 +11,11 @@ RESULT_VARIABLE result
 
 find_package(Protobuf REQUIRED)
 
+if (NOT result EQUAL 0)
+    message(FATAL_ERROR "Code generation failed!")
+endif()
 
 aux_source_directory(src/Std Std)
-
 add_library(Std SHARED ${Std})
 target_include_directories(Std PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(Std PUBLIC protobuf::libprotobuf)
