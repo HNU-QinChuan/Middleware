@@ -4,7 +4,7 @@ project(Middleware-Node)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(spdlog REQUIRED)
-find_package(Protobuf REQUIRED)
+# find_package(Protobuf REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
         src/Node.cpp
@@ -16,11 +16,8 @@ add_library(${PROJECT_NAME} SHARED
         include/hmw/Subscriber.decl.hpp
         include/hmw/Subscriber.hpp
 )
-target_include_directories(${PROJECT_NAME} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    # $<INSTALL_INTERFACE:include>  
-)
-target_link_libraries(${PROJECT_NAME} spdlog::spdlog protobuf::libprotobuf rt)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt)
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 export(TARGETS ${PROJECT_NAME} FILE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Targets.cmake NAMESPACE ${PROJECT_NAME}::)
