@@ -3,43 +3,47 @@ import "google/protobuf/timestamp.proto";
 package Std;
 
 message Gnvtg {
-    string gnvtg = 1;
-    double heading2 = 3;         //地面航向，以磁北为参考，单位：度
-    double speed1 = 4;           //水平运动速度，单位：节（海里/小时）
-    double speed2 = 5;           //水平运动速度，单位：千米/小时 heading1 = 2;         //地面航向，以真北为参考，单位：度
-    string status = 6;           //定位状态：
+    Header header = 1;
+    string gnvtg = 2;
+    double heading1 = 3;          //地面航向，以真北为参考，单位：度
+    double heading2 = 4;         //地面航向，以磁北为参考，单位：度
+    double speed1 = 5;           //水平运动速度，单位：节（海里/小时）
+    double speed2 = 6;           //水平运动速度，单位：千米/小时 heading1 = 6;         //地面航向，以真北为参考，单位：度
+    string status = 7;           //定位状态：
                                  //A = 单点定位，D = 差分定位， E = 航位推算，
                                  //F = 浮点 RTK， M = 手动输入， N = 数据无效，
                                  //P = PPP 模式，R = 固定解，S = 模拟器模式
 }
 
 message Gpfpd {
-    string gpfpd = 1;             //$GPFPD...
-    double heading = 2;           //偏航角（0～359.99）
-    double pitch = 3;             //俯仰角（-90～90）
-    double roll = 4;              //横滚角（-180～180）
-    double lattitude = 5;         //纬度（-90～90）
-    double longitude =6;          //经度（-180～180）
-    double altitude = 7;          //高度，单位（米）
-    double velocity_east = 8;     //东向速度，单位（米/秒）
-    double velocity_north = 9;    //北向速度，单位（米/秒）
-    double velocity_up = 10;      //天向速度，单位（米/秒）
-    double baseline = 11;         //基线长度，单位（米）
-    uint32 nsv1 = 12;             //天线 1 卫星数
-    uint32 nsv2 = 13;             //天线 2 卫星数
-    uint32 status = 14;           //系统状态：0：初始化  1：粗对准  2：精对准  3：GPS 定位  4：GPS 定向  5：RTK 定位
+    Header header = 1;
+    string gpfpd = 2;             //$GPFPD...
+    double heading = 3;           //偏航角（0～359.99）
+    double pitch = 4;             //俯仰角（-90～90）
+    double roll = 5;              //横滚角（-180～180）
+    double lattitude = 6;         //纬度（-90～90）
+    double longitude = 7;         //经度（-180～180）
+    double altitude = 8;          //高度，单位（米）
+    double velocity_east = 9;     //东向速度，单位（米/秒）
+    double velocity_north = 10;   //北向速度，单位（米/秒）
+    double velocity_up = 11;      //天向速度，单位（米/秒）
+    double baseline = 12;         //基线长度，单位（米）
+    uint32 nsv1 = 13;             //天线 1 卫星数
+    uint32 nsv2 = 14;             //天线 2 卫星数
+    uint32 status = 15;           //系统状态：0：初始化  1：粗对准  2：精对准  3：GPS 定位  4：GPS 定向  5：RTK 定位
                                   //8：纯惯性  9：零速校正  B：差分定向  C：动态对准
 }
 
-message Gtimu{
-    string gtimu = 1;                   // $GTIMU...
-    double gyro_x = 2;                  // 陀螺仪 X 轴角速率，单位（度/秒）
-    double gyro_y = 3;                  // 陀螺仪 Y 轴角速率，单位（度/秒）
-    double gyro_z = 4;                  // 陀螺仪 Z 轴角速率，单位（度/秒）
-    double acc_x = 5;                   // 加速度计 X 轴加速度，单位为（g）
-    double acc_y = 6;                   // 加速度计 Y 轴加速度，单位为（g）
-    double acc_z = 7;                   // 加速度计 Z 轴加速度，单位为（g）
-    double tpr = 8;                     // 温度，单位为摄氏度
+message Gtimu {
+    Header header = 1;
+    string gtimu = 2;                   // $GTIMU...
+    double gyro_x = 3;                  // 陀螺仪 X 轴角速率，单位（度/秒）
+    double gyro_y = 4;                  // 陀螺仪 Y 轴角速率，单位（度/秒）
+    double gyro_z = 5;                  // 陀螺仪 Z 轴角速率，单位（度/秒）
+    double acc_x = 6;                   // 加速度计 X 轴加速度，单位为（g）
+    double acc_y = 7;                   // 加速度计 Y 轴加速度，单位为（g）
+    double acc_z = 8;                   // 加速度计 Z 轴加速度，单位为（g）
+    double tpr = 9;                     // 温度，单位为摄氏度
 }
 
 
