@@ -10,6 +10,7 @@
 #include<boost/beast.hpp>
 #include <spdlog/spdlog.h>
 #include"hmw/Timer.hpp"
+#include"hmw/NodeImpl.hpp"
 
 namespace Hnu::Middleware {
   class PublisherInterface;
@@ -28,8 +29,8 @@ namespace Hnu::Middleware {
     std::shared_ptr<Timer> createTimer(int interval, const std::function<void()>& callback);
     template <typename Message>
     std::shared_ptr<Publisher<Message>> createPublisher(const std::string& topic){
-      if (m_publishes.contains(topic)) {
-        return std::static_pointer_cast<Publisher<Message>>(m_publishes[topic]);
+      if (m_impl.containsPublisher(topic)) {
+        return std::static_pointer_cast<Publisher<Message>>(m_impl.getPublisher(topic));
       }
       auto publish=std::make_shared<Publisher<Message>>(m_ioc,shared_from_this(),topic);
       if(!publish->run()){
@@ -37,14 +38,14 @@ namespace Hnu::Middleware {
         throw std::runtime_error("error on create publish");
         // return nullptr;
       }
-      m_publishes[topic]=publish;
+      m_impl.addPublisher(topic, std::static_pointer_cast<PublisherInterface>(publish));
       spdlog::debug("Create publish: {}",topic);
       return publish;
     }
     template <typename Message>
     std::shared_ptr<Subscriber<Message>> createSubscriber(const std::string& topic,const std::function<void(std::shared_ptr<Message>)>& callback){
-      if (m_subscribes.contains(topic)) {
-        return std::static_pointer_cast<Subscriber<Message>>(m_subscribes[topic]);
+      if (m_impl.containsSubscriber(topic)) {
+        return std::static_pointer_cast<Subscriber<Message>>(m_impl.getSubscriber(topic));
       }
       auto subscribe=std::make_shared<Subscriber<Message>>(m_ioc,shared_from_this(),topic);
       if(!subscribe->run(callback)){
@@ -52,19 +53,16 @@ namespace Hnu::Middleware {
         throw std::runtime_error("error on create subscribe");
         // return nullptr;
       }
-      m_subscribes[topic]=subscribe;
+      m_impl.addSubscriber(topic, std::static_pointer_cast<SubscriberInterface>(subscribe));
       spdlog::debug("Create subscribe: {}",topic);
       return subscribe;
     }
     std::string getName();
   private:
-    struct Impl;
+
     std::string m_name;
     asio::io_context m_ioc;
-    Impl* m_impl;
-    std::unordered_map<std::string,std::shared_ptr<PublisherInterface>> m_publishes;
-    std::unordered_map<std::string,std::shared_ptr<SubscriberInterface>> m_subscribes;
-
+    NodeImpl m_impl;
   };
 
 } // Middleware

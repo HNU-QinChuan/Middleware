@@ -18,6 +18,8 @@ add_library(${PROJECT_NAME} SHARED
         include/hmw/Subscriber.hpp
         include/hmw/Define.hpp
         include/hmw/Timer.hpp
+        src/NodeImpl.cpp
+        include/hmw/NodeImpl.hpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog protobuf::libprotobuf rt)
