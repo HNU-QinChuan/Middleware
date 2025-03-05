@@ -20,6 +20,8 @@ namespace Hnu::Middleware {
     std::string getName();
     void setNode(std::shared_ptr<Node> node);
     void publish2Node(const std::string& message);
+    void cancle();
+    ~Subscribe();
   private:
 
     std::weak_ptr<Node> m_node;

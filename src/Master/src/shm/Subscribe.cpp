@@ -17,6 +17,19 @@ namespace Hnu::Middleware {
   m_topic_name(name), m_eventfd(eventfd), m_node(node),m_type(type) {
 
   }
+  Subscribe::~Subscribe() {
+    // m_eventfdStream->close();
+    // std::shared_ptr<Node> node=m_node.lock();
+    // if(node){
+    //   node->removePublish(m_topic_name);
+    // }
+    // interprocess::shared_memory_object::remove(("sub."+node->getName()+"."+m_topic_name).c_str());
+    // MiddlewareManager::middlewareManager.m_subscribes.erase(m_topic_name);
+  }
+  void Subscribe::cancle() {
+    m_eventfdStream->cancel();
+  }
+
   std::string Subscribe::getName() {
     return m_topic_name;
   }
