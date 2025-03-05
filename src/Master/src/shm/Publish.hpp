@@ -19,6 +19,8 @@ namespace Hnu::Middleware {
     bool run();
     std::string getName();
     void setNode(std::shared_ptr<Node> node);
+    void cancel();
+    ~Publish();
   private:
     void doEventfdRead();
     void onEventfdRead(const boost::system::error_code& ec,std::size_t bytes);

@@ -24,6 +24,20 @@ namespace Hnu::Middleware {
   void Publish::setNode(std::shared_ptr<Node> node) {
     m_node=node;
   }
+  Publish::~Publish() {
+    // m_eventfdStream->cancel();
+    // m_eventfdStream->close();
+    // std::shared_ptr<Node> node=m_node.lock();
+    // if(node){
+    //   node->removePublish(m_topic_name);
+    // }
+    // interprocess::shared_memory_object::remove(("pub."+node->getName()+"."+m_topic_name).c_str());
+    // MiddlewareManager::middlewareManager.m_publishes.erase(m_topic_name);
+  }
+  void Publish::cancel() {
+    m_eventfdStream->cancel();
+  }
+
   bool Publish::run() {
     auto pidfd = syscall(SYS_pidfd_open, m_node.lock()->getPid(), 0);
     if(pidfd==-1){

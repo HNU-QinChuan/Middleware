@@ -3,12 +3,21 @@
 //
 
 #include "shm/Node.hpp"
+
+#include "MiddlewareManager.hpp"
 #include "shm/Publish.hpp"
 #include "shm/Subscribe.hpp"
 
 namespace Hnu::Middleware {
   Node::Node(const std::string& name,int pid):m_name(name),m_pid(pid) {
   }
+  Node::~Node() {
+    // for (auto& [topic,publish]:m_publishes) {
+    //   publish.reset();
+    // }
+    // for ()
+  }
+
   std::string Node::getName() {
     return m_name;
   }
@@ -28,5 +37,39 @@ namespace Hnu::Middleware {
   void Node::addSubscribe(std::shared_ptr<Subscribe> subscribe) {
     m_subscribes[subscribe->getName()]=subscribe;
     // subscribe->setNode(shared_from_this());
+  }
+  std::shared_ptr<Publish> Node::removePublish(const std::string& topic) {
+    auto iter=m_publishes.find(topic);
+    if(iter==m_publishes.end()){
+      return nullptr;
+    }
+    auto res=iter->second;
+    m_publishes.erase(iter);
+    return res;
+  }
+  std::shared_ptr<Subscribe> Node::removeSubscribe(const std::string& topic) {
+    auto iter=m_subscribes.find(topic);
+    if(iter==m_subscribes.end()){
+      return nullptr;
+    }
+    auto res=iter->second;
+    m_subscribes.erase(iter);
+    return res;
+  }
+  std::vector<std::shared_ptr<Publish>> Node::removeAllPublish() {
+    std::vector<std::shared_ptr<Publish>> res;
+    for (auto& [topic,publish]:m_publishes) {
+      res.push_back(publish);
+    }
+    m_publishes.clear();
+    return res;
+  }
+  std::vector<std::shared_ptr<Subscribe>> Node::removeAllSubscribe() {
+    std::vector<std::shared_ptr<Subscribe>> res;
+    for (auto& [topic,subscribe]:m_subscribes) {
+      res.push_back(subscribe);
+    }
+    m_subscribes.clear();
+    return res;
   }
 }
