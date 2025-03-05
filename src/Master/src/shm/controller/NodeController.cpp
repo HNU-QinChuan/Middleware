@@ -33,7 +33,7 @@ namespace Hnu::Middleware {
       for (auto &pair: MiddlewareManager::middlewareManager.m_nodes) {
         jsonArray.append(pair.first);
       }
-      root["nodes"] = jsonArray;
+      root["node"] = jsonArray;
       res.result(http::status::ok);
       Json::StreamWriterBuilder writer;
       res.body() = writeString(writer, root);

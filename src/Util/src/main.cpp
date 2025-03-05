@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 
         std::string topic_target = "/topic/list";
         std::string topic_key = "topic";
-        std::string node_target = "/node/list";
+        std::string node_target = "/node";
         std::string node_key = "node";
 
         // 定义所有可能的选项
