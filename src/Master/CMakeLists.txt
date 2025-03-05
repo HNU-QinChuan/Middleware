@@ -29,7 +29,7 @@ add_executable(${PROJECT_NAME} src/main.cpp
         src/shm/controller/NodeSubController.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt)
+target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt jsoncpp)
 
 add_custom_command(
     TARGET ${PROJECT_NAME}

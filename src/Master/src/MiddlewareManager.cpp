@@ -17,48 +17,6 @@ namespace Hnu::Middleware {
   void MiddlewareManager::run() {
     middlewareManager.m_ioc.run();
   }
-  bool MiddlewareManager::addNode(const std::string& node,int pid) {
-    if (middlewareManager.m_nodes.contains(node)) {
-      return false;
-    }
-    middlewareManager.m_nodes[node]=std::make_shared<Node>(node,pid);
-    spdlog::debug("Add Node: {}",node);
-    return true;
-  }
-  bool MiddlewareManager::addPublish(const std::string& node,const std::string& topic,int eventfd,const std::string& type) {
-    // MiddlewareManager &middlewareManager = getInstance();
-    if(!middlewareManager.m_nodes.contains(node)){
-      return false;
-    }
-    if(middlewareManager.m_nodes[node]->containsPublish(topic)){
-      return false;
-    }
-    auto publish=std::make_shared<Publish>(topic,eventfd,middlewareManager.m_nodes[node],type);
-    if(!publish->run()){
-      return false;
-    }
-    middlewareManager.m_nodes[node]->addPublish(publish);
-    middlewareManager.m_publishes[topic].push_back(publish);
-    spdlog::debug("Add Publish: {} {}",node,topic);
-    return true;
-  }
-  bool MiddlewareManager::addSubscrie(const std::string& node, const std::string& topic, int eventfd,const std::string& type) {
-    // MiddlewareManager& middlewareManager = getInstance();
-    if (!middlewareManager.m_nodes.contains(node)) {
-      return false;
-    }
-    if (middlewareManager.m_nodes[node]->containsSubscribe(topic)) {
-      return false;
-    }
-    auto subscribe = std::make_shared<Subscribe>(topic, eventfd, middlewareManager.m_nodes[node],type);
-    if (!subscribe->run()) {
-      return false;
-    }
-    middlewareManager.m_nodes[node]->addSubscribe(subscribe);
-    middlewareManager.m_subscribes[topic].push_back(subscribe);
-    spdlog::debug("Add Subscribe: {} {}", node, topic);
-    return true;
-  }
   void MiddlewareManager::transferMessage(const std::string& topic, const std::string& message) {
     auto iter=middlewareManager.m_subscribes.find(topic);
     if(iter==middlewareManager.m_subscribes.end()){
