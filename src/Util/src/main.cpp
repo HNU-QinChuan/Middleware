@@ -36,8 +36,8 @@ void json_list(asio::local::stream_protocol::socket& socket, const std::string& 
         return ;
     }
 
-    std::cout << "解析后的JSON数据： " << std::endl;
-    std::cout << jsonData.toStyledString() << std::endl;
+    // std::cout << "解析后的JSON数据： " << std::endl;
+    // std::cout << jsonData.toStyledString() << std::endl;
 
     if(jsonData.isMember(key) && jsonData[key].isArray()) {
         std::cout << key << " :" <<std::endl;
@@ -59,7 +59,6 @@ void send_http_request(const std::string& host, const std::string& target, const
         //构造并发送http请求
         http::request<http::string_body> req{http::verb::get, target, 11};
         req.set(http::field::host, host);
-        //req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
         http::write(socket, req);
 
         //读取响应
@@ -102,7 +101,7 @@ int main(int argc, char* argv[]) {
 
         std::string topic_target = "/topic/list";
         std::string topic_key = "topic";
-        std::string node_target = "/node/list";
+        std::string node_target = "/node";
         std::string node_key = "node";
 
         // 定义所有可能的选项
