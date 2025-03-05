@@ -15,7 +15,8 @@
 #endif
 
 namespace Hnu::Middleware {
-  Publish::Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node):m_ioc(MiddlewareManager::getIoc()),m_topic_name(name),m_eventfd(eventfd) ,m_node(node){
+  Publish::Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node,const std::string& type):m_ioc(MiddlewareManager::getIoc()),
+  m_topic_name(name),m_eventfd(eventfd) ,m_node(node),m_type(type){
   }
   std::string Publish::getName() {
     return m_topic_name;

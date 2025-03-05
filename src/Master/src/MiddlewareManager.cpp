@@ -25,7 +25,7 @@ namespace Hnu::Middleware {
     spdlog::debug("Add Node: {}",node);
     return true;
   }
-  bool MiddlewareManager::addPublish(const std::string& node,const std::string& topic,int eventfd){
+  bool MiddlewareManager::addPublish(const std::string& node,const std::string& topic,int eventfd,const std::string& type) {
     // MiddlewareManager &middlewareManager = getInstance();
     if(!middlewareManager.m_nodes.contains(node)){
       return false;
@@ -33,7 +33,7 @@ namespace Hnu::Middleware {
     if(middlewareManager.m_nodes[node]->containsPublish(topic)){
       return false;
     }
-    auto publish=std::make_shared<Publish>(topic,eventfd,middlewareManager.m_nodes[node]);
+    auto publish=std::make_shared<Publish>(topic,eventfd,middlewareManager.m_nodes[node],type);
     if(!publish->run()){
       return false;
     }
@@ -42,7 +42,7 @@ namespace Hnu::Middleware {
     spdlog::debug("Add Publish: {} {}",node,topic);
     return true;
   }
-  bool MiddlewareManager::addSubscrie(const std::string& node, const std::string& topic, int eventfd) {
+  bool MiddlewareManager::addSubscrie(const std::string& node, const std::string& topic, int eventfd,const std::string& type) {
     // MiddlewareManager& middlewareManager = getInstance();
     if (!middlewareManager.m_nodes.contains(node)) {
       return false;
@@ -50,7 +50,7 @@ namespace Hnu::Middleware {
     if (middlewareManager.m_nodes[node]->containsSubscribe(topic)) {
       return false;
     }
-    auto subscribe = std::make_shared<Subscribe>(topic, eventfd, middlewareManager.m_nodes[node]);
+    auto subscribe = std::make_shared<Subscribe>(topic, eventfd, middlewareManager.m_nodes[node],type);
     if (!subscribe->run()) {
       return false;
     }

@@ -13,7 +13,8 @@
 #endif
 
 namespace Hnu::Middleware {
-  Subscribe::Subscribe(const std::string& name, int eventfd, std::shared_ptr<Node> node) : m_ioc(MiddlewareManager::getIoc()), m_topic_name(name), m_eventfd(eventfd), m_node(node) {
+  Subscribe::Subscribe(const std::string& name, int eventfd, std::shared_ptr<Node> node,const std::string& type) : m_ioc(MiddlewareManager::getIoc()),
+  m_topic_name(name), m_eventfd(eventfd), m_node(node),m_type(type) {
 
   }
   std::string Subscribe::getName() {

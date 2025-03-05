@@ -15,7 +15,7 @@ namespace Hnu::Middleware {
   //TODO: 不使用共享指针
   class Subscribe : public std::enable_shared_from_this<Subscribe> {
   public:
-    Subscribe(const std::string& name,int eventfd,std::shared_ptr<Node> node);
+    Subscribe(const std::string& name,int eventfd,std::shared_ptr<Node> node,const std::string& type);
     bool run();
     std::string getName();
     void setNode(std::shared_ptr<Node> node);
@@ -29,6 +29,7 @@ namespace Hnu::Middleware {
     interprocess::managed_shared_memory m_shm;
     lock_free_queue* queue;
     std::unique_ptr<asio::posix::stream_descriptor> m_eventfdStream;
+    std::string m_type;
   };
 
 } // Middleware

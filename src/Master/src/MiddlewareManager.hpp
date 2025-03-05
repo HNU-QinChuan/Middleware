@@ -23,8 +23,8 @@ namespace Hnu::Middleware {
 
 
     static bool addNode(const std::string& node,int pid);
-    static bool addPublish(const std::string& node,const std::string& topic,int eventfd);
-    static bool addSubscrie(const std::string& node, const std::string& topic, int eventfd);
+    static bool addPublish(const std::string& node,const std::string& topic,int eventfd,const std::string& type);
+    static bool addSubscrie(const std::string& node, const std::string& topic, int eventfd,const std::string& type);
     static void transferMessage(const std::string& topic,const std::string& message);
     static boost::asio::io_context& getIoc();
     static void run();

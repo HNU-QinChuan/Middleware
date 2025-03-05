@@ -20,8 +20,6 @@ namespace Hnu::Middleware {
     bool run();
     void publish(const Message& message);
   private:
-
-
     asio::io_context& m_ioc;
     local_stream m_socket;
     std::string m_topic_name;
@@ -30,6 +28,7 @@ namespace Hnu::Middleware {
     std::unique_ptr<asio::posix::stream_descriptor> m_eventfdStream;
     interprocess::managed_shared_memory m_shm;
     lock_free_queue* queue;
+    std::string m_type;
   };
 
 } // Middleware

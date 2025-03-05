@@ -13,6 +13,8 @@ namespace Hnu::Middleware {
   template<typename Message>
   Subscriber<Message>::Subscriber(asio::io_context& ioc, std::shared_ptr<Node> node, const std::string& topic_name)
     :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name),m_eventfdValue(0){
+    auto des=Message::descriptor();
+    m_type=des->full_name();
   }
   template<typename Message>
   bool Subscriber<Message>::run(const std::function<void(std::shared_ptr<Message>)>& callback) {
@@ -35,6 +37,7 @@ namespace Hnu::Middleware {
     request.set("sub",m_topic_name);
     request.set("node",m_node.lock()->getName());
     request.set("eventfd",std::to_string(m_event_fd));
+    request.set("type",m_type);
     request.prepare_payload();
     ec.clear();
     beast::http::write(m_socket,request,ec);

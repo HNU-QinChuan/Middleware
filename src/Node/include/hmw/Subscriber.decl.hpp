@@ -30,6 +30,7 @@ namespace Hnu::Middleware {
     lock_free_queue* queue;
     std::function<void(std::shared_ptr<Message> message)> m_callback;
     uint64_t m_eventfdValue;
+    std::string m_type;
   };
 
 }

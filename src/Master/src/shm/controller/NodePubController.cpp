@@ -13,7 +13,8 @@ namespace Hnu::Middleware {
       int eventfd = std::stoi(std::string(req["eventfd"]));
       std::string topic = std::string(req["pub"]);
       std::string node = std::string(req["node"]);
-      if (MiddlewareManager::addPublish(node, topic, eventfd)) {
+      std::string type = std::string(req["type"]);
+      if (MiddlewareManager::addPublish(node, topic, eventfd,type)) {
         res.result(http::status::ok);
       } else {
         res.result(http::status::bad_request);
