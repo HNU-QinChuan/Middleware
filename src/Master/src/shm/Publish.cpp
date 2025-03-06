@@ -25,13 +25,14 @@ namespace Hnu::Middleware {
     m_node=node;
   }
   Publish::~Publish() {
+    spdlog::debug("Destroy Publish:{}",m_topic_name);
     // m_eventfdStream->cancel();
     // m_eventfdStream->close();
     // std::shared_ptr<Node> node=m_node.lock();
     // if(node){
     //   node->removePublish(m_topic_name);
     // }
-    // interprocess::shared_memory_object::remove(("pub."+node->getName()+"."+m_topic_name).c_str());
+    // interprocess::shared_memory_object::remove(("pub."+m_node_name+"."+m_topic_name).c_str());
     // MiddlewareManager::middlewareManager.m_publishes.erase(m_topic_name);
   }
   void Publish::cancel() {
@@ -49,7 +50,8 @@ namespace Hnu::Middleware {
       spdlog::error("pidfd getfd error: {}",strerror(errno));
       return false;
     }
-    std::string shmName="pub."+m_node.lock()->getName()+"."+m_topic_name;
+    m_node_name=m_node.lock()->getName();
+    std::string shmName="pub."+m_node_name+"."+m_topic_name;
     try{
       interprocess::shared_memory_object::remove(shmName.c_str());
       m_shm=interprocess::managed_shared_memory(interprocess::create_only,shmName.c_str(),SHM_SIZE);
@@ -66,7 +68,6 @@ namespace Hnu::Middleware {
     m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Publish::onEventfdRead,shared_from_this()));
   }
   void Publish::onEventfdRead(const boost::system::error_code& ec,std::size_t bytes) {
-
     if(ec){
       spdlog::error("Eventfd Read Error: {}",ec.message());
       return;

@@ -9,7 +9,7 @@ namespace Hnu::Middleware {
 
 
 
-  Node::Node(const std::string &name) : m_name(name) ,m_impl(m_ioc,m_name){
+  Node::Node(const std::string &name) : m_name(name) ,m_impl(m_name){
     m_impl.run();
   }
   void Node::run(){

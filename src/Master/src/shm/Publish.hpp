@@ -28,6 +28,7 @@ namespace Hnu::Middleware {
     asio::io_context& m_ioc;
     std::string m_topic_name;
     std::weak_ptr<Node> m_node;
+    std::string m_node_name;
     int m_eventfd;
     interprocess::managed_shared_memory m_shm;
     lock_free_queue* queue;

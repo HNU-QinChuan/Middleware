@@ -43,15 +43,15 @@ namespace Hnu::Middleware {
       std::shared_ptr<Node> node = MiddlewareManager::middlewareManager.m_nodes[node_name];
       if (node) {
         std::vector<std::shared_ptr<Subscribe>> subs=node->removeAllSubscribe();
-        for (auto& sub:subs) {
+        for (auto sub:subs) {
           sub->cancle();
-          auto vec=MiddlewareManager::middlewareManager.m_subscribes[sub->getName()];
+          auto& vec=MiddlewareManager::middlewareManager.m_subscribes[sub->getName()];
           vec.erase(std::remove(vec.begin(),vec.end(),sub),vec.end());
         }
         std::vector<std::shared_ptr<Publish>> pubs=node->removeAllPublish();
-        for (auto& pub:pubs) {
+        for (auto pub:pubs) {
           pub->cancel();
-          auto vec=MiddlewareManager::middlewareManager.m_publishes[pub->getName()];
+          auto& vec=MiddlewareManager::middlewareManager.m_publishes[pub->getName()];
           vec.erase(std::remove(vec.begin(),vec.end(),pub),vec.end());
         }
         MiddlewareManager::middlewareManager.m_nodes.erase(node_name);

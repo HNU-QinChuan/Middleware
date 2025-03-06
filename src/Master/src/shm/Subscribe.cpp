@@ -18,12 +18,13 @@ namespace Hnu::Middleware {
 
   }
   Subscribe::~Subscribe() {
+    spdlog::debug("Destroy Subscribe:{}",m_topic_name);
     // m_eventfdStream->close();
     // std::shared_ptr<Node> node=m_node.lock();
     // if(node){
     //   node->removePublish(m_topic_name);
     // }
-    // interprocess::shared_memory_object::remove(("sub."+node->getName()+"."+m_topic_name).c_str());
+    // interprocess::shared_memory_object::remove(("sub."+m_node_name+"."+m_topic_name).c_str());
     // MiddlewareManager::middlewareManager.m_subscribes.erase(m_topic_name);
   }
   void Subscribe::cancle() {
@@ -47,7 +48,8 @@ namespace Hnu::Middleware {
       spdlog::error("pidfd getfd error: {}",strerror(errno));
       return false;
     }
-    std::string shmName="sub."+m_node.lock()->getName()+"."+m_topic_name;
+    m_node_name=m_node.lock()->getName();
+    std::string shmName="sub."+m_node_name+"."+m_topic_name;
     try{
       interprocess::shared_memory_object::remove(shmName.c_str());
       m_shm=interprocess::managed_shared_memory(interprocess::create_only,shmName.c_str(),SHM_SIZE);

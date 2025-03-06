@@ -28,6 +28,7 @@ namespace Hnu::Middleware {
     asio::io_context& m_ioc;
     std::string m_topic_name;
     int m_eventfd;
+    std::string m_node_name;
     interprocess::managed_shared_memory m_shm;
     lock_free_queue* queue;
     std::unique_ptr<asio::posix::stream_descriptor> m_eventfdStream;
