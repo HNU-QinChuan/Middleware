@@ -16,7 +16,7 @@ namespace Hnu::Middleware {
   using local_stream=beast::basic_stream<asio::local::stream_protocol>;
   class Server :public std::enable_shared_from_this<Server> {
   public:
-    explicit Server();
+    Server(asio::execution_context& ioc);
     void run();
     local_stream::socket_type& socket();
   private:
@@ -25,7 +25,6 @@ namespace Hnu::Middleware {
     void doWrite();
     void onWrite(const boost::system::error_code& ec,std::size_t bytes);
 
-    asio::io_context& m_ioc;
     local_stream m_stream;
     beast::http::request<beast::http::string_body> m_request;
     beast::http::response<beast::http::string_body> m_response;

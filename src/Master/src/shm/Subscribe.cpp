@@ -13,7 +13,7 @@
 #endif
 
 namespace Hnu::Middleware {
-  Subscribe::Subscribe(const std::string& name, int eventfd, std::shared_ptr<Node> node,const std::string& type) : m_ioc(MiddlewareManager::getIoc()),
+  Subscribe::Subscribe(const std::string& name, int eventfd, std::shared_ptr<Node> node,const std::string& type) :
   m_topic_name(name), m_eventfd(eventfd), m_node(node),m_type(type) {
 
   }
@@ -58,7 +58,7 @@ namespace Hnu::Middleware {
       spdlog::error("subscribe create shm error: {}",e.what());
       return false;
     }
-    m_eventfdStream=std::make_unique<asio::posix::stream_descriptor>(m_ioc,m_eventfd);
+    m_eventfdStream=std::make_unique<asio::posix::stream_descriptor>(MiddlewareManager::getIoc(),m_eventfd);
     return true;
   }
   void Subscribe::publish2Node(const std::string& message) {

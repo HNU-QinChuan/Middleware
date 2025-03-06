@@ -15,7 +15,7 @@
 #endif
 
 namespace Hnu::Middleware {
-  Publish::Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node,const std::string& type):m_ioc(MiddlewareManager::getIoc()),
+  Publish::Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node,const std::string& type):
   m_topic_name(name),m_eventfd(eventfd) ,m_node(node),m_type(type){
   }
   std::string Publish::getName() {
@@ -60,7 +60,7 @@ namespace Hnu::Middleware {
       spdlog::error("publish create shm error: {}",e.what());
       return false;
     }
-    m_eventfdStream=std::make_unique<asio::posix::stream_descriptor>(m_ioc,m_eventfd);
+    m_eventfdStream=std::make_unique<asio::posix::stream_descriptor>(MiddlewareManager::getIoc(),m_eventfd);
     doEventfdRead();
     return true;
   }
@@ -69,6 +69,10 @@ namespace Hnu::Middleware {
   }
   void Publish::onEventfdRead(const boost::system::error_code& ec,std::size_t bytes) {
     if(ec){
+      if(ec.value()==asio::error::operation_aborted){
+        // spdlog::debug("Eventfd Read Cancelled");
+        return;
+      }
       spdlog::error("Eventfd Read Error: {}",ec.message());
       return;
     }

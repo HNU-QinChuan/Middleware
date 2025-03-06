@@ -25,7 +25,6 @@ namespace Hnu::Middleware {
   private:
 
     std::weak_ptr<Node> m_node;
-    asio::io_context& m_ioc;
     std::string m_topic_name;
     int m_eventfd;
     std::string m_node_name;

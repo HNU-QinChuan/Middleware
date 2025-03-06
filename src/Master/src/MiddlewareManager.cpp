@@ -3,6 +3,7 @@
 //
 
 #include "MiddlewareManager.hpp"
+#include "shm/Acceptor.hpp"
 #include <spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
@@ -15,6 +16,8 @@ namespace Hnu::Middleware {
     return middlewareManager.m_ioc;
   }
   void MiddlewareManager::run() {
+    Acceptor acceptor(middlewareManager.m_ioc);
+    acceptor.run();
     middlewareManager.m_ioc.run();
   }
   void MiddlewareManager::transferMessage(const std::string& topic, const std::string& message) {

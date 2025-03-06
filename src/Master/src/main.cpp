@@ -7,7 +7,5 @@
 
 int main() {
   spdlog::set_level(spdlog::level::debug);
-  Hnu::Middleware::Acceptor acceptor;
-  acceptor.run();
   Hnu::Middleware::MiddlewareManager::run();
 }
