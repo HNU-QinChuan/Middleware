@@ -23,6 +23,7 @@ namespace Hnu::Middleware {
     void addSubscriber(const std::string& topic,std::shared_ptr<SubscriberInterface> subscriber);
     std::shared_ptr<SubscriberInterface> getSubscriber(const std::string& topic);
     std::shared_ptr<PublisherInterface> getPublisher(const std::string& topic);
+    std::string getName();
 
   private:
     void onSignal(const boost::system::error_code& ec,int signal);

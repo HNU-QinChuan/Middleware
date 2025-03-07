@@ -32,7 +32,7 @@ namespace Hnu::Middleware {
       if (m_impl.containsPublisher(topic)) {
         return std::static_pointer_cast<Publisher<Message>>(m_impl.getPublisher(topic));
       }
-      auto publish=std::make_shared<Publisher<Message>>(m_ioc,shared_from_this(),topic);
+      auto publish=std::make_shared<Publisher<Message>>(m_ioc,&m_impl,topic);
       if(!publish->run()){
         spdlog::error("error on create publish: {}",topic);
         throw std::runtime_error("error on create publish");
@@ -47,7 +47,7 @@ namespace Hnu::Middleware {
       if (m_impl.containsSubscriber(topic)) {
         return std::static_pointer_cast<Subscriber<Message>>(m_impl.getSubscriber(topic));
       }
-      auto subscribe=std::make_shared<Subscriber<Message>>(m_ioc,shared_from_this(),topic);
+      auto subscribe=std::make_shared<Subscriber<Message>>(m_ioc,&m_impl,topic);
       if(!subscribe->run(callback)){
         spdlog::error("error on create subscribe: {}",topic);
         throw std::runtime_error("error on create subscribe");
@@ -60,7 +60,7 @@ namespace Hnu::Middleware {
     std::string getName();
   private:
 
-    std::string m_name;
+    // std::string m_name;
     asio::io_context m_ioc;
     NodeImpl m_impl;
   };

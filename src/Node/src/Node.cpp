@@ -9,7 +9,7 @@ namespace Hnu::Middleware {
 
 
 
-  Node::Node(const std::string &name) : m_name(name) ,m_impl(m_name){
+  Node::Node(const std::string &name) : m_impl(name){
     m_impl.run();
   }
   void Node::run(){
@@ -17,7 +17,7 @@ namespace Hnu::Middleware {
     m_ioc.run();
   }
   std::string Node::getName(){
-    return m_name;
+    return m_impl.getName();
   }
   std::shared_ptr<Timer> Node::createTimer(int interval, const std::function<void()>& callback) {
     auto timer= std::make_shared<Timer>(m_ioc);

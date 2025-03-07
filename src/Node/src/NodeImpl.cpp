@@ -104,4 +104,7 @@ namespace Hnu::Middleware {
     m_socket.close();
     std::exit(0);
   }
+  std::string NodeImpl::getName(){
+    return m_name;
+  }
 }

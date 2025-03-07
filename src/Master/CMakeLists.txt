@@ -8,25 +8,18 @@ find_package(spdlog REQUIRED)
 
 include_directories(src)
 
+aux_source_directory(src/shm shm)
+aux_source_directory(src/shm/controller shm_controller)
+
+
 add_executable(${PROJECT_NAME} src/main.cpp
-        src/shm/Acceptor.hpp
-        src/shm/Acceptor.cpp
-        src/shm/Server.hpp
-        src/shm/Server.cpp
-        src/shm/Subscribe.cpp
-        src/shm/Subscribe.hpp
-        src/shm/Publish.cpp
-        src/shm/Publish.hpp
-        src/MiddlewareManager.cpp
-        src/MiddlewareManager.hpp
-        src/shm/Node.cpp
-        src/shm/Node.hpp
-        src/shm/Define.hpp
-        src/shm/UdsRouter.cpp
-        src/shm/UdsRouter.hpp
-        src/shm/controller/NodeController.cpp
-        src/shm/controller/NodePubController.cpp
-        src/shm/controller/NodeSubController.cpp
+    ${shm}
+    ${shm_controller}
+    src/MiddlewareManager.cpp
+    src/MiddlewareManager.hpp
+    src/InterfaceManager.cpp
+    src/InterfaceManager.hpp
+
 )
 
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt jsoncpp)
