@@ -18,5 +18,7 @@ add_library(dgps
         src/serial.h
         src/ntrip.h
 )
+add_executable(main src/main.cpp)
 
 target_link_libraries(dgps Middleware-Node::Middleware-Node  Middleware-Msgs::Std yaml-cpp)
+target_link_libraries(main dgps)

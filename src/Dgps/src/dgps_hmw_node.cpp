@@ -35,9 +35,6 @@ std::string getExecutablePath() {
 }
 
 
-
-
-
 namespace Dgps_hmw_node{
 
 
@@ -50,13 +47,13 @@ public:
         std::string exeDir = getExecutablePath();
         std::string yamlPath = exeDir + "/../src/Dgps/yaml/dgps.yaml";
         YAML::Node config = YAML::LoadFile(yamlPath);
-        serverName = config[serverName].as<std::string>();
-        serverPort = config[serverPort].as<std::string>();
-        userName = config[userName].as<std::string>();
-        password = config[password].as<std::string>();
-        serialPort = config[serialPort].as<std::string>();
-        topic = config[topic].as<std::string>();
-        frame_id = config[frame_id].as<std::string>();
+        serverName = config["serverName"].as<std::string>();
+        serverPort = config["serverPort"].as<std::string>();
+        userName = config["userName"].as<std::string>();
+        password = config["password"].as<std::string>();
+        serialPort = config["serialPort"].as<std::string>();
+        topic = config["topic"].as<std::string>();
+        frame_id = config["frame_id"].as<std::string>();
 
         args.server = serverName.c_str();
         args.port = serverPort.c_str();
