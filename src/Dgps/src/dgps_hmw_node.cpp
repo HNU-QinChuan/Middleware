@@ -82,23 +82,23 @@ public:
         args.serlogfile = 0;
         args.stop = false;
 
-        // RCLCPP_ERROR(get_logger(), "Username= %s",args.user);
-        // RCLCPP_ERROR(get_logger(), "password= %s",args.password);
-        // RCLCPP_ERROR(get_logger(), "port= %s",args.port);
-        // RCLCPP_ERROR(get_logger(), "dev= %s",args.serdevice);
-
         pub = this->createPublisher<Std::NavSatFix>(topic);
-        pub_gpfpd = this->createPublisher<Std::Gpfpd>("/dgps_gpfpd");
-        pub_gtimu = this->createPublisher<Std::Gtimu>("/dgps_gtimu");
-        pub_gnvtg = this->createPublisher<Std::Gnvtg>("/dgps_gnvtg");
+        pub_gpfpd = this->createPublisher<Std::Gpfpd>("_dgps_gpfpd");
+        pub_gtimu = this->createPublisher<Std::Gtimu>("_dgps_gtimu");
+        pub_gnvtg = this->createPublisher<Std::Gnvtg>("_dgps_gnvtg");
         ntrip_thread = std::make_shared<std::thread>(ntrip_client,&args);
         timer_ = this->createTimer(20, [this] { timer_callback(); });
-        pub_status = this->createPublisher<Std::String>("/Dev_status");
+        pub_status = this->createPublisher<Std::String>("_Dev_status");
 
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
         Std::String mstr;
         mstr.set_data("DGPS_HMW_NODE START");
         pub_status->publish(mstr);
+
+        // RCLCPP_ERROR(get_logger(), "Username= %s",args.user);
+        // RCLCPP_ERROR(get_logger(), "password= %s",args.password);
+        // RCLCPP_ERROR(get_logger(), "port= %s",args.port);
+        // RCLCPP_ERROR(get_logger(), "dev= %s",args.serdevice);
     }
 
     ~DGpsHmw() {

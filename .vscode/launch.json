@@ -4,7 +4,7 @@
     "name": "(gdb) 启动",
     "type": "cppdbg",
     "request": "launch",
-    "program": "${fileDirname}/../bin/main",
+    "program": "/home/aoao/code/cpp/Middleware/bin/Middleware-Master",
     "args": [],
     "stopAtEntry": false,
     "cwd": "${fileDirname}",
