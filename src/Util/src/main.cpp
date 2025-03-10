@@ -319,24 +319,3 @@ int main(int argc, char* argv[]){
 
     return 0;
 }
-
-// #include "Std/String.pb.h"  // 确保包含你的 Protobuf 头文件
-// #include <google/protobuf/message.h>
-// #include <google/protobuf/dynamic_message.h>
-// #include <google/protobuf/descriptor.h>
-
-// int main() {
-//     // 🔥 强制注册 Std.String
-//     protobuf_Std_2fString_2eproto::AddDescriptors();
-
-//     const google::protobuf::Descriptor* descriptor =
-//         google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName("Std.String");
-
-//     if (descriptor) {
-//         std::cout << "✅ 找到 Protobuf 类型: " << descriptor->full_name() << std::endl;
-//     } else {
-//         std::cerr << "❌ 仍然找不到 Protobuf 类型: Std.String" << std::endl;
-//     }
-
-//     return 0;
-// }
