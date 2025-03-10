@@ -1,0 +1,16 @@
+host1:
+  interface1:
+    tcp:
+      ip: "127.0.0.1"
+      port: 8080
+      segement: 1
+
+
+host2:
+  interface2:
+    tcp:
+      ip: "127.0.0.1"
+      port: 8081
+      segement: 1
+
+
