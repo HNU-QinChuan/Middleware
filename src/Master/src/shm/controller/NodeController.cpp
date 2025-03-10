@@ -33,7 +33,7 @@ namespace Hnu::Middleware {
       for (auto &pair: MiddlewareManager::middlewareManager.m_nodes) {
         jsonArray.append(pair.first);
       }
-      root["node"] = jsonArray;
+      root["nodes"] = jsonArray;
       res.result(http::status::ok);
       Json::StreamWriterBuilder writer;
       res.body() = writeString(writer, root);
@@ -47,12 +47,18 @@ namespace Hnu::Middleware {
           sub->cancle();
           auto& vec=MiddlewareManager::middlewareManager.m_subscribes[sub->getName()];
           vec.erase(std::remove(vec.begin(),vec.end(),sub),vec.end());
+          if(vec.empty()){
+            MiddlewareManager::middlewareManager.m_subscribes.erase(sub->getName());
+          }
         }
         std::vector<std::shared_ptr<Publish>> pubs=node->removeAllPublish();
         for (auto pub:pubs) {
           pub->cancel();
           auto& vec=MiddlewareManager::middlewareManager.m_publishes[pub->getName()];
           vec.erase(std::remove(vec.begin(),vec.end(),pub),vec.end());
+          if(vec.empty()){
+            MiddlewareManager::middlewareManager.m_publishes.erase(pub->getName());
+          }
         }
         MiddlewareManager::middlewareManager.m_nodes.erase(node_name);
         res.result(http::status::ok);

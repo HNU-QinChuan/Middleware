@@ -67,6 +67,12 @@ namespace Hnu::Middleware {
       m_eventfdStream->write_some(asio::buffer(&value,sizeof(value)));
     }
   }
+  std::string Subscribe::getType() {
+    return m_type;
+  }
+  std::string Subscribe::getNodeName() {
+    return m_node_name;
+  }
 
 
 }

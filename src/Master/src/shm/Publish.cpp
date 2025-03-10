@@ -84,5 +84,11 @@ namespace Hnu::Middleware {
     }
     doEventfdRead();
   }
+  std::string Publish::getType() {
+    return m_type;
+  }
+  std::string Publish::getNodeName() {
+    return m_node_name;
+  }
 
 }

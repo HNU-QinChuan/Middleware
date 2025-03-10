@@ -18,6 +18,8 @@ namespace Hnu::Middleware {
     Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node,const std::string& type);
     bool run();
     std::string getName();
+    std::string getType();
+    std::string getNodeName();
     void setNode(std::shared_ptr<Node> node);
     void cancel();
     ~Publish();
