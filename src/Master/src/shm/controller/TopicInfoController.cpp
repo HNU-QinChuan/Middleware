@@ -23,7 +23,7 @@ namespace Hnu::Middleware {
       Json::Value root;
       Json::Value pubnodes(Json::arrayValue);
       Json::Value subnodes(Json::arrayValue);
-      Json::String topic_type;
+      std::string topic_type;
       if(pubcount > 0) {
         for(auto& pub: MiddlewareManager::middlewareManager.m_publishes[topic_name]) {
           pubnodes.append(pub->getNodeName());
