@@ -44,6 +44,7 @@ public:
     explicit DGpsHmw(const std::string &name)
         : Hnu::Middleware::Node(name)
     {
+        spdlog::info("dgps_ros2_node start...");
         std::string exeDir = getExecutablePath();
         std::string yamlPath = exeDir + "/../src/Dgps/yaml/dgps.yaml";
         YAML::Node config = YAML::LoadFile(yamlPath);
