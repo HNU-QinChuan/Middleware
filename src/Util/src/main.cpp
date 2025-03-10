@@ -26,17 +26,17 @@ namespace asio = boost::asio;
 namespace http = beast::http;
 
 
+template <typename T>
+T json_list(asio::local::stream_protocol::socket& socket, const std::string& key){
+    //读取响应
+    beast::flat_buffer buffer;
+    http::response<http::dynamic_body> res;
+    http::read(socket, buffer, res);
 
-// std::vector<std::string> json_list(asio::local::stream_protocol::socket& socket, const std::string& key){
-//     //读取响应
-//     beast::flat_buffer buffer;
-//     http::response<http::dynamic_body> res;
-//     http::read(socket, buffer, res);
-
-//     std::string response_body = beast::buffers_to_string(res.body().data());
-//     std::cout << "HTTP Resoponse : \n" << response_body << std::endl;
-std::vector<std::string> json_list(const std::string& key){
-    std::vector<std::string> result;
+    std::string response_body = beast::buffers_to_string(res.body().data());
+    std::cout << "HTTP Resoponse : \n" << response_body << std::endl;
+    // std::vector<std::string> json_list(const std::string& key){
+    T result;
     //解析json响应
     Json::Reader reader;
     Json::Value jsonData;
@@ -48,18 +48,32 @@ std::vector<std::string> json_list(const std::string& key){
     ]
     })";
 
-    if (!reader.parse(jsonString, jsonData)){
+    if (!reader.parse(response_body, jsonData)){
         std::cerr << "JSON 解析失败： " << reader.getFormattedErrorMessages() << std::endl;
         return result;
     }
 
-    if(jsonData.isMember(key) && jsonData[key].isArray()) {
-        std::cout << key << " :" <<std::endl;
-        for (const auto& item : jsonData[key]){
-            std::cout << item.asString() << std::endl;
-            result.push_back(item.asString());
-        }
+    if (!jsonData.isMember(key)) {
+        std::cerr << "读取错误: " << key << " 不存在！" << std::endl;
+        return result;
     }
+
+    //在编译期间检查数据类型
+    if constexpr (std::is_same_v<T, std::vector<std::string>>) {
+        // 处理数组
+        if (jsonData[key].isArray()) {
+            for (const auto& item : jsonData[key]) {
+                result.push_back(item.asString());
+            }
+        } 
+        // else {
+        //     result.push_back(jsonData[key].asString()); // 兼容 key 不是数组的情况
+        // }
+    } 
+    else if constexpr (std::is_same_v<T, std::string>) {
+        // 处理单个字符串
+        result = jsonData[key].asString();
+    } 
     else {
         std::cout << "读取错误！" << std::endl;
     }
@@ -67,57 +81,56 @@ std::vector<std::string> json_list(const std::string& key){
 }
 
 void send_list_http(const std::string& host, const std::string& target, const std::string& key){
-    // try{
-    //     asio::io_context io_context;
-    //     asio::local::stream_protocol::socket socket(io_context);
-    //     socket.connect("/tmp/master");
+    try{
+        asio::io_context io_context;
+        asio::local::stream_protocol::socket socket(io_context);
+        socket.connect("/tmp/master");
         
-    //     //构造并发送http请求
-    //     http::request<http::string_body> req{http::verb::get, target, 11};
-    //     req.set(http::field::host, host);
-    //     http::write(socket, req);
+        //构造并发送http请求
+        http::request<http::string_body> req{http::verb::get, target, 11};
+        req.set(http::field::host, host);
+        http::write(socket, req);
 
-    //     //读取响应
-    //     json_list(socket, key);
+        //读取响应
+        std::vector<std::string> response = json_list<std::vector<std::string>>(socket, key);
+        std::cout << key << " :" <<std::endl;
+        for (const auto& item : response){
+            std::cout << item << std::endl;
+        }
 
-    //     socket.shutdown(boost::asio::local::stream_protocol::socket::shutdown_both);  // 关闭 socket 连接
-    //     socket.close();
-
-    // }
-    // catch (const std::exception& e) {
-    //     std::cerr << "Error: " << e.what() << std::endl;
-    // }
-    json_list(key);
+        socket.shutdown(boost::asio::local::stream_protocol::socket::shutdown_both);  // 关闭 socket 连接
+        socket.close();
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    //json_list(key);
 }
 
 std::string send_echo_http(const std::string& host, const std::string& target, const std::string& key, const std::string& topic_name){
-    // try{
-    //     asio::io_context io_context;
-    //     asio::local::stream_protocol::socket socket(io_context);
-    //     socket.connect("/tmp/master");
-        
-    //     //构造并发送http请求
-    //     http::request<http::string_body> req{http::verb::get, target, 11};
-    //     req.set(http::field::host, host);
-    //     //将 topic_name 作为 URL 查询参数
-    //     std::string new_target = target + "?topic=" + topic_name;
-    //     req.target(new_target);
-
-    //     http::write(socket, req);
-
-    //     //读取响应
-    //     std::string type;
-    //     type = json_list(socket, key)[0];
-
-    //     socket.shutdown(boost::asio::local::stream_protocol::socket::shutdown_both);  // 关闭 socket 连接
-    //     socket.close();
-
-    // }
-    // catch (const std::exception& e) {
-    //     std::cerr << "Error: " << e.what() << std::endl;
-    // }
     std::string type;
-    type = json_list(key)[0];
+    try{
+        asio::io_context io_context;
+        asio::local::stream_protocol::socket socket(io_context);
+        socket.connect("/tmp/master");
+        
+        //构造并发送http请求
+        http::request<http::string_body> req{http::verb::get, target, 11};
+        req.set(http::field::host, host);
+        req.set("topic",topic_name);
+
+        http::write(socket, req);
+
+        //读取响应
+        type = json_list<std::string>(socket, key);
+
+        socket.shutdown(boost::asio::local::stream_protocol::socket::shutdown_both);  // 关闭 socket 连接
+        socket.close();
+
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
 
     return type;
 }
@@ -212,9 +225,8 @@ void data_list(const std::string& host, const std::string& target, const std::st
 
 void showTopicInfo(std::shared_ptr<Hnu::Middleware::Node> node, const std::string& host, const std::string& target, const std::string& key, const std::string& topic_name) {
     std::cout << "Displaying information for topic: " << topic_name << std::endl;
-    //获取话题数据类型(只有一个)
+    //获取话题数据类型
     std::string type = send_echo_http(host, target, key, topic_name);
-    //std::cout << type << std::endl;
     //创建订阅者并输出话题数据
     subscribe_and_echo(node, topic_name, type);
 }
@@ -222,7 +234,6 @@ void showTopicInfo(std::shared_ptr<Hnu::Middleware::Node> node, const std::strin
 void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name, const std::string& message_type, const std::string& message_value) {
     //std::cout << "Publishing message to topic '" << topicName << "': (%s)" << message_type << message_value << std::endl;
     //创建发布者
-    printf("Publishing message to topic '%s': (%s) %s \n", topic_name.c_str(), message_type.c_str(), message_value.c_str());
     create_protobuf_message(node, topic_name, message_type, message_value);
 }
 
@@ -237,9 +248,7 @@ int main(int argc, char* argv[]){
     std::string node_target = "/node";
     std::string node_key = "nodes";
     std::string echo_target = "/topic/info";
-    std::string echo_key = "message_type";
-
-    auto node = std::make_shared<Hnu::Middleware::Node>("client_node");
+    std::string echo_key = "type";
 
     std::vector<std::string> tokens;
     for(int i=1; i < argc; i++){
@@ -263,7 +272,8 @@ int main(int argc, char* argv[]){
         if(tokens[1] == "echo"){
             if (size == 3){
                 if (!tokens[2].empty()) {
-                    showTopicInfo(node, host, echo_target, echo_key,tokens[2]);
+                    auto echo_node = std::make_shared<Hnu::Middleware::Node>("echo_node");
+                    showTopicInfo(echo_node, host, echo_target, echo_key,tokens[2]);
                 } else {
                     std::cerr << "Error: topic name is required for echo" << std::endl;
                 }
@@ -277,7 +287,8 @@ int main(int argc, char* argv[]){
         } else if (tokens[1] == "pub") {
             if (size == 5){
                 if (!tokens[2].empty() && !tokens[3].empty() && !tokens[4].empty()) {
-                    publishTopic(node, tokens[2], tokens[3], tokens[4]);
+                    auto pub_node = std::make_shared<Hnu::Middleware::Node>("publish_node");
+                    publishTopic(pub_node, tokens[2], tokens[3], tokens[4]);
                 } else {
                     std::cerr << "Error: topic name, message type, and message value are required for pub" << std::endl;
                 }
