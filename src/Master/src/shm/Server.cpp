@@ -3,12 +3,11 @@
 //
 
 #include "shm/Server.hpp"
-#include "MiddlewareManager.hpp"
 #include <spdlog/spdlog.h>
 #include "shm/UdsRouter.hpp"
 
 namespace Hnu::Middleware {
-  Server::Server():m_ioc(MiddlewareManager::getIoc()),m_stream(m_ioc) {
+  Server::Server(asio::execution_context& ioc):m_stream(static_cast<asio::io_context&>(ioc)) {
   }
 
   local_stream::socket_type& Server::socket() {

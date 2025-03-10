@@ -13,7 +13,7 @@
 
 namespace Hnu::Middleware {
   template <typename Message>
-  Publisher<Message>::Publisher(asio::io_context& ioc, std::shared_ptr<Node> node, const std::string& topic_name)
+  Publisher<Message>::Publisher(asio::io_context& ioc,NodeImpl* node, const std::string& topic_name)
     :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name){
     auto des=Message::descriptor();
     m_type=des->full_name();
@@ -37,7 +37,7 @@ namespace Hnu::Middleware {
     request.target("/node/pub");
     request.method(beast::http::verb::post);
     request.set("pub",m_topic_name);
-    request.set("node",m_node.lock()->getName());
+    request.set("node",m_node->getName());
     request.set("eventfd",std::to_string(m_event_fd));
     request.set("type",m_type);
     request.prepare_payload();
@@ -59,7 +59,7 @@ namespace Hnu::Middleware {
       spdlog::error("error on server side");
       return false;
     }
-    std::string shmName="pub."+m_node.lock()->getName()+"."+m_topic_name;
+    std::string shmName="pub."+m_node->getName()+"."+m_topic_name;
     try {
       m_shm=interprocess::managed_shared_memory(interprocess::open_only,shmName.c_str());
     }catch (const interprocess::interprocess_exception& e){

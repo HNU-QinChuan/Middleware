@@ -18,6 +18,8 @@ namespace Hnu::Middleware {
     Publish(const std::string& name,int eventfd,std::shared_ptr<Node> node,const std::string& type);
     bool run();
     std::string getName();
+    std::string getType();
+    std::string getNodeName();
     void setNode(std::shared_ptr<Node> node);
     void cancel();
     ~Publish();
@@ -25,9 +27,9 @@ namespace Hnu::Middleware {
     void doEventfdRead();
     void onEventfdRead(const boost::system::error_code& ec,std::size_t bytes);
 
-    asio::io_context& m_ioc;
     std::string m_topic_name;
     std::weak_ptr<Node> m_node;
+    std::string m_node_name;
     int m_eventfd;
     interprocess::managed_shared_memory m_shm;
     lock_free_queue* queue;

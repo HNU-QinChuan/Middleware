@@ -24,6 +24,7 @@ namespace Hnu::Middleware {
     static void handle(Request& req,Response& res);
   private:
     UdsRouter()=default;
+    static UdsRouter m_instance;
     static UdsRouter& getInstance();
     std::unordered_map<std::string,std::unordered_map<http::verb,std::function<void(Request&,Response&)>>> m_router;
   };

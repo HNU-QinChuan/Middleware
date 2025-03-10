@@ -16,12 +16,24 @@
 #include <regex>
 #include <boost/array.hpp>
 #include <ctime>
+#include <libgen.h>
 
 // #define STATUS_NO_FIX -1
 // #define STATUS_FIX 0
 // #define STATUS_GBAS_FIX 2
 // #define SERVICE_GPS 1
 // #define COVARIANCE_TYPE_DIAGONAL_KNOWN  2
+
+std::string getExecutablePath() {
+    char buffer[1024];
+    ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+    if (len != -1) {
+        buffer[len] = '\0';
+        return std::string(dirname(buffer));
+    }
+    return "";
+}
+
 
 namespace Dgps_hmw_node{
 
@@ -32,15 +44,16 @@ public:
     explicit DGpsHmw(const std::string &name)
         : Hnu::Middleware::Node(name)
     {
-
-        YAML::Node config = YAML::LoadFile("../yaml/dgps.yaml");
-        serverName = config[serverName].as<std::string>();
-        serverPort = config[serverPort].as<std::string>();
-        userName = config[userName].as<std::string>();
-        password = config[password].as<std::string>();
-        serialPort = config[serialPort].as<std::string>();
-        topic = config[topic].as<std::string>();
-        frame_id = config[frame_id].as<std::string>();
+        std::string exeDir = getExecutablePath();
+        std::string yamlPath = exeDir + "/../src/Dgps/yaml/dgps.yaml";
+        YAML::Node config = YAML::LoadFile(yamlPath);
+        serverName = config["serverName"].as<std::string>();
+        serverPort = config["serverPort"].as<std::string>();
+        userName = config["userName"].as<std::string>();
+        password = config["password"].as<std::string>();
+        serialPort = config["serialPort"].as<std::string>();
+        topic = config["topic"].as<std::string>();
+        frame_id = config["frame_id"].as<std::string>();
 
         args.server = serverName.c_str();
         args.port = serverPort.c_str();
@@ -69,23 +82,23 @@ public:
         args.serlogfile = 0;
         args.stop = false;
 
-        // RCLCPP_ERROR(get_logger(), "Username= %s",args.user);
-        // RCLCPP_ERROR(get_logger(), "password= %s",args.password);
-        // RCLCPP_ERROR(get_logger(), "port= %s",args.port);
-        // RCLCPP_ERROR(get_logger(), "dev= %s",args.serdevice);
-
         pub = this->createPublisher<Std::NavSatFix>(topic);
-        pub_gpfpd = this->createPublisher<Std::Gpfpd>("/dgps_gpfpd");
-        pub_gtimu = this->createPublisher<Std::Gtimu>("/dgps_gtimu");
-        pub_gnvtg = this->createPublisher<Std::Gnvtg>("/dgps_gnvtg");
+        pub_gpfpd = this->createPublisher<Std::Gpfpd>("_dgps_gpfpd");
+        pub_gtimu = this->createPublisher<Std::Gtimu>("_dgps_gtimu");
+        pub_gnvtg = this->createPublisher<Std::Gnvtg>("_dgps_gnvtg");
         ntrip_thread = std::make_shared<std::thread>(ntrip_client,&args);
         timer_ = this->createTimer(20, [this] { timer_callback(); });
-        pub_status = this->createPublisher<Std::String>("/Dev_status");
+        pub_status = this->createPublisher<Std::String>("_Dev_status");
 
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
         Std::String mstr;
         mstr.set_data("DGPS_HMW_NODE START");
         pub_status->publish(mstr);
+
+        // RCLCPP_ERROR(get_logger(), "Username= %s",args.user);
+        // RCLCPP_ERROR(get_logger(), "password= %s",args.password);
+        // RCLCPP_ERROR(get_logger(), "port= %s",args.port);
+        // RCLCPP_ERROR(get_logger(), "dev= %s",args.serdevice);
     }
 
     ~DGpsHmw() {

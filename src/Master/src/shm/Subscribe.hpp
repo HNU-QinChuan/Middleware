@@ -18,6 +18,8 @@ namespace Hnu::Middleware {
     Subscribe(const std::string& name,int eventfd,std::shared_ptr<Node> node,const std::string& type);
     bool run();
     std::string getName();
+    std::string getType();
+    std::string getNodeName();
     void setNode(std::shared_ptr<Node> node);
     void publish2Node(const std::string& message);
     void cancle();
@@ -25,9 +27,9 @@ namespace Hnu::Middleware {
   private:
 
     std::weak_ptr<Node> m_node;
-    asio::io_context& m_ioc;
     std::string m_topic_name;
     int m_eventfd;
+    std::string m_node_name;
     interprocess::managed_shared_memory m_shm;
     lock_free_queue* queue;
     std::unique_ptr<asio::posix::stream_descriptor> m_eventfdStream;

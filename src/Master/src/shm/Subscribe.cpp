@@ -13,17 +13,18 @@
 #endif
 
 namespace Hnu::Middleware {
-  Subscribe::Subscribe(const std::string& name, int eventfd, std::shared_ptr<Node> node,const std::string& type) : m_ioc(MiddlewareManager::getIoc()),
+  Subscribe::Subscribe(const std::string& name, int eventfd, std::shared_ptr<Node> node,const std::string& type) :
   m_topic_name(name), m_eventfd(eventfd), m_node(node),m_type(type) {
 
   }
   Subscribe::~Subscribe() {
+    spdlog::debug("Destroy Subscribe:{}",m_topic_name);
     // m_eventfdStream->close();
     // std::shared_ptr<Node> node=m_node.lock();
     // if(node){
     //   node->removePublish(m_topic_name);
     // }
-    // interprocess::shared_memory_object::remove(("sub."+node->getName()+"."+m_topic_name).c_str());
+    // interprocess::shared_memory_object::remove(("sub."+m_node_name+"."+m_topic_name).c_str());
     // MiddlewareManager::middlewareManager.m_subscribes.erase(m_topic_name);
   }
   void Subscribe::cancle() {
@@ -47,7 +48,8 @@ namespace Hnu::Middleware {
       spdlog::error("pidfd getfd error: {}",strerror(errno));
       return false;
     }
-    std::string shmName="sub."+m_node.lock()->getName()+"."+m_topic_name;
+    m_node_name=m_node.lock()->getName();
+    std::string shmName="sub."+m_node_name+"."+m_topic_name;
     try{
       interprocess::shared_memory_object::remove(shmName.c_str());
       m_shm=interprocess::managed_shared_memory(interprocess::create_only,shmName.c_str(),SHM_SIZE);
@@ -56,7 +58,7 @@ namespace Hnu::Middleware {
       spdlog::error("subscribe create shm error: {}",e.what());
       return false;
     }
-    m_eventfdStream=std::make_unique<asio::posix::stream_descriptor>(m_ioc,m_eventfd);
+    m_eventfdStream=std::make_unique<asio::posix::stream_descriptor>(MiddlewareManager::getIoc(),m_eventfd);
     return true;
   }
   void Subscribe::publish2Node(const std::string& message) {
@@ -64,6 +66,12 @@ namespace Hnu::Middleware {
       uint64_t value=1;
       m_eventfdStream->write_some(asio::buffer(&value,sizeof(value)));
     }
+  }
+  std::string Subscribe::getType() {
+    return m_type;
+  }
+  std::string Subscribe::getNodeName() {
+    return m_node_name;
   }
 
 

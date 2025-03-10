@@ -7,6 +7,7 @@
 #include "MiddlewareManager.hpp"
 #include "shm/Publish.hpp"
 #include "shm/Subscribe.hpp"
+#include <spdlog/spdlog.h>
 
 namespace Hnu::Middleware {
   Node::Node(const std::string& name,int pid):m_name(name),m_pid(pid) {
@@ -16,6 +17,7 @@ namespace Hnu::Middleware {
     //   publish.reset();
     // }
     // for ()
+    spdlog::debug("Destroy Node:{}",m_name);
   }
 
   std::string Node::getName() {

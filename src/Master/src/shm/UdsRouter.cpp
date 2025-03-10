@@ -6,9 +6,10 @@
 
 
 namespace Hnu::Middleware {
+  UdsRouter UdsRouter::m_instance;
   UdsRouter& UdsRouter::getInstance() {
-    static UdsRouter instance;
-    return instance;
+    // static UdsRouter instance;
+    return m_instance;
   }
   void UdsRouter::registerController(const std::string &path, http::verb verb, std::function<void (Request &, Response &)> func){
     getInstance().m_router[path][verb]=func;
