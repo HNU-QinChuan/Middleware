@@ -43,7 +43,7 @@ T json_list(asio::local::stream_protocol::socket& socket, const std::string& key
     http::read(socket, buffer, res);
 
     std::string response_body = beast::buffers_to_string(res.body().data());
-    std::cout << "HTTP Resoponse : \n" << response_body << std::endl;
+    // std::cout << "HTTP Resoponse : \n" << response_body << std::endl;
     // std::vector<std::string> json_list(const std::string& key){
     T result;
     //解析json响应
@@ -308,7 +308,10 @@ void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node,
 
 
 int main(int argc, char* argv[]){
-    Std::String str;
+    //强制注册数据类型
+    // protobuf_Std_2fString_2eproto::AddDescriptors();
+    // protobuf_Std_2fdgps_2eproto::AddDescriptors();
+
     std::string host = "localhost";
     std::string topic_target = "/topic";
     std::string topic_key = "topics";
