@@ -236,8 +236,6 @@ void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node, const std::string
 
 
 int main(int argc, char* argv[]){
-    protobuf_Std_2fString_2eproto::AddDescriptors();
-    protobuf_Std_2fdgps_2eproto::AddDescriptors();
     Std::String str;
     std::string host = "localhost";
     std::string topic_target = "/topic";

@@ -22,5 +22,11 @@ int main(){
   {
     spdlog::info("str: {}", dgps->status());
   });
+  auto pub = node->createSubscriber<Std::NavSatFix>("dgps", [](std::shared_ptr<Std::NavSatFix> dgps)
+  {
+    spdlog::info("str: {}", dgps->status().status());
+  });
+
+  node->run();
 
 }

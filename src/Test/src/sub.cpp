@@ -10,7 +10,7 @@
 int main(){
   spdlog::set_level(spdlog::level::debug);
   auto node=std::make_shared<Hnu::Middleware::Node>("sub_node");
-  auto subscribe=node->createSubscriber<Std::String>("test",[](std::shared_ptr<Std::String> person){
+  auto subscribe=node->createSubscriber<Std::String>("topic1",[](std::shared_ptr<Std::String> person){
     spdlog::info("str: {}", person->data());
   });
   node->run();
