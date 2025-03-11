@@ -75,9 +75,6 @@ T json_list(asio::local::stream_protocol::socket& socket, const std::string& key
                 result.push_back(item.asString());
             }
         } 
-        // else {
-        //     result.push_back(jsonData[key].asString()); // 兼容 key 不是数组的情况
-        // }
     } 
     else if constexpr (std::is_same_v<T, std::string>) {
         // 处理单个字符串
@@ -311,8 +308,6 @@ void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node,
 
 
 int main(int argc, char* argv[]){
-    protobuf_Std_2fString_2eproto::AddDescriptors();
-    protobuf_Std_2fdgps_2eproto::AddDescriptors();
     Std::String str;
     std::string host = "localhost";
     std::string topic_target = "/topic";
