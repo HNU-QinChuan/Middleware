@@ -2,6 +2,7 @@
 #include <boost/program_options/variables_map.hpp>
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
@@ -25,6 +26,14 @@ namespace beast = boost::beast;
 namespace asio = boost::asio;
 namespace http = beast::http;
 
+//分离出Std和数据类型
+std::string transformMessageType(const std::string& message_type) {
+    size_t pos = message_type.find('.');
+    if (pos != std::string::npos) {
+        return message_type.substr(0, pos) + "::" + message_type.substr(pos + 1);
+    }
+    return message_type;
+}
 
 template <typename T>
 T json_list(asio::local::stream_protocol::socket& socket, const std::string& key){
@@ -135,27 +144,51 @@ std::string send_echo_http(const std::string& host, const std::string& target, c
     return type;
 }
 
-void subscribe_and_echo(std::shared_ptr<Hnu::Middleware::Node> node, 
-                        const std::string& topic_name, 
-                        const std::string& message_type){
-    if(message_type == "Std.String"){
+
+std::unordered_map<std::string, std::function<void(std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name)>> subscribe_handlers = {
+    {"Std::String", [](std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name){
         auto subscriber = node -> createSubscriber<Std::String>(topic_name,
             [](std::shared_ptr<Std::String> message){
                 std::cout << "Received data: (" << message -> GetTypeName() << ")" << message -> data() << std::endl;
         });
-    } 
+    }}
+    // {"Std::dgps", [](std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name){
+    //     auto subscriber = node -> createSubscriber<Std::dgps>(topic_name,
+    //         [](std::shared_ptr<Std::dgps> message){
+    //             std::cout << "Received data: (" << message -> GetTypeName() << ")" << message -> data() << std::endl;
+    //     });
+    // }}
+};
+
+void subscribe_and_echo(std::shared_ptr<Hnu::Middleware::Node> node, 
+                        const std::string& topic_name, 
+                        const std::string& message_type){
+    std::string std_type = transformMessageType(message_type);
+    //使用哈希表存储不同数据类型及对应的function
+    if (subscribe_handlers.count(std_type)) {
+        subscribe_handlers[std_type](node, topic_name);  // 调用对应的 lambda 处理函数
+        std::cout << "Successfully subscribe " << topic_name << ", waiting for message..." << std::endl;
+        node -> run();
+    } else {
+        std::cerr << "Unknown message type: " << std_type << std::endl;
+    }
+
+    // if(message_type == "Std.String"){
+    //     auto subscriber = node -> createSubscriber<Std::String>(topic_name,
+    //         [](std::shared_ptr<Std::String> message){
+    //             std::cout << "Received data: (" << message -> GetTypeName() << ")" << message -> data() << std::endl;
+    //     });
+    // } 
     // else if(message_type == "Std.dgps"){
     //     auto subscriber = node -> createSubscriber<Std::dgps>(topic_name,
     //         [](std::shared_ptr<Std::dgps> message){
     //             std::cout << "Received data: (" << message -> GetTypeName() << ")" << message -> data() << std::endl;
     //     });
     // } 
-    else {
-        std::cerr << "Unknown Protobuf message type: " << message_type << std::endl;
-    }
-
-    std::cout << "Successfully subscribe " << topic_name << ", waiting for message..." << std::endl;
-    node -> run();
+    // else {
+    //     std::cerr << "Unknown Protobuf message type: " << message_type << std::endl;
+    // }
+    //node -> run();
 }
 
 template <typename T>
@@ -169,10 +202,33 @@ void publish_message(std::shared_ptr<Hnu::Middleware::Node> node,
               << ": " << message.DebugString() << std::endl;
 }
 
+// 处理函数映射
+std::unordered_map<std::string, std::function<void(std::shared_ptr<Hnu::Middleware::Node> node, 
+                                const std::string& topic_name, 
+                                std::shared_ptr<google::protobuf::Message>& message,
+                                int rate, bool rate_flag)>> publish_handlers = {
+    {"Std::String", [](std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name,
+                            std::shared_ptr<google::protobuf::Message> message,
+                            int rate, bool rate_flag) 
+        {
+            auto msg = std::static_pointer_cast<Std::String>(message);
+            if (rate_flag == 0){
+                publish_message(node, topic_name, *msg);
+            }
+            else{
+                auto timer = node->createTimer(rate, [node, topic_name, msg]() {
+                    publish_message(node, topic_name, *msg);
+                });
+            }
+        }
+    }
+};
+
 void create_protobuf_message(std::shared_ptr<Hnu::Middleware::Node> node,
     const std::string& topic_name,
     const std::string& message_type, 
-    const std::string& message_value) 
+    const std::string& message_value,
+    int rate, bool rate_flag) 
 {
     const google::protobuf::Descriptor* descriptor =
         google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(message_type);
@@ -196,22 +252,32 @@ void create_protobuf_message(std::shared_ptr<Hnu::Middleware::Node> node,
     const google::protobuf::Reflection* reflection = message->GetReflection();
     const google::protobuf::FieldDescriptor* field = descriptor->FindFieldByName("data");
 
-    if (!field || field->cpp_type() != google::protobuf::FieldDescriptor::CPPTYPE_STRING) {
+    if (!field) {
         std::cerr << "Protobuf type(" << message_type << ") is missing the 'data' field or has an incorrect type" << std::endl;
         return;
     }
 
     reflection->SetString(message.get(), field, message_value);
 
-    if (message_type == "Std.String") {
-        publish_message(node, topic_name, *dynamic_cast<Std::String*>(message.get()));
-    } 
-    // else if (message_type == "Std.dgps") {
-    //     publish_message(node, topic_name, *dynamic_cast<Std::dgps*>(message.get()));
-    // } 
-    else {
-        std::cerr << "Unknown Protobuf message type: " << message_type << std::endl;
+    std::string std_type = transformMessageType(message_type);
+    //std::cout << "Replaced type: " << std_type << std::endl;
+
+    //使用哈希表存储不同数据类型及对应的function
+    if (publish_handlers.count(std_type)) {
+        publish_handlers[std_type](node, topic_name, message, rate, rate_flag);  // 调用对应的 lambda 处理函数
+    } else {
+        std::cerr << "Unknown message type: " << std_type << std::endl;
     }
+
+    // if (message_type == "Std.String") {
+    //     publish_message(node, topic_name, *dynamic_cast<Std::String*>(message.get()));
+    // } 
+    // // else if (message_type == "Std.dgps") {
+    // //     publish_message(node, topic_name, *dynamic_cast<Std::dgps*>(message.get()));
+    // // } 
+    // else {
+    //     std::cerr << "Unknown Protobuf message type: " << message_type << std::endl;
+    // }
 
     node -> run();
     return;
@@ -223,7 +289,9 @@ void data_list(const std::string& host, const std::string& target, const std::st
     send_list_http(host, target, key);
 }
 
-void showTopicInfo(std::shared_ptr<Hnu::Middleware::Node> node, const std::string& host, const std::string& target, const std::string& key, const std::string& topic_name) {
+void showTopicInfo(std::shared_ptr<Hnu::Middleware::Node> node, 
+                    const std::string& host, const std::string& target, 
+                    const std::string& key, const std::string& topic_name) {
     std::cout << "Displaying information for topic: " << topic_name << std::endl;
     //获取话题数据类型
     std::string type = send_echo_http(host, target, key, topic_name);
@@ -231,10 +299,14 @@ void showTopicInfo(std::shared_ptr<Hnu::Middleware::Node> node, const std::strin
     subscribe_and_echo(node, topic_name, type);
 }
 
-void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name, const std::string& message_type, const std::string& message_value) {
+void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node, 
+                    const std::string& topic_name, 
+                    const std::string& message_type, 
+                    const std::string& message_value, 
+                    int rate, bool rate_flag) {
     //std::cout << "Publishing message to topic '" << topicName << "': (%s)" << message_type << message_value << std::endl;
     //创建发布者
-    create_protobuf_message(node, topic_name, message_type, message_value);
+    create_protobuf_message(node, topic_name, message_type, message_value, rate, rate_flag);
 }
 
 
@@ -249,6 +321,8 @@ int main(int argc, char* argv[]){
     std::string node_key = "nodes";
     std::string echo_target = "/topic/info";
     std::string echo_key = "type";
+    int rate = 100;
+    bool rate_flag = 1;
 
     std::vector<std::string> tokens;
     for(int i=1; i < argc; i++){
@@ -285,10 +359,24 @@ int main(int argc, char* argv[]){
                 std::cerr << "Invalid command, press [-h] for more detailed usage" << std::endl;
             }
         } else if (tokens[1] == "pub") {
-            if (size == 5){
+            if (size >= 5){
                 if (!tokens[2].empty() && !tokens[3].empty() && !tokens[4].empty()) {
                     auto pub_node = std::make_shared<Hnu::Middleware::Node>("publish_node");
-                    publishTopic(pub_node, tokens[2], tokens[3], tokens[4]);
+                    //确定发布数据的频率
+                    if(size == 6){
+                        if(tokens[5] == "--once"){
+                            rate_flag = 0;
+                        }
+                        else if(tokens[5] == "--rate"){
+                            std::cerr << "Error: rate is required for pub" << std::endl;
+                        }
+                    }
+                    else if(size == 7){
+                        if(tokens[5] == "--rate"){
+                            rate = std::stoi(tokens[6]);
+                        }
+                    }
+                    publishTopic(pub_node, tokens[2], tokens[3], tokens[4], rate, rate_flag);
                 } else {
                     std::cerr << "Error: topic name, message type, and message value are required for pub" << std::endl;
                 }
@@ -321,7 +409,7 @@ int main(int argc, char* argv[]){
         std::cout << "Commands: " << std::endl;
         std::cout << "  topic|node list: show all topics or nodes" << std::endl;
         std::cout << "  topic echo <topic_name>: Display information for <topic_name>" << std::endl;
-        std::cout << "  topic pub <topic_name> <message_type> <message_value>: Publish <message_value> to <topic_name> with <message_type>" << std::endl;
+        std::cout << "  topic pub <topic_name> <message_type> <message_value> (--rate|--once): Publish <message_value> to <topic_name> with <message_type> and unnecessary option (--rate with an integer)" << std::endl;
     }
     else{
         std::cerr << "Unknown command, press [-h] for more detailed usage" <<std::endl;
