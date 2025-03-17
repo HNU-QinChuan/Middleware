@@ -39,6 +39,7 @@ int main(int argc,char* argv[]){
     }
     reflection->SetString(message, field, it->asString());
   }
+  std::cout<<message->DebugString()<<std::endl;
   auto publisher=node.createPublisher<google::protobuf::Message>(topic,type);
   auto timer=node.createTimer(500,[&]{
     publisher->publish(*message);

@@ -7,6 +7,7 @@
 #include "hmw/SubscriberInterface.hpp"
 #include"Define.hpp"
 #include "hmw/NodeImpl.hpp"
+#include<google/protobuf/message.h>
 
 namespace Hnu::Middleware {
 
@@ -14,6 +15,7 @@ namespace Hnu::Middleware {
   class Subscriber:public SubscriberInterface {
   public:
     Subscriber(asio::io_context& ioc,NodeImpl* node,const std::string& topic_name);
+    Subscriber(asio::io_context& ioc,NodeImpl* node,const std::string& topic_name,const std::string& type);
     bool run(const std::function<void(std::shared_ptr<Message>)>& callback);
     // void createSubscribe(const std::function<void(std::shared_ptr<Message> message)>& callback);
   private:
@@ -30,6 +32,7 @@ namespace Hnu::Middleware {
     std::function<void(std::shared_ptr<Message> message)> m_callback;
     uint64_t m_eventfdValue;
     std::string m_type;
+    const google::protobuf::Message* m_prototype;
   };
 
 }

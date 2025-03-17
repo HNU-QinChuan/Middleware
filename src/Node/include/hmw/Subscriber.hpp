@@ -15,6 +15,13 @@ namespace Hnu::Middleware {
     :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name),m_eventfdValue(0){
     auto des=Message::descriptor();
     m_type=des->full_name();
+    m_prototype = google::protobuf::MessageFactory::generated_factory()->GetPrototype(des);
+  }
+  template<typename Message>
+  Subscriber<Message>::Subscriber(asio::io_context& ioc,NodeImpl* node, const std::string& topic_name,const std::string& type)
+    :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name),m_eventfdValue(0),m_type(type){
+      const google::protobuf::Descriptor* descriptor =google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(type);
+      m_prototype = google::protobuf::MessageFactory::generated_factory()->GetPrototype(descriptor);
   }
   template<typename Message>
   bool Subscriber<Message>::run(const std::function<void(std::shared_ptr<Message>)>& callback) {
@@ -82,7 +89,7 @@ namespace Hnu::Middleware {
       return;
     }
     for (int i=0;i<m_eventfdValue;++i) {
-      auto message=std::make_shared<Message>();
+      auto message=std::shared_ptr<Message>(static_cast<Message*>(m_prototype->New()));
       string data{m_shm.get_segment_manager()};
       if(queue->pop(data)){
         message->ParseFromArray(data.data(),data.size());

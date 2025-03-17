@@ -21,5 +21,5 @@ target_link_libraries(pub Middleware-Node::Middleware-Node  Middleware-Msgs::Std
 add_executable(sub src/sub.cpp)
 target_link_libraries(sub Middleware-Node::Middleware-Node  Middleware-Msgs::Std)
 
-add_executable(topicpub src/topicpub.cpp)
-target_link_libraries(topicpub Middleware-Node::Middleware-Node  Middleware-Msgs::Std jsoncpp)
+add_executable(topicecho src/topicecho.cpp)
+target_link_libraries(topicecho Middleware-Node::Middleware-Node  Middleware-Msgs::Std jsoncpp)
