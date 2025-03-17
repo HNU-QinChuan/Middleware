@@ -17,6 +17,7 @@ namespace Hnu::Middleware {
   class Publisher :public PublisherInterface {
   public:
     Publisher(asio::io_context& ioc, NodeImpl* node,const std::string& topic_name);
+    Publisher(asio::io_context& ioc, NodeImpl* node,const std::string& topic_name,const std::string& type);
     bool run();
     void publish(const Message& message);
   private:

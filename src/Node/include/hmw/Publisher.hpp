@@ -19,6 +19,10 @@ namespace Hnu::Middleware {
     m_type=des->full_name();
   }
   template <typename Message>
+  Publisher<Message>::Publisher(asio::io_context& ioc,NodeImpl* node, const std::string& topic_name,const std::string& type)
+    :m_ioc(ioc),m_socket(ioc),m_node(node),m_topic_name(topic_name),m_type(type){
+  }
+  template <typename Message>
   bool Publisher<Message>::run(){
     m_event_fd=eventfd(0,0);
     if(m_event_fd==-1){

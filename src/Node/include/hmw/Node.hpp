@@ -43,6 +43,21 @@ namespace Hnu::Middleware {
       return publish;
     }
     template <typename Message>
+    std::shared_ptr<Publisher<Message>> createPublisher(const std::string& topic,const std::string& type){
+      if (m_impl.containsPublisher(topic)) {
+        return std::static_pointer_cast<Publisher<Message>>(m_impl.getPublisher(topic));
+      }
+      auto publish=std::make_shared<Publisher<Message>>(m_ioc,&m_impl,topic,type);
+      if(!publish->run()){
+        spdlog::error("error on create publish: {}",topic);
+        throw std::runtime_error("error on create publish");
+        // return nullptr;
+      }
+      m_impl.addPublisher(topic, std::static_pointer_cast<PublisherInterface>(publish));
+      spdlog::debug("Create publish: {}",topic);
+      return publish;
+    }
+    template <typename Message>
     std::shared_ptr<Subscriber<Message>> createSubscriber(const std::string& topic,const std::function<void(std::shared_ptr<Message>)>& callback){
       if (m_impl.containsSubscriber(topic)) {
         return std::static_pointer_cast<Subscriber<Message>>(m_impl.getSubscriber(topic));
