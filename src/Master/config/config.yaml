@@ -3,7 +3,7 @@ host1:
     tcp:
       ip: "127.0.0.1"
       port: 8080
-      segement: 1
+      segment: 1
 
 
 host2:
@@ -11,6 +11,6 @@ host2:
     tcp:
       ip: "127.0.0.1"
       port: 8081
-      segement: 1
+      segment: 1
 
 
