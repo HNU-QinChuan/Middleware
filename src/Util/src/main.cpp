@@ -1,6 +1,7 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <iostream>
+#include <jsoncpp/json/reader.h>
 #include <string>
 #include <algorithm>
 #include <boost/beast/core.hpp>
@@ -26,15 +27,6 @@ namespace beast = boost::beast;
 namespace asio = boost::asio;
 namespace http = beast::http;
 
-//分离出Std和数据类型
-std::string transformMessageType(const std::string& message_type) {
-    size_t pos = message_type.find('.');
-    if (pos != std::string::npos) {
-        return message_type.substr(0, pos) + "::" + message_type.substr(pos + 1);
-    }
-    return message_type;
-}
-
 template <typename T>
 T json_list(asio::local::stream_protocol::socket& socket, const std::string& key){
     //读取响应
@@ -44,26 +36,20 @@ T json_list(asio::local::stream_protocol::socket& socket, const std::string& key
 
     std::string response_body = beast::buffers_to_string(res.body().data());
     // std::cout << "HTTP Resoponse : \n" << response_body << std::endl;
-    // std::vector<std::string> json_list(const std::string& key){
+
     T result;
     //解析json响应
     Json::Reader reader;
     Json::Value jsonData;
     std::string errs;
 
-    std::string jsonString = R"({
-    "message_type": [
-        "int"
-    ]
-    })";
-
     if (!reader.parse(response_body, jsonData)){
-        std::cerr << "JSON 解析失败： " << reader.getFormattedErrorMessages() << std::endl;
+        std::cerr << "Failed to parse json: " << reader.getFormattedErrorMessages() << std::endl;
         return result;
     }
 
     if (!jsonData.isMember(key)) {
-        std::cerr << "读取错误: " << key << " 不存在！" << std::endl;
+        std::cerr << key << " not found in json" << std::endl;
         return result;
     }
 
@@ -79,9 +65,10 @@ T json_list(asio::local::stream_protocol::socket& socket, const std::string& key
     else if constexpr (std::is_same_v<T, std::string>) {
         // 处理单个字符串
         result = jsonData[key].asString();
+        // std::cout << result << std::endl;
     } 
     else {
-        std::cout << "读取错误！" << std::endl;
+        std::cout << "Failed to read." << std::endl;
     }
     return result;
 }
@@ -99,7 +86,7 @@ void send_list_http(const std::string& host, const std::string& target, const st
 
         //读取响应
         std::vector<std::string> response = json_list<std::vector<std::string>>(socket, key);
-        std::cout << key << " :" <<std::endl;
+        std::cout << key << ":" <<std::endl;
         for (const auto& item : response){
             std::cout << item << std::endl;
         }
@@ -142,84 +129,32 @@ std::string send_echo_http(const std::string& host, const std::string& target, c
 }
 
 
-std::unordered_map<std::string, std::function<void(std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name)>> subscribe_handlers = {
-    {"Std::String", [](std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name){
-        auto subscriber = node -> createSubscriber<Std::String>(topic_name,
-            [](std::shared_ptr<Std::String> message){
-                std::cout << "Received data: (" << message -> GetTypeName() << ")" << message -> data() << std::endl;
-        });
-    }}
-    // {"Std::dgps", [](std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name){
-    //     auto subscriber = node -> createSubscriber<Std::dgps>(topic_name,
-    //         [](std::shared_ptr<Std::dgps> message){
-    //             std::cout << "Received data: (" << message -> GetTypeName() << ")" << message -> data() << std::endl;
-    //     });
-    // }}
-};
-
 void subscribe_and_echo(std::shared_ptr<Hnu::Middleware::Node> node, 
                         const std::string& topic_name, 
                         const std::string& message_type){
-    std::string std_type = transformMessageType(message_type);
-    //使用哈希表存储不同数据类型及对应的function
-    if (subscribe_handlers.count(std_type)) {
-        subscribe_handlers[std_type](node, topic_name);  // 调用对应的 lambda 处理函数
-        std::cout << "Successfully subscribe " << topic_name << ", waiting for message..." << std::endl;
-        node -> run();
-    } else {
-        std::cerr << "Unknown message type: " << std_type << std::endl;
+    const google::protobuf::Descriptor* descriptor = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(message_type);
+    if (descriptor == nullptr) {
+        std::cerr << "[ERROR] Cannot found " << message_type
+          << " in DescriptorPool" << std::endl;
+        return;
     }
-
-    // if(message_type == "Std.String"){
-    //     auto subscriber = node -> createSubscriber<Std::String>(topic_name,
-    //         [](std::shared_ptr<Std::String> message){
-    //             std::cout << "Received data: (" << message -> GetTypeName() << ")" << message -> data() << std::endl;
-    //     });
-    // } 
-    // else if(message_type == "Std.dgps"){
-    //     auto subscriber = node -> createSubscriber<Std::dgps>(topic_name,
-    //         [](std::shared_ptr<Std::dgps> message){
-    //             std::cout << "Received data: (" << message -> GetTypeName() << ")" << message -> data() << std::endl;
-    //     });
-    // } 
-    // else {
-    //     std::cerr << "Unknown Protobuf message type: " << message_type << std::endl;
-    // }
-    //node -> run();
+    auto subscriber = node->createSubscriber<google::protobuf::Message>(topic_name, message_type, [&](std::shared_ptr<google::protobuf::Message> message){
+        std::cout << "Received data (" << message_type << "): " << message -> DebugString() << std::endl;
+    });
+    node -> run();
 }
 
 template <typename T>
 void publish_message(std::shared_ptr<Hnu::Middleware::Node> node, 
                      const std::string& topic_name, 
-                     const T& message) {
-    auto publisher = node->createPublisher<T>(topic_name);
+                     const T& message,
+                     const std::string& message_type) {
+    auto publisher = node->createPublisher<google::protobuf::Message>(topic_name,message_type);
     publisher->publish(message);
     std::cout << "Publishing(" << message.GetTypeName() 
               << ") message to topic " << topic_name 
               << ": " << message.DebugString() << std::endl;
 }
-
-// 处理函数映射
-std::unordered_map<std::string, std::function<void(std::shared_ptr<Hnu::Middleware::Node> node, 
-                                const std::string& topic_name, 
-                                std::shared_ptr<google::protobuf::Message>& message,
-                                int rate, bool rate_flag)>> publish_handlers = {
-    {"Std::String", [](std::shared_ptr<Hnu::Middleware::Node> node, const std::string& topic_name,
-                            std::shared_ptr<google::protobuf::Message> message,
-                            int rate, bool rate_flag) 
-        {
-            auto msg = std::static_pointer_cast<Std::String>(message);
-            if (rate_flag == 0){
-                publish_message(node, topic_name, *msg);
-            }
-            else{
-                auto timer = node->createTimer(rate, [node, topic_name, msg]() {
-                    publish_message(node, topic_name, *msg);
-                });
-            }
-        }
-    }
-};
 
 void create_protobuf_message(std::shared_ptr<Hnu::Middleware::Node> node,
     const std::string& topic_name,
@@ -247,34 +182,32 @@ void create_protobuf_message(std::shared_ptr<Hnu::Middleware::Node> node,
     std::shared_ptr<google::protobuf::Message> message(prototype->New());
 
     const google::protobuf::Reflection* reflection = message->GetReflection();
-    const google::protobuf::FieldDescriptor* field = descriptor->FindFieldByName("data");
-
-    if (!field) {
-        std::cerr << "Protobuf type(" << message_type << ") is missing the 'data' field or has an incorrect type" << std::endl;
+    
+    //解析JSON文件并赋值
+    Json::Reader reader;
+    Json::Value jsonData;
+    if(!reader.parse(message_value,jsonData)){
+        std::cerr << "Failed to parse json: " << message_value <<std::endl;
         return;
     }
-
-    reflection->SetString(message.get(), field, message_value);
-
-    std::string std_type = transformMessageType(message_type);
-    //std::cout << "Replaced type: " << std_type << std::endl;
-
-    //使用哈希表存储不同数据类型及对应的function
-    if (publish_handlers.count(std_type)) {
-        publish_handlers[std_type](node, topic_name, message, rate, rate_flag);  // 调用对应的 lambda 处理函数
-    } else {
-        std::cerr << "Unknown message type: " << std_type << std::endl;
+    for (auto it = jsonData.begin(); it != jsonData.end() ; ++it) {
+        const google::protobuf::FieldDescriptor* field = descriptor -> FindFieldByName(it.key().asString());
+        if(field == nullptr){
+           std::cerr << "Protobuf type(" << message_type << ") is missing the "<< it.key().asString() << "field or has an incorrect type" << std::endl;
+            return;
+        }
+        reflection -> SetString(message.get(), field, it -> asString());
     }
+    //std::cout<<message->DebugString()<<std::endl;
 
-    // if (message_type == "Std.String") {
-    //     publish_message(node, topic_name, *dynamic_cast<Std::String*>(message.get()));
-    // } 
-    // // else if (message_type == "Std.dgps") {
-    // //     publish_message(node, topic_name, *dynamic_cast<Std::dgps*>(message.get()));
-    // // } 
-    // else {
-    //     std::cerr << "Unknown Protobuf message type: " << message_type << std::endl;
-    // }
+    if (rate_flag == 0){
+        publish_message(node, topic_name, *message, message_type);
+    }
+    else{
+        auto timer = node->createTimer(rate, [node, topic_name, message, message_type]() {
+            publish_message(node, topic_name, *message, message_type);
+        });
+    }
 
     node -> run();
     return;
@@ -286,10 +219,9 @@ void data_list(const std::string& host, const std::string& target, const std::st
     send_list_http(host, target, key);
 }
 
-void showTopicInfo(std::shared_ptr<Hnu::Middleware::Node> node, 
+void showTopicEcho(std::shared_ptr<Hnu::Middleware::Node> node, 
                     const std::string& host, const std::string& target, 
                     const std::string& key, const std::string& topic_name) {
-    std::cout << "Displaying information for topic: " << topic_name << std::endl;
     //获取话题数据类型
     std::string type = send_echo_http(host, target, key, topic_name);
     //创建订阅者并输出话题数据
@@ -309,8 +241,9 @@ void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node,
 
 int main(int argc, char* argv[]){
     //强制注册数据类型
-    // protobuf_Std_2fString_2eproto::AddDescriptors();
-    // protobuf_Std_2fdgps_2eproto::AddDescriptors();
+    protobuf_Std_2fString_2eproto::AddDescriptors();
+    //protobuf_Std_2fdgps_2eproto::AddDescriptors();
+    //GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     std::string host = "localhost";
     std::string topic_target = "/topic";
@@ -345,7 +278,7 @@ int main(int argc, char* argv[]){
             if (size == 3){
                 if (!tokens[2].empty()) {
                     auto echo_node = std::make_shared<Hnu::Middleware::Node>("echo_node");
-                    showTopicInfo(echo_node, host, echo_target, echo_key,tokens[2]);
+                    showTopicEcho(echo_node, host, echo_target, echo_key,tokens[2]);
                 } else {
                     std::cerr << "Error: topic name is required for echo" << std::endl;
                 }

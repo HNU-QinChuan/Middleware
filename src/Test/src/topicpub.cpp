@@ -7,6 +7,7 @@
 
 
 int main(int argc,char* argv[]){
+  
   if(argc!=6){
     std::cerr<<"Usage: "<<argv[0]<<" topic pub <topic> <type> <msg>"<<std::endl;
     return 1;

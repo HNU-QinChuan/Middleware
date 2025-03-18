@@ -4,8 +4,10 @@
 #include<boost/beast.hpp>
 #include<jsoncpp/json/json.h>
 #include<google/protobuf/message.h>
+#include <Std/String.pb.h>
 
 int main(int argc,char* argv[]){
+  protobuf_Std_2fString_2eproto::AddDescriptors();
   if(argc!=4){
     std::cerr<<"Usage: "<<argv[0]<<" topic echo <topic> "<<std::endl;
     return 1;

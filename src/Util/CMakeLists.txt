@@ -9,4 +9,8 @@ find_package(Boost REQUIRED COMPONENTS program_options)
 
 add_executable(middleware-util src/main.cpp)
 
-target_link_libraries(middleware-util Middleware-Node::Middleware-Node Middleware-Msgs::Std Boost::program_options pthread jsoncpp protobuf)
+target_link_libraries(middleware-util 
+Middleware-Node::Middleware-Node 
+Middleware-Msgs::Std 
+Boost::program_options 
+pthread jsoncpp protobuf)
