@@ -241,7 +241,7 @@ void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node,
 
 int main(int argc, char* argv[]){
     //强制注册数据类型
-    protobuf_Std_2fString_2eproto::AddDescriptors();
+    // protobuf_Std_2fString_2eproto::AddDescriptors();
     //protobuf_Std_2fdgps_2eproto::AddDescriptors();
     //GOOGLE_PROTOBUF_VERIFY_VERSION;
 
