@@ -14,3 +14,5 @@ Middleware-Node::Middleware-Node
 Middleware-Msgs::Std 
 Boost::program_options 
 pthread jsoncpp protobuf)
+
+target_link_options(middleware-util PRIVATE "-Wl,--no-as-needed")
