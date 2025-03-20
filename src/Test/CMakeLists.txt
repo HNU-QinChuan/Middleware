@@ -23,6 +23,8 @@ target_link_libraries(sub Middleware-Node::Middleware-Node  Middleware-Msgs::Std
 
 add_executable(topicecho src/topicecho.cpp)
 target_link_libraries(topicecho Middleware-Node::Middleware-Node  Middleware-Msgs::Std jsoncpp)
+target_link_options(topicecho PRIVATE "-Wl,--no-as-needed")
 
 add_executable(topicpub src/topicpub.cpp)
 target_link_libraries(topicpub Middleware-Node::Middleware-Node  Middleware-Msgs::Std jsoncpp)
+target_link_options(topicpub PRIVATE "-Wl,--no-as-needed")

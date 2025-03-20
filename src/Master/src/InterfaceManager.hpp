@@ -1,4 +1,6 @@
-
+#include "interface/Host.hpp"
+#include <vector>
+#include <memory>
 
 
 namespace Hnu::Interface {
@@ -9,6 +11,9 @@ namespace Hnu::Interface {
     InterfaceManager(InterfaceManager&&) = delete;
     InterfaceManager& operator=(InterfaceManager&&) = delete;
     static InterfaceManager& getInstance();
+
+    std::vector<Host*> hosts;
+
   private:
     InterfaceManager()=default;
 

@@ -12,7 +12,7 @@ execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_D
 aux_source_directory(src/Std Std)
 add_library(Std SHARED ${Std})
 target_include_directories(Std PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-# target_link_libraries(Std PUBLIC protobuf::libprotobuf)
+# target_link_options(Std PUBLIC "-Wl,--no-as-needed")
 add_library(${PROJECT_NAME}::Std ALIAS Std)
 
 
