@@ -10,11 +10,15 @@ include_directories(src)
 
 aux_source_directory(src/shm shm)
 aux_source_directory(src/shm/controller shm_controller)
+aux_source_directory(src/interface interface)
+aux_source_directory(src/tcp tcp)
 
 
 add_executable(${PROJECT_NAME} src/main.cpp
     ${shm}
     ${shm_controller}
+    ${interface}
+    ${tcp}
     src/MiddlewareManager.cpp
     src/MiddlewareManager.hpp
     src/InterfaceManager.cpp
