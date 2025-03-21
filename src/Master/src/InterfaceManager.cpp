@@ -4,7 +4,7 @@
 #include<filesystem>
 #include <fstream>
 #include "tcp/TcpInterface.hpp"
-#include "tcp/TcpHost.hpp"
+#include "tcp/TcpHostInterface.hpp"
 
 namespace Hnu::Interface {
 
@@ -17,7 +17,7 @@ namespace Hnu::Interface {
   void InterfaceManager::init(const std::string& hostName){
     m_hostName = hostName;
     std::string execpath=std::filesystem::canonical("/proc/self/exe").parent_path();
-    std::string configPath = execpath+"./config.json";
+    std::string configPath = execpath+"/masterconfig.json";
     std::ifstream configFile(configPath);
     if (!configFile.is_open()) {
       spdlog::error("Failed to open config file: {}", configPath);
@@ -53,28 +53,39 @@ namespace Hnu::Interface {
     for(const auto& host : hosts) {
       std::string hostName = host["name"].asString();
       if(hostName!=m_hostName){
+        std::shared_ptr<Host> hostInstance=std::make_shared<Host>(hostName);
         const Json::Value& interfaces = host["interfaces"];
         for (const auto& interface : interfaces) {
           std::string interfaceName = interface["name"].asString();
           std::string type = interface["type"].asString();
           int segment = interface["segment"].asInt();
-          std::shared_ptr<Host> hostInstance;
+          std::shared_ptr<HostInterface> hostInterface;
           if(type=="tcp"){
             std::string ip = interface["ip"].asString();
             int port = interface["port"].asInt();
-            hostInstance = std::make_shared<Tcp::TcpHost>(interfaceName, type, segment, ip, port);
+            hostInterface = std::make_shared<Tcp::TcpHostInterface>(interfaceName, type, segment, ip, port);
           }
-          hostlist[hostName] = hostInstance;
-          for(auto&[key,value]:interfaceList){
+          hostInstance->setHostInterface(interfaceName, hostInterface);
+          for(auto& [key,value]:interfaceList){
             if(value->getSegment()==segment){
-              value->insertHost(key, hostName, hostInstance);
+              value->setHostInterface(interfaceName, hostInterface);
             }
           }
         }
       }
     }
-
-
-
+    map.init(hosts, m_hostName);
+    route = map.getRoute();
+    for (const auto& [key, value] : route) {
+      spdlog::debug("Route: {} -> {} -> {}", key, value.first, value.second);
+    }
+  }
+  void InterfaceManager::run(){
+    for(const auto&[key,value]:interfaceList){
+      std::thread* thread = new std::thread([value]() {
+        value->run();
+      });
+      threads.push_back(thread);
+    }
   }
 }

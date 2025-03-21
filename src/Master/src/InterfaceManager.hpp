@@ -18,14 +18,16 @@ namespace Hnu::Interface {
     // static InterfaceManager& getInstance();
     static InterfaceManager interfaceManager;
     void init(const std::string& hostName);
+    void run();
 
   private:
     InterfaceManager()=default;
-    std::unordered_map<std::string, std::vector<std::string>> topic2host;
-    std::unordered_map<std::string, std::pair<std::string, std::string>> route;//desthost interface nexthost
+    std::unordered_map<std::string, std::vector<std::string>> topic2host;//topic对host的映射
+    std::unordered_map<std::string, std::pair<std::string, std::string>> route;//desthost interface nextinterface
     std::unordered_map<std::string, std::shared_ptr<Host>> hostlist;
     std::unordered_map<std::string, std::shared_ptr<Interface>> interfaceList;
     Map map;
     std::string m_hostName;
+    std::vector<std::thread*> threads;
   };
 }

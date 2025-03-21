@@ -11,12 +11,14 @@ namespace Hnu::Interface {
       if(hostName==localhost){
         key2node[0]=hostName;
         const Json::Value& interfaces = host["interfaces"];
+        std::unordered_map<int, std::string> localSegemnt2interface;
         for (const auto& interface : interfaces) {
           std::string interfaceName = interface["name"].asString();
           int segment = interface["segment"].asInt();
           localSegemnt2interface[segment]=interfaceName;
           segment2node[segment].push_back(0);
         }
+        segment2interface.push_back(localSegemnt2interface);
         break;  
       }
 
@@ -28,11 +30,14 @@ namespace Hnu::Interface {
         i++;
         key2node[i]=hostName;
         const Json::Value& interfaces = host["interfaces"];
+        std::unordered_map<int, std::string> s2i;
         for (const auto& interface : interfaces) {
           std::string interfaceName = interface["name"].asString();
           int segment = interface["segment"].asInt();
+          s2i[segment]=interfaceName;
           segment2node[segment].push_back(i);
         }
+        segment2interface.push_back(s2i);
       }
     }
     map.resize(i+1);
@@ -86,7 +91,7 @@ namespace Hnu::Interface {
         int cur=i;
         while(par!=-1){
           if(par==0){
-            route[key2node[i]]=std::make_pair(localSegemnt2interface[map[par][cur].segment],key2node[cur]);
+            route[key2node[i]]=std::make_pair(segment2interface[par][map[par][cur].segment],segment2interface[cur][map[par][cur].segment]);
           }
           cur=par;
           par=parent[par];

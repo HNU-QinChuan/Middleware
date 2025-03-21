@@ -24,7 +24,8 @@ namespace Hnu::Interface {
     std::unordered_map<int, std::string> key2node;
     std::unordered_map<int, std::vector<int>> segment2node;
     std::vector<std::vector<line>> map;
-    std::unordered_map<int, std::string> localSegemnt2interface;
+    // std::unordered_map<int, std::string> localSegemnt2interface;
+    std::vector<std::unordered_map<int, std::string>> segment2interface;
 
 
   };
