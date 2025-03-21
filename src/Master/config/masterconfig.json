@@ -1,0 +1,37 @@
+{
+  "hosts":
+  [
+    {
+      "name":"host1",
+      "interfaces":
+      [
+        {
+          "name":"interface1",
+          "type":"tcp",
+          "ip":"127.0.0.1",
+          "port":8080,
+          "segmnet":1
+        }
+      ]
+    },
+    {
+      "name":"host2",
+      "interfaces":
+      [
+        {
+          "name":"interface2",
+          "type":"tcp",
+          "ip":"127.0.0.1",
+          "port":"8081",
+          "segmnet":2
+        }
+      ]
+    }
+  ],
+  "map":
+  {
+
+  }
+
+
+}

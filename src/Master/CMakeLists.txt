@@ -19,10 +19,19 @@ add_executable(${PROJECT_NAME} src/main.cpp
     src/MiddlewareManager.hpp
     src/InterfaceManager.cpp
     src/InterfaceManager.hpp
-
 )
 
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt jsoncpp)
+
+
+#install config/masterconfig.json到CMAKE_RUNTIME_OUTPUT_DIRECTORY
+#不调用install，而是在构建后
+add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/config/masterconfig.json ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/masterconfig.json
+    COMMENT "拷贝配置文件到输出目录"
+)
 
 add_custom_command(
     TARGET ${PROJECT_NAME}
