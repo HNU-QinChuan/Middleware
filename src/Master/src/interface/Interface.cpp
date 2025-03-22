@@ -12,4 +12,14 @@ namespace Hnu::Interface {
   void Interface::setHostInterface(const std::string& name, std::shared_ptr<HostInterface> hostInterface) {
     name2hostInterface[name] = hostInterface;
   }
+
+  void Interface::start(){
+    run();
+    for(auto&[key,value]:name2hostInterface){
+      value->run(ioc);
+    }
+
+    asio::io_context::work work(ioc);
+    ioc.run();
+  }
 }

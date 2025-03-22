@@ -6,6 +6,7 @@
 #include<unordered_map>
 #include <vector>
 #include <memory>
+#include<boost/beast.hpp>
 
 
 namespace Hnu::Interface {
@@ -19,6 +20,8 @@ namespace Hnu::Interface {
     static InterfaceManager interfaceManager;
     void init(const std::string& hostName);
     void run();
+    static void broadcast(std::string jsonString);
+    static void newConnectRun();
 
   private:
     InterfaceManager()=default;
@@ -29,5 +32,7 @@ namespace Hnu::Interface {
     Map map;
     std::string m_hostName;
     std::vector<std::thread*> threads;
+    boost::asio::io_context ioc;//InterfaceManager的数据处理线程
+    std::thread* iocTread;
   };
 }

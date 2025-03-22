@@ -5,6 +5,7 @@
 #include <fstream>
 #include "tcp/TcpInterface.hpp"
 #include "tcp/TcpHostInterface.hpp"
+#include "MiddlewareManager.hpp"
 
 namespace Hnu::Interface {
 
@@ -42,7 +43,7 @@ namespace Hnu::Interface {
           int segment = interface["segment"].asInt();
           if(type=="tcp"){
             std::string ip = interface["ip"].asString();
-            int port = interface["port"].asInt();
+            unsigned port = interface["port"].asUInt();
             auto tcpInterface = std::make_shared<Tcp::TcpInterface>(interfaceName, type, segment, ip, port);
             interfaceList[interfaceName] = tcpInterface;
           }
@@ -62,8 +63,8 @@ namespace Hnu::Interface {
           std::shared_ptr<HostInterface> hostInterface;
           if(type=="tcp"){
             std::string ip = interface["ip"].asString();
-            int port = interface["port"].asInt();
-            hostInterface = std::make_shared<Tcp::TcpHostInterface>(interfaceName, type, segment, ip, port);
+            unsigned port = interface["port"].asUInt();
+            hostInterface = std::make_shared<Tcp::TcpHostInterface>(interfaceName,hostName, type, segment, ip, port);
           }
           hostInstance->setHostInterface(interfaceName, hostInterface);
           for(auto& [key,value]:interfaceList){
@@ -81,11 +82,23 @@ namespace Hnu::Interface {
     }
   }
   void InterfaceManager::run(){
+    iocTread = new std::thread([this]() {
+      asio::io_context::work work(ioc);
+      ioc.run();
+    });
     for(const auto&[key,value]:interfaceList){
       std::thread* thread = new std::thread([value]() {
-        value->run();
+        value->start();
       });
       threads.push_back(thread);
     }
+  }
+  void InterfaceManager::newConnectRun(){
+    Middleware::MiddlewareManager::getIoc().
+    post(std::bind(Middleware::MiddlewareManager::getAllNodeInfo,std::ref(interfaceManager.ioc),
+    &InterfaceManager::broadcast));
+  }
+  void InterfaceManager::broadcast(std::string jsonString){
+    
   }
 }

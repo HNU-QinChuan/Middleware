@@ -16,7 +16,8 @@ namespace Hnu::Interface{
     void setHostInterface(const std::string& name, std::shared_ptr<HostInterface> hostInterface);
 
 
-    virtual void run()=0;
+    virtual void run() = 0;
+    void start();
 
   protected:
     asio::io_context ioc;

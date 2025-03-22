@@ -6,7 +6,6 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
-#include <unordered_set>
 #include"interface/HostInterface.hpp"
 
 namespace Hnu::Interface{
@@ -17,8 +16,8 @@ namespace Hnu::Interface{
 
   private:
     std::string m_name;
-    std::unordered_map<std::string, std::unordered_set<std::string>> node2pubtopic;
-    std::unordered_map<std::string, std::unordered_set<std::string>> node2subtopic;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> node2pubtopic2type;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> node2subtopic2type;
 
     std::unordered_map<std::string, std::shared_ptr<HostInterface>> hostInterfaceList;
   };

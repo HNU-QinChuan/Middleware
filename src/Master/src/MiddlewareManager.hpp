@@ -8,6 +8,7 @@
 #include "shm/Publish.hpp"
 #include "shm/Subscribe.hpp"
 #include "shm/Node.hpp"
+#include <jsoncpp/json/value.h>
 #include<unordered_map>
 #include<vector>
 
@@ -25,6 +26,8 @@ namespace Hnu::Middleware {
     static void transferMessage(const std::string& topic,const std::string& message);
     static boost::asio::io_context& getIoc();
     static void run();
+    static void getAllNodeInfo(asio::io_context& ioc,const std::function<void(std::string)>& callback);
+
     std::unordered_map<std::string,std::shared_ptr<Node>> m_nodes;
     std::unordered_map<std::string,std::vector<std::shared_ptr<Publish>>> m_publishes;
     std::unordered_map<std::string,std::vector<std::shared_ptr<Subscribe>>> m_subscribes;
