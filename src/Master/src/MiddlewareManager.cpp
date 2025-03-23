@@ -3,6 +3,7 @@
 //
 
 #include "MiddlewareManager.hpp"
+#include "InterfaceManager.hpp"
 #include "shm/Acceptor.hpp"
 #include <jsoncpp/json/writer.h>
 #include <spdlog/spdlog.h>
@@ -30,7 +31,7 @@ namespace Hnu::Middleware {
       subscribe->publish2Node(message);
     }
   }
-  void MiddlewareManager::getAllNodeInfo(asio::io_context& ioc,const std::function<void(std::string)>& callback){
+  std::string MiddlewareManager::getAllNodeInfo(){
     Json::Value root;
     Json::Value nodes(Json::arrayValue);
         /*
@@ -88,7 +89,7 @@ namespace Hnu::Middleware {
     root["nodes"]=nodes;
     Json::StreamWriterBuilder writer;
     std::string jsonString = Json::writeString(writer, root);
-    ioc.post(std::bind_front(callback, jsonString));
+    return jsonString;
   }
 
 

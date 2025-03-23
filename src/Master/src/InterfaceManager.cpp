@@ -82,23 +82,24 @@ namespace Hnu::Interface {
     }
   }
   void InterfaceManager::run(){
-    iocTread = new std::thread([this]() {
-      asio::io_context::work work(ioc);
-      ioc.run();
-    });
     for(const auto&[key,value]:interfaceList){
-      std::thread* thread = new std::thread([value]() {
-        value->start();
-      });
-      threads.push_back(thread);
+      value->start(Middleware::MiddlewareManager::getIoc());
     }
   }
-  void InterfaceManager::newConnectRun(){
-    Middleware::MiddlewareManager::getIoc().
-    post(std::bind(Middleware::MiddlewareManager::getAllNodeInfo,std::ref(interfaceManager.ioc),
-    &InterfaceManager::broadcast));
+
+  void InterfaceManager::broadcast(http::request<http::string_body>& req){
+    req.set("src",InterfaceManager::interfaceManager.m_hostName);
+    for(auto&[host,hostptr]:InterfaceManager::interfaceManager.hostlist){
+      req.set("dest",host);
+      std::string interfaceName=InterfaceManager::interfaceManager.route[host].first;
+      std::string nextInterface=InterfaceManager::interfaceManager.route[host].second;
+      InterfaceManager::interfaceManager.interfaceList[interfaceName]->send(nextInterface,req);
+    }
   }
-  void InterfaceManager::broadcast(std::string jsonString){
-    
+
+  void InterfaceManager::transfer(const std::string& dest,http::request<http::string_body>& req){
+    std::string interfaceName=InterfaceManager::interfaceManager.route[dest].first;
+    std::string nextInterface=InterfaceManager::interfaceManager.route[dest].second;
+    InterfaceManager::interfaceManager.interfaceList[interfaceName]->send(nextInterface,req);
   }
 }

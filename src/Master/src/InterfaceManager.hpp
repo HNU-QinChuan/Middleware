@@ -10,6 +10,7 @@
 
 
 namespace Hnu::Interface {
+  namespace http = boost::beast::http;
   class InterfaceManager {
   public:
     InterfaceManager(const InterfaceManager&) = delete;
@@ -20,9 +21,9 @@ namespace Hnu::Interface {
     static InterfaceManager interfaceManager;
     void init(const std::string& hostName);
     void run();
-    static void broadcast(std::string jsonString);
-    static void newConnectRun();
-
+    static void broadcast(http::request<http::string_body>& req);
+    static void transfer(const std::string&dest,http::request<http::string_body>& req);
+    std::string m_hostName;
   private:
     InterfaceManager()=default;
     std::unordered_map<std::string, std::vector<std::string>> topic2host;//topic对host的映射
@@ -30,9 +31,6 @@ namespace Hnu::Interface {
     std::unordered_map<std::string, std::shared_ptr<Host>> hostlist;
     std::unordered_map<std::string, std::shared_ptr<Interface>> interfaceList;
     Map map;
-    std::string m_hostName;
-    std::vector<std::thread*> threads;
-    boost::asio::io_context ioc;//InterfaceManager的数据处理线程
-    std::thread* iocTread;
+
   };
 }

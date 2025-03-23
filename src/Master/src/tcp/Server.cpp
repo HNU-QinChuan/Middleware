@@ -1,4 +1,5 @@
 #include "tcp/Server.hpp"
+#include"interface/InterfaceRouter.hpp"
 #include<spdlog/spdlog.h>
 
 
@@ -24,8 +25,9 @@ namespace Hnu::Tcp {
       spdlog::error("Read Error: {}", ec.message());
       return;
     }
-    // UdsRouter::handle(m_request,m_response);
-    doWrite();
+    Interface::InterfaceRouter::handle(m_request);
+    doRead();
+    // doWrite();
   }
   void Server::doWrite() {
     m_response.prepare_payload();

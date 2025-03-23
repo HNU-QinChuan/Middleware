@@ -13,13 +13,17 @@ namespace Hnu::Interface {
     name2hostInterface[name] = hostInterface;
   }
 
-  void Interface::start(){
-    run();
+  void Interface::start(asio::io_context& ioc) {
+    run(ioc);
     for(auto&[key,value]:name2hostInterface){
       value->run(ioc);
     }
 
-    asio::io_context::work work(ioc);
-    ioc.run();
   }
+  void Interface::send(std::string nextInterface,http::request<http::string_body>& req){
+    name2hostInterface[nextInterface]->send(req); 
+  }
+  // void Interface::send(std::string nextInterface,http::request<http::string_body>& req,std::function<void(http::response<http::string_body>&)>& cb){
+  //   name2hostInterface[nextInterface]->send(req,cb); 
+  // }
 }

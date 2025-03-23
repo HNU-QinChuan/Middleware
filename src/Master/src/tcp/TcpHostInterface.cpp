@@ -12,18 +12,61 @@ namespace Hnu::Tcp{
   }
   void TcpHostInterface::run(asio::io_context& ioc) {
     m_stream = std::make_unique<beast::tcp_stream>(ioc);
-    // m_stream->expires_after(std::chrono::seconds(30));
     doConnect();
   }
   void TcpHostInterface::doConnect() {
+    isConnected = false;
     m_stream->async_connect(m_endpoint, std::bind_front(&TcpHostInterface::onConnect, shared_from_this()));
   }
-  void TcpHostInterface::onConnect(beast::error_code ec) {
+  void TcpHostInterface::onConnect(const beast::error_code& ec) {
     if (ec) {
       spdlog::warn("Connect to {} error: {} ,and will reconnect next time",hostName, ec.message());
       return;
     }
     isConnected = true;
-    // spdlog::info("Connected to {}:{}", m_ip, m_port);
+    onNew();
   }
+  void TcpHostInterface::send(boost::beast::http::request<boost::beast::http::string_body>& req) {
+    if (!isConnected) {
+      spdlog::debug("Reconnect to {}", hostName);
+      doConnect();
+      return;
+    }
+    if(!isReady){
+      return;
+    }
+    isReady = false;
+    request = req;
+    beast::http::async_write(*m_stream, request,
+      std::bind_front(&TcpHostInterface::onWrite, shared_from_this()));
+  }
+  void TcpHostInterface::onWrite(const beast::error_code& ec, std::size_t bytes_transferred) {
+    if (ec) {
+      spdlog::warn("Write to {} error: {}", hostName, ec.message());
+      m_stream->close();
+      doConnect();
+      return;
+    }
+    // doRead();
+  }
+  // void TcpHostInterface::doRead() {
+  //   buffer.clear();
+  //   response.clear();
+  //   beast::http::async_read(*m_stream, buffer, response,
+  //     std::bind_front(&TcpHostInterface::onRead, shared_from_this()));
+  // }
+  // void TcpHostInterface::onRead(const beast::error_code& ec, std::size_t bytes_transferred) {
+  //   if (ec) {
+  //     spdlog::warn("Read from {} error: {}", hostName, ec.message());
+  //     m_stream->close();
+  //     doConnect();
+  //     return;
+  //   }
+  //   if (hasCallback) {
+  //     callback(response);
+  //     hasCallback = false;
+  //   }
+  //   isReady = true;
+  // }
+
 }
