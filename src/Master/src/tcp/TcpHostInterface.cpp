@@ -24,7 +24,7 @@ namespace Hnu::Tcp{
       return;
     }
     isConnected = true;
-    onNew();
+    // onNew();
   }
   void TcpHostInterface::send(boost::beast::http::request<boost::beast::http::string_body>& req) {
     if (!isConnected) {

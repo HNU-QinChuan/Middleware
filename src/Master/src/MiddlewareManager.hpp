@@ -24,6 +24,7 @@ namespace Hnu::Middleware {
 
 
     static void transferMessage(const std::string& topic,const std::string& message);
+    static void transferInnerMessage(const std::string& topic,const std::string& message);
     static boost::asio::io_context& getIoc();
     static void run();
     static std::string getAllNodeInfo();

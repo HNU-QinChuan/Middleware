@@ -1,4 +1,5 @@
 #include "interface/Interface.hpp"
+#include<spdlog/spdlog.h>
 
 
 namespace Hnu::Interface {
@@ -21,6 +22,7 @@ namespace Hnu::Interface {
 
   }
   void Interface::send(std::string nextInterface,http::request<http::string_body>& req){
+    // spdlog::debug("Send to {}", nextInterface);
     name2hostInterface[nextInterface]->send(req); 
   }
   // void Interface::send(std::string nextInterface,http::request<http::string_body>& req,std::function<void(http::response<http::string_body>&)>& cb){

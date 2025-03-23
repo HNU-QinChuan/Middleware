@@ -41,12 +41,13 @@ namespace Hnu::Interface {
           std::string interfaceName = interface["name"].asString();
           std::string type = interface["type"].asString();
           int segment = interface["segment"].asInt();
+          std::shared_ptr<Interface> interfacePtr;
           if(type=="tcp"){
             std::string ip = interface["ip"].asString();
             unsigned port = interface["port"].asUInt();
-            auto tcpInterface = std::make_shared<Tcp::TcpInterface>(interfaceName, type, segment, ip, port);
-            interfaceList[interfaceName] = tcpInterface;
+            interfacePtr = std::make_shared<Tcp::TcpInterface>(interfaceName, type, segment, ip, port); 
           }
+          interfaceList[interfaceName] = interfacePtr;
         }
         break;  
       }
@@ -73,6 +74,7 @@ namespace Hnu::Interface {
             }
           }
         }
+        hostlist[hostName] = hostInstance;
       }
     }
     map.init(hosts, m_hostName);
@@ -89,10 +91,12 @@ namespace Hnu::Interface {
 
   void InterfaceManager::broadcast(http::request<http::string_body>& req){
     req.set("src",InterfaceManager::interfaceManager.m_hostName);
+    // spdlog::debug("Broadcast to all hosts");
     for(auto&[host,hostptr]:InterfaceManager::interfaceManager.hostlist){
       req.set("dest",host);
       std::string interfaceName=InterfaceManager::interfaceManager.route[host].first;
       std::string nextInterface=InterfaceManager::interfaceManager.route[host].second;
+      // spdlog::debug("Broadcast to {} via {}:{}",host,interfaceName,nextInterface);
       InterfaceManager::interfaceManager.interfaceList[interfaceName]->send(nextInterface,req);
     }
   }
@@ -101,5 +105,54 @@ namespace Hnu::Interface {
     std::string interfaceName=InterfaceManager::interfaceManager.route[dest].first;
     std::string nextInterface=InterfaceManager::interfaceManager.route[dest].second;
     InterfaceManager::interfaceManager.interfaceList[interfaceName]->send(nextInterface,req);
+  }
+  void InterfaceManager::addNode(const std::string &node){
+    http::request<http::string_body> req{
+      http::verb::post,
+      "/node",
+      11
+    };
+    req.set("node",node);
+    broadcast(req);
+  }
+  void InterfaceManager::addsub(const std::string &node, const std::string &topic, const std::string &type){
+    http::request<http::string_body> req{
+      http::verb::post,
+      "/node/sub",
+      11
+    };
+    req.set("node",node);
+    req.set("sub",topic);
+    req.set("type",type);
+    broadcast(req);
+  }
+  void InterfaceManager::addpub(const std::string &node, const std::string &topic, const std::string &type){
+    http::request<http::string_body> req{
+      http::verb::post,
+      "/node/pub",
+      11
+    };
+    req.set("node",node);
+    req.set("pub",topic);
+    req.set("type",type);
+    broadcast(req);
+  }
+  void InterfaceManager::publish(const std::string &topic, const std::string &data){
+    http::request<http::string_body> req{
+      http::verb::post,
+      "/pub",
+      11
+    };
+    req.set("topic",topic);
+    req.body()=data;
+    auto& host=InterfaceManager::interfaceManager.topic2host[topic];
+    req.set("src",InterfaceManager::interfaceManager.m_hostName);
+    for(auto& hostName:host){
+      req.set("dest",hostName);
+      std::string interfaceName=InterfaceManager::interfaceManager.route[hostName].first;
+      std::string nextInterface=InterfaceManager::interfaceManager.route[hostName].second;
+      InterfaceManager::interfaceManager.interfaceList[interfaceName]->send(nextInterface,req);
+    }
+
   }
 }

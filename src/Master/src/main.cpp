@@ -8,7 +8,7 @@
 
 int main(int argc,char* argv[]) {
   spdlog::set_level(spdlog::level::debug);
-  Hnu::Interface::InterfaceManager::interfaceManager.init("host1");
+  Hnu::Interface::InterfaceManager::interfaceManager.init(argv[1]);
   Hnu::Interface::InterfaceManager::interfaceManager.run();
   Hnu::Middleware::MiddlewareManager::run();
 }

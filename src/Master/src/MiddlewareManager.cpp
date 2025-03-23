@@ -30,6 +30,16 @@ namespace Hnu::Middleware {
     for (auto subscribe:iter->second) {
       subscribe->publish2Node(message);
     }
+    Interface::InterfaceManager::publish(topic, message);
+  }
+  void MiddlewareManager::transferInnerMessage(const std::string& topic, const std::string& message) {
+    auto iter=middlewareManager.m_subscribes.find(topic);
+    if(iter==middlewareManager.m_subscribes.end()){
+      return;
+    }
+    for (auto subscribe:iter->second) {
+      subscribe->publish2Node(message);
+    }
   }
   std::string MiddlewareManager::getAllNodeInfo(){
     Json::Value root;

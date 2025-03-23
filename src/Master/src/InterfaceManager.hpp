@@ -23,13 +23,18 @@ namespace Hnu::Interface {
     void run();
     static void broadcast(http::request<http::string_body>& req);
     static void transfer(const std::string&dest,http::request<http::string_body>& req);
+    static void addNode(const std::string& node);
+    static void addsub(const std::string& node, const std::string& topic, const std::string& type);
+    static void addpub(const std::string& node, const std::string& topic, const std::string& type);
+    static void publish(const std::string& topic, const std::string& data);
     std::string m_hostName;
-  private:
-    InterfaceManager()=default;
     std::unordered_map<std::string, std::vector<std::string>> topic2host;//topic对host的映射
     std::unordered_map<std::string, std::pair<std::string, std::string>> route;//desthost interface nextinterface
     std::unordered_map<std::string, std::shared_ptr<Host>> hostlist;
     std::unordered_map<std::string, std::shared_ptr<Interface>> interfaceList;
+  private:
+    InterfaceManager()=default;
+
     Map map;
 
   };
