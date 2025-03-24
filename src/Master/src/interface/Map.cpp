@@ -1,6 +1,6 @@
 #include "interface/Map.hpp"
 #include<spdlog/spdlog.h>
-#include<queue>
+#include<climits>
 
 namespace Hnu::Interface {
 

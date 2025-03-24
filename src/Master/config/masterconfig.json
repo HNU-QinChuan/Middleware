@@ -8,9 +8,9 @@
         {
           "name":"interface1",
           "type":"tcp",
-          "ip":"127.0.0.1",
+          "ip":"172.17.0.1",
           "port":8080,
-          "segmnet":1
+          "segment":1
         }
       ]
     },
@@ -21,9 +21,9 @@
         {
           "name":"interface2",
           "type":"tcp",
-          "ip":"127.0.0.1",
-          "port":8081,
-          "segmnet":2
+          "ip":"172.17.0.2",
+          "port":8080,
+          "segment":1
         }
       ]
     }

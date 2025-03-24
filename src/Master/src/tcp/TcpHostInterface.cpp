@@ -24,29 +24,36 @@ namespace Hnu::Tcp{
       return;
     }
     isConnected = true;
+    doWrite();
     // onNew();
   }
+  void TcpHostInterface::doWrite() {
+    if(isReady&&isConnected&&!m_requestQueue.empty()){
+      isReady=false;
+      request=m_requestQueue.front();
+      m_requestQueue.pop();
+      beast::http::async_write(*m_stream, request,
+        std::bind_front(&TcpHostInterface::onWrite, shared_from_this()));
+    }
+  }
   void TcpHostInterface::send(boost::beast::http::request<boost::beast::http::string_body>& req) {
-    if (!isConnected) {
-      spdlog::debug("Reconnect to {}", hostName);
+    req.prepare_payload();
+    m_requestQueue.push(req);
+    if(!isConnected){
       doConnect();
       return;
     }
-    if(!isReady){
-      return;
-    }
-    isReady = false;
-    request = req;
-    beast::http::async_write(*m_stream, request,
-      std::bind_front(&TcpHostInterface::onWrite, shared_from_this()));
+    doWrite();
   }
   void TcpHostInterface::onWrite(const beast::error_code& ec, std::size_t bytes_transferred) {
+    isReady=true;
     if (ec) {
       spdlog::warn("Write to {} error: {}", hostName, ec.message());
       m_stream->close();
       doConnect();
       return;
     }
+    doWrite();
     // doRead();
   }
   // void TcpHostInterface::doRead() {

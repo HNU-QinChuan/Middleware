@@ -22,7 +22,6 @@ namespace Hnu::Interface {
       11
     };
     req.body()=Middleware::MiddlewareManager::getAllNodeInfo();
-    req.prepare_payload();
     InterfaceManager::broadcast(req);
   }
 }

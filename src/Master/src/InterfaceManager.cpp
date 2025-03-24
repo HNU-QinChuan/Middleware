@@ -70,6 +70,7 @@ namespace Hnu::Interface {
           hostInstance->setHostInterface(interfaceName, hostInterface);
           for(auto& [key,value]:interfaceList){
             if(value->getSegment()==segment){
+              // spdlog::debug("same segment {} {}",value->getSegment(),segment);
               value->setHostInterface(interfaceName, hostInterface);
             }
           }
@@ -140,14 +141,16 @@ namespace Hnu::Interface {
   void InterfaceManager::publish(const std::string &topic, const std::string &data){
     http::request<http::string_body> req{
       http::verb::post,
-      "/pub",
+      "/publish",
       11
     };
     req.set("topic",topic);
     req.body()=data;
+    // spdlog::debug("publist topic {} data {}",topic,data);
     auto& host=InterfaceManager::interfaceManager.topic2host[topic];
     req.set("src",InterfaceManager::interfaceManager.m_hostName);
     for(auto& hostName:host){
+      // spdlog::debug("publish to host {}",hostName);
       req.set("dest",hostName);
       std::string interfaceName=InterfaceManager::interfaceManager.route[hostName].first;
       std::string nextInterface=InterfaceManager::interfaceManager.route[hostName].second;

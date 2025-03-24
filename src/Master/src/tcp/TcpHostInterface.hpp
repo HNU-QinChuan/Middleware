@@ -3,6 +3,7 @@
 #include "interface/HostInterface.hpp"
 #include <boost/asio.hpp>
 #include<boost/beast.hpp>
+#include <queue>
 
 namespace Hnu::Tcp{
   namespace asio = boost::asio;
@@ -17,6 +18,7 @@ namespace Hnu::Tcp{
     std::shared_ptr<TcpHostInterface> shared_from_this();
   private:
     void onConnect(const beast::error_code& ec);
+    void doWrite();
     void onWrite(const beast::error_code& ec, std::size_t bytes_transferred);
     // void doRead();
     // void onRead(const beast::error_code& ec, std::size_t bytes_transferred);
@@ -26,8 +28,8 @@ namespace Hnu::Tcp{
     unsigned m_port;
     asio::ip::tcp::endpoint m_endpoint;
     std::unique_ptr<beast::tcp_stream> m_stream;
-    beast::flat_buffer buffer;
     bool isConnected = false;
     bool isReady = true;
+    std::queue<beast::http::request<beast::http::string_body>> m_requestQueue;
   };
 }

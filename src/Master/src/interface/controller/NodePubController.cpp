@@ -1,5 +1,6 @@
 #include "InterfaceManager.hpp"
 #include"interface/InterfaceRouter.hpp"
+#include<spdlog/spdlog.h>
 
 
 
@@ -13,7 +14,8 @@ namespace Hnu::Interface {
       std::string type = std::string(req["type"]);
       std::string host=req["src"].to_string();
       InterfaceManager::interfaceManager.hostlist[host]->addPub(node, pub, type);
+      spdlog::debug("Host {} add pub {} to node {} and type is {}", host, pub, node, type);
     }
   };
-  CONTROLLER_REGISTER(NodePubController, "/node/sub", http::verb::post, &NodePubController::handlePost);
+  CONTROLLER_REGISTER(NodePubController, "/node/pub", http::verb::post, &NodePubController::handlePost);
 }

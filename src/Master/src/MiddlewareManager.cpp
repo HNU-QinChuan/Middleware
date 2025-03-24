@@ -23,6 +23,7 @@ namespace Hnu::Middleware {
     middlewareManager.m_ioc.run();
   }
   void MiddlewareManager::transferMessage(const std::string& topic, const std::string& message) {
+    Interface::InterfaceManager::publish(topic, message);
     auto iter=middlewareManager.m_subscribes.find(topic);
     if(iter==middlewareManager.m_subscribes.end()){
       return;
@@ -30,7 +31,7 @@ namespace Hnu::Middleware {
     for (auto subscribe:iter->second) {
       subscribe->publish2Node(message);
     }
-    Interface::InterfaceManager::publish(topic, message);
+
   }
   void MiddlewareManager::transferInnerMessage(const std::string& topic, const std::string& message) {
     auto iter=middlewareManager.m_subscribes.find(topic);
