@@ -1,0 +1,23 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "Header.proto";
+package Dgps;
+
+message Gpfpd {
+    Header header = 1;
+    string gpfpd = 2;             //$GPFPD...
+    double heading = 3;           //偏航角（0～359.99）
+    double pitch = 4;             //俯仰角（-90～90）
+    double roll = 5;              //横滚角（-180～180）
+    double lattitude = 6;         //纬度（-90～90）
+    double longitude = 7;         //经度（-180～180）
+    double altitude = 8;          //高度，单位（米）
+    double velocity_east = 9;     //东向速度，单位（米/秒）
+    double velocity_north = 10;   //北向速度，单位（米/秒）
+    double velocity_up = 11;      //天向速度，单位（米/秒）
+    double baseline = 12;         //基线长度，单位（米）
+    uint32 nsv1 = 13;             //天线 1 卫星数
+    uint32 nsv2 = 14;             //天线 2 卫星数
+    uint32 status = 15;           //系统状态：0：初始化  1：粗对准  2：精对准  3：GPS 定位  4：GPS 定向  5：RTK 定位
+                                  //8：纯惯性  9：零速校正  B：差分定向  C：动态对准
+}

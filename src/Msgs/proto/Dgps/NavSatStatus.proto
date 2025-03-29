@@ -1,0 +1,27 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+package Dgps;
+
+// 导航卫星定位状态消息
+message NavSatStatus {
+    // 卫星定位状态
+    enum Status {
+        STATUS_NO_FIX = 0;    // 无法确定位置
+        STATUS_FIX = 1;       // 未增强定位
+        STATUS_SBAS_FIX = 2;  // 使用卫星增强系统的定位
+        STATUS_GBAS_FIX = 3;  // 使用地基增强系统的定位
+    }
+
+    Status status = 1;
+
+    // 正在使用哪种GPS服务
+    uint32 service = 2;
+
+    // 服务标志常量
+    enum Service {
+        SERVICE_GPS = 0;
+        SERVICE_GLONASS = 1;
+        SERVICE_COMPASS = 2;  // 包括北斗系统
+        SERVICE_GALILEO = 3;
+    }
+}

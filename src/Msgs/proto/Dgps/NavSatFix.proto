@@ -1,0 +1,41 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "NavSatStatus.proto";
+import "Header.proto";
+package Dgps;
+
+
+// 这表示从卫星导航系统获取的定位信息。
+message NavSatFix {
+    // Header 指定参考坐标系和时间戳
+    Header header = 1;
+
+    // 卫星导航状态信息
+    NavSatStatus status = 2;
+
+    // 纬度 [度]。赤道以北为正，以南为负。
+    double latitude = 3;
+
+    // 经度 [度]。本初子午线以东为正，以西为负。
+    double longitude = 4;
+
+    // 高度 [米]。WGS-84椭球体以上为正
+    double altitude = 5;
+
+    // 位置协方差 [m^2]，相对于通过报告位置的切平面定义。分量为东、北、上(ENU)，以行优先顺序排列。
+    repeated double position_covariance = 6; // 固定大小为9
+
+    // 定义如何解释position_covariance
+    enum CovarianceType {
+        COVARIANCE_TYPE_UNKNOWN = 0;
+        COVARIANCE_TYPE_APPROXIMATED = 1;
+        COVARIANCE_TYPE_DIAGONAL_KNOWN = 2;
+        COVARIANCE_TYPE_KNOWN = 3;
+    }
+
+    // 如果类型是COVARIANCE_TYPE_UNKNOWN，则协方差矩阵包含全零。
+    // 如果类型是COVARIANCE_TYPE_APPROXIMATED，则协方差矩阵可能已被驱动程序近似计算，例如由于传感器能力有限。
+    // 如果类型是COVARIANCE_TYPE_DIAGONAL_KNOWN，则主对角线有效。
+    // 如果类型是COVARIANCE_TYPE_KNOWN，则整个矩阵都有效。
+    CovarianceType position_covariance_type = 7;
+}

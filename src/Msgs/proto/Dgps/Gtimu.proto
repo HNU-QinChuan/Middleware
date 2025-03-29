@@ -1,0 +1,16 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "Header.proto";
+package Dgps;
+
+message Gtimu {
+    Header header = 1;
+    string gtimu = 2;                   // $GTIMU...
+    double gyro_x = 3;                  // 陀螺仪 X 轴角速率，单位（度/秒）
+    double gyro_y = 4;                  // 陀螺仪 Y 轴角速率，单位（度/秒）
+    double gyro_z = 5;                  // 陀螺仪 Z 轴角速率，单位（度/秒）
+    double acc_x = 6;                   // 加速度计 X 轴加速度，单位为（g）
+    double acc_y = 7;                   // 加速度计 Y 轴加速度，单位为（g）
+    double acc_z = 8;                   // 加速度计 Z 轴加速度，单位为（g）
+    double tpr = 9;                     // 温度，单位为摄氏度
+}
