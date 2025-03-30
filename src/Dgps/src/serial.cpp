@@ -74,8 +74,8 @@ __attribute__((__unused__))
   tcgetattr(sn->Stream, &sn->Termios);
 
   memset(&newtermios, 0, sizeof(struct termios));
-  newtermios.c_cflag = Baud | StopBits | Parity | DataBits
-  | CLOCAL | CREAD;
+  newtermios.c_cflag =
+    static_cast<unsigned int>(Baud) | static_cast<unsigned int>(StopBits)| static_cast<unsigned int>(Parity) | static_cast<unsigned int>(DataBits) | CLOCAL | CREAD;
   if(Protocol == SPAPROTOCOL_RTS_CTS)
     newtermios.c_cflag |= CRTSCTS;
   else

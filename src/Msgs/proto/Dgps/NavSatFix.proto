@@ -1,5 +1,4 @@
 syntax = "proto3";
-import "google/protobuf/timestamp.proto";
 import "NavSatStatus.proto";
 import "Header.proto";
 package Dgps;
