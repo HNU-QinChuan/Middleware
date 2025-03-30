@@ -15,5 +15,5 @@ namespace Hnu::Interface {
       // spdlog::debug("get topic {} from host {}", topic, req["src"].to_string());
     }
   };
-  CONTROLLER_REGISTER(PublishController, "/publish", http::verb::post, &PublishController::handlePost);
+  CONTROLLER_REGISTER(PublishController, "/publish", http::verb::post, &PublishController::handlePost)
 }

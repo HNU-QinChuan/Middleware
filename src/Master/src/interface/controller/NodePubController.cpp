@@ -17,5 +17,5 @@ namespace Hnu::Interface {
       spdlog::debug("Host {} add pub {} to node {} and type is {}", host, pub, node, type);
     }
   };
-  CONTROLLER_REGISTER(NodePubController, "/node/pub", http::verb::post, &NodePubController::handlePost);
+  CONTROLLER_REGISTER(NodePubController, "/node/pub", http::verb::post, &NodePubController::handlePost)
 }

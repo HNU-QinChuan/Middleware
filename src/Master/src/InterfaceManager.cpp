@@ -116,7 +116,16 @@ namespace Hnu::Interface {
     req.set("node",node);
     broadcast(req);
   }
-  void InterfaceManager::addsub(const std::string &node, const std::string &topic, const std::string &type){
+  void InterfaceManager::deleteNode(const std::string &node){
+    http::request<http::string_body> req{
+      http::verb::delete_,
+      "/node",
+      11
+    };
+    req.set("node",node);
+    broadcast(req);
+  }
+  void InterfaceManager::addSub(const std::string &node, const std::string &topic, const std::string &type){
     http::request<http::string_body> req{
       http::verb::post,
       "/node/sub",
@@ -127,7 +136,17 @@ namespace Hnu::Interface {
     req.set("type",type);
     broadcast(req);
   }
-  void InterfaceManager::addpub(const std::string &node, const std::string &topic, const std::string &type){
+  void InterfaceManager::deleteSub(const std::string &node, const std::string &topic){
+    http::request<http::string_body> req{
+      http::verb::delete_,
+      "/node/sub",
+      11
+    };
+    req.set("node",node);
+    req.set("sub",topic);
+    broadcast(req);
+  }
+  void InterfaceManager::addPub(const std::string &node, const std::string &topic, const std::string &type){
     http::request<http::string_body> req{
       http::verb::post,
       "/node/pub",
@@ -136,6 +155,16 @@ namespace Hnu::Interface {
     req.set("node",node);
     req.set("pub",topic);
     req.set("type",type);
+    broadcast(req);
+  }
+  void InterfaceManager::deletePub(const std::string &node, const std::string &topic){
+    http::request<http::string_body> req{
+      http::verb::delete_,
+      "/node/pub",
+      11
+    };
+    req.set("node",node);
+    req.set("pub",topic);
     broadcast(req);
   }
   void InterfaceManager::publish(const std::string &topic, const std::string &data){

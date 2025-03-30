@@ -11,12 +11,23 @@ namespace Hnu::Interface {
     hostInterfaceList[interfaceName] = hostInterface;
   }
   void Host::addNode(const std::string& node) {
-    nodelist[node] = node;
+    nodelist.insert(node);
+  }
+  void Host::deleteNode(const std::string& node) {
+    nodelist.erase(node);
+    node2pubtopic2type.erase(node);
+    node2subtopic2type.erase(node);
   }
   void Host::addSub(const std::string& node, const std::string& topic, const std::string& type) {
     node2subtopic2type[node][topic] = type;
   }
+  void Host::deleteSub(const std::string& node, const std::string& topic) {
+    node2subtopic2type[node].erase(topic);
+  }
   void Host::addPub(const std::string& node, const std::string& topic, const std::string& type) {
     node2pubtopic2type[node][topic] = type;
+  }
+  void Host::deletePub(const std::string& node, const std::string& topic) {
+    node2pubtopic2type[node].erase(topic);
   }
 }

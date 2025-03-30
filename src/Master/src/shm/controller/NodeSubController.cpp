@@ -35,7 +35,7 @@ namespace Hnu::Middleware {
       }
       MiddlewareManager::middlewareManager.m_nodes[node]->addSubscribe(subscribe);
       MiddlewareManager::middlewareManager.m_subscribes[topic].push_back(subscribe);
-      Interface::InterfaceManager::addsub(node, topic,type);
+      Interface::InterfaceManager::addSub(node, topic,type);
       spdlog::debug("Add Subscribe: {} {}", node, topic);
       return true;
     }

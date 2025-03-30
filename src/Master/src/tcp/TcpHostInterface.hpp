@@ -30,6 +30,7 @@ namespace Hnu::Tcp{
     std::unique_ptr<beast::tcp_stream> m_stream;
     bool isConnected = false;
     bool isReady = true;
+    bool isConnecting=false;
     std::queue<beast::http::request<beast::http::string_body>> m_requestQueue;
   };
 }

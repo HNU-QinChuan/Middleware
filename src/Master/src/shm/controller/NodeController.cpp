@@ -67,6 +67,7 @@ namespace Hnu::Middleware {
       } else {
         res.result(http::status::bad_request);
       }
+      Interface::InterfaceManager::deleteNode(node_name);
     }
   };
   CONTROLLER_REGISTER(NodeController, "/node"

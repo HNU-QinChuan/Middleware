@@ -35,7 +35,7 @@ namespace Hnu::Middleware {
       }
       MiddlewareManager::middlewareManager.m_nodes[node]->addPublish(publish);
       MiddlewareManager::middlewareManager.m_publishes[topic].push_back(publish);
-      Interface::InterfaceManager::addpub(node, topic,type);
+      Interface::InterfaceManager::addPub(node, topic,type);
       spdlog::debug("Add Publish: {} {}",node,topic);
       return true;
     }
