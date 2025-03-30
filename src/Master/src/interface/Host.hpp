@@ -20,6 +20,7 @@ namespace Hnu::Interface{
     void deleteSub(const std::string& node, const std::string& topic);
     void addPub(const std::string& node, const std::string& topic, const std::string& type);
     void deletePub(const std::string& node, const std::string& topic);
+    void clear();
 
   private:
     std::string m_name;

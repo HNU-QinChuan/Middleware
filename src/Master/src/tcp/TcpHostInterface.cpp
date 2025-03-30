@@ -15,6 +15,9 @@ namespace Hnu::Tcp{
     doConnect();
   }
   void TcpHostInterface::doConnect() {
+    if(isConnecting){
+      return;
+    }
     isConnected = false;
     isConnecting=true;
     m_stream->async_connect(m_endpoint, std::bind_front(&TcpHostInterface::onConnect, shared_from_this()));
@@ -22,12 +25,13 @@ namespace Hnu::Tcp{
   void TcpHostInterface::onConnect(const beast::error_code& ec) {
     isConnecting=false;
     if (ec) {
-      spdlog::warn("Connect to {} error: {} ,and will reconnect next time",hostName, ec.message());
+      m_stream->close();
+      spdlog::warn("Connect to {} error: {} errorcode: {},and will reconnect next time",hostName, ec.message(),ec.value());
       return;
     }
     isConnected = true;
     doWrite();
-    // onNew();
+    onNew();
   }
   void TcpHostInterface::doWrite() {
     if(isReady&&isConnected&&!m_requestQueue.empty()){
@@ -41,7 +45,7 @@ namespace Hnu::Tcp{
   void TcpHostInterface::send(boost::beast::http::request<boost::beast::http::string_body>& req) {
     req.prepare_payload();
     m_requestQueue.push(req);
-    if(!isConnected&&!isConnecting){
+    if(!isConnected){
       doConnect();
       return;
     }

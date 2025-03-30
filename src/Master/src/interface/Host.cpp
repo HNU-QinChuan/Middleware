@@ -30,4 +30,9 @@ namespace Hnu::Interface {
   void Host::deletePub(const std::string& node, const std::string& topic) {
     node2pubtopic2type[node].erase(topic);
   }
+  void Host::clear(){
+    nodelist.clear();
+    node2pubtopic2type.clear();
+    node2subtopic2type.clear();
+  }
 }
