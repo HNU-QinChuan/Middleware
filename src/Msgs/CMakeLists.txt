@@ -9,22 +9,6 @@ if(NOT Protobuf_FOUND)
     message(FATAL_ERROR "Protobuf not found!")
 endif()
 
-# 创建 Std 目录
-if(NOT EXISTS ${STD_GENERATED_DIR})
-    file(MAKE_DIRECTORY ${STD_GENERATED_DIR})
-    message(STATUS "Created directory: ${STD_GENERATED_DIR}")
-else()
-    message(STATUS "Directory already exists: ${STD_GENERATED_DIR}")
-endif()
-
-# 创建 Dgps 目录
-if(NOT EXISTS ${DGPS_GENERATED_DIR})
-    file(MAKE_DIRECTORY ${DGPS_GENERATED_DIR})
-    message(STATUS "Created directory: ${DGPS_GENERATED_DIR}")
-else()
-    message(STATUS "Directory already exists: ${DGPS_GENERATED_DIR}")
-endif()
-
 # 公共的 protobuf 处理函数
 function(generate_protobuf_library PROTO_DIR GENERATED_DIR LIB_NAME)
     # 创建输出目录
