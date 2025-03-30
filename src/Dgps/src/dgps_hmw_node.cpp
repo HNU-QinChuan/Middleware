@@ -5,7 +5,10 @@
 #include <thread>
 #include <string>
 #include "ntrip.h"
-#include <Std/dgps.pb.h>
+#include <Dgps/Gnvtg.pb.h>
+#include <Dgps/Gpfpd.pb.h>
+#include <Dgps/Gtimu.pb.h>
+#include <Dgps/NavSatFix.pb.h>
 #include <hmw/Node.hpp>
 #include <hmw/Publisher.hpp>
 #include <spdlog/spdlog.h>
@@ -83,10 +86,10 @@ public:
         args.serlogfile = 0;
         args.stop = false;
 
-        pub = this->createPublisher<Std::NavSatFix>(topic);
-        pub_gpfpd = this->createPublisher<Std::Gpfpd>("_dgps_gpfpd");
-        pub_gtimu = this->createPublisher<Std::Gtimu>("_dgps_gtimu");
-        pub_gnvtg = this->createPublisher<Std::Gnvtg>("_dgps_gnvtg");
+        pub = this->createPublisher<Dgps::NavSatFix>(topic);
+        pub_gpfpd = this->createPublisher<Dgps::Gpfpd>("_dgps_gpfpd");
+        pub_gtimu = this->createPublisher<Dgps::Gtimu>("_dgps_gtimu");
+        pub_gnvtg = this->createPublisher<Dgps::Gnvtg>("_dgps_gnvtg");
         ntrip_thread = std::make_shared<std::thread>(ntrip_client,&args);
         timer_ = this->createTimer(20, [this] { timer_callback(); });
         pub_status = this->createPublisher<Std::String>("_Dev_status");
@@ -114,10 +117,10 @@ public:
 
     void timer_callback()
     {
-        Std::NavSatFix sat;
-        Std::Gpfpd gpfpd;
-        Std::Gtimu gtimu;
-        Std::Gnvtg gnvtg;
+        Dgps::NavSatFix sat;
+        Dgps::Gpfpd gpfpd;
+        Dgps::Gtimu gtimu;
+        Dgps::Gnvtg gnvtg;
 
         int ret = getGpsMsg(sat, gpfpd, gtimu, gnvtg);
         if (ret > 0)
@@ -142,7 +145,7 @@ public:
         }
     }
 
-    void nmeaToFix(std::smatch m, Std::NavSatFix &sat)
+    void nmeaToFix(std::smatch m, Dgps::NavSatFix &sat)
     {
         sat.mutable_header()->set_frame_id("gps");
         auto timestamp = new google::protobuf::Timestamp();
@@ -151,10 +154,10 @@ public:
         timestamp->set_nanos(0);
         sat.mutable_header()->set_allocated_stamp(timestamp);
 
-        int8_t status = Std::NavSatStatus::STATUS_NO_FIX;
-        uint16_t service = Std::NavSatStatus::SERVICE_GPS;
+        int8_t status = Dgps::NavSatStatus::STATUS_NO_FIX;
+        uint16_t service = Dgps::NavSatStatus::SERVICE_GPS;
         double epe_quality = 1000000;
-        uint8_t covariance_type = Std::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
+        uint8_t covariance_type = Dgps::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
 
         if(m[2] != "") {
             // cout<<"Lat:"<<m[2]<<"  Longi:"<<m[4]<<endl;
@@ -162,42 +165,42 @@ public:
             if(m[6] == "-1" || m[6] == "0") {   //Invalid
                 status = -1;
                 epe_quality = 1000000;
-                covariance_type = Std::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
+                covariance_type = Dgps::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
             }
             else if(m[6] == "1") {  //SPS
                 status = 1;
                 epe_quality = 4.0;
-                covariance_type = Std::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
+                covariance_type = Dgps::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
             }
             else if(m[6] == "2") {  //DGPS
                 status = 2;
                 epe_quality = 0.1;
-                covariance_type = Std::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
+                covariance_type = Dgps::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
             }
             else if(m[6] == "4") {  //RTK Fix
                 status = 4;
                 epe_quality = 0.02;
-                covariance_type = Std::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
+                covariance_type = Dgps::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
             }
             else if(m[6] == "5") {  //RTK Float
                 status = 5;
                 epe_quality = 4.0;
-                covariance_type = Std::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
+                covariance_type = Dgps::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
             }
             else if(m[6] == "9") {  //WAAS
                 status = 9;
                 epe_quality = 3.0;
-                covariance_type = Std::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
+                covariance_type = Dgps::NavSatFix::COVARIANCE_TYPE_APPROXIMATED;
             }
             else {
                 status = stoi(m[6]);
                 epe_quality = 1000000;
-                covariance_type = Std::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
+                covariance_type = Dgps::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
             }
 
-            sat.mutable_status()->set_status(static_cast<Std::NavSatStatus_Status>(status));
+            sat.mutable_status()->set_status(static_cast<Dgps::NavSatStatus_Status>(status));
             sat.mutable_status()->set_service(service);
-            sat.set_position_covariance_type(static_cast<Std::NavSatFix_CovarianceType>(covariance_type));
+            sat.set_position_covariance_type(static_cast<Dgps::NavSatFix_CovarianceType>(covariance_type));
 
             sat.set_latitude(NMEA2float(m[2]));
             if(m[3] == "S") sat.set_latitude(-sat.latitude());
@@ -222,7 +225,7 @@ public:
 
     }
 
-    int getGpsMsg(Std::NavSatFix &sat, Std::Gpfpd &gpfpd, Std::Gtimu &gtimu, Std::Gnvtg &gnvtg)
+    int getGpsMsg(Dgps::NavSatFix &sat, Dgps::Gpfpd &gpfpd, Dgps::Gtimu &gtimu, Dgps::Gnvtg &gnvtg)
     {
         std::string candidate = getNmea();
 
@@ -347,10 +350,10 @@ private:
     std::string topic;
     std::shared_ptr<Hnu::Middleware::Timer> timer_;
 
-    std::shared_ptr<Hnu::Middleware::Publisher<Std::Gpfpd>> pub_gpfpd;
-    std::shared_ptr<Hnu::Middleware::Publisher<Std::Gtimu>> pub_gtimu;
-    std::shared_ptr<Hnu::Middleware::Publisher<Std::Gnvtg>> pub_gnvtg;
-    std::shared_ptr<Hnu::Middleware::Publisher<Std::NavSatFix>> pub;
+    std::shared_ptr<Hnu::Middleware::Publisher<Dgps::Gpfpd>> pub_gpfpd;
+    std::shared_ptr<Hnu::Middleware::Publisher<Dgps::Gtimu>> pub_gtimu;
+    std::shared_ptr<Hnu::Middleware::Publisher<Dgps::Gnvtg>> pub_gnvtg;
+    std::shared_ptr<Hnu::Middleware::Publisher<Dgps::NavSatFix>> pub;
     std::shared_ptr<Hnu::Middleware::Publisher<Std::String>> pub_status;
 
     std::shared_ptr<std::thread> ntrip_thread;

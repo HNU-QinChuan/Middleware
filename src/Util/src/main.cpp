@@ -17,7 +17,10 @@
 #include <hmw/Publisher.hpp>
 #include <hmw/Subscriber.hpp>
 #include <Std/String.pb.h>
-#include <Std/dgps.pb.h>
+#include <Dgps/Gnvtg.pb.h>
+#include <Dgps/Gpfpd.pb.h>
+#include <Dgps/Gtimu.pb.h>
+#include <Dgps/NavSatFix.pb.h>
 #include <memory>
 #include <google/protobuf/message.h>
 #include <google/protobuf/dynamic_message.h>
