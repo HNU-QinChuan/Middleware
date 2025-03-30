@@ -16,9 +16,9 @@ namespace Hnu::Interface {
     void handleDelete(Request& req){
       std::string node = std::string(req["node"]);
       std::string host=req["src"].to_string();
-      InterfaceManager::interfaceManager.hostlist[host]->deleteNode(node);
-      for(auto& [topic,hostset]:InterfaceManager::interfaceManager.topic2host){
-        hostset.erase(host); 
+      auto removeTopics=InterfaceManager::interfaceManager.hostlist[host]->deleteNode(node);
+      for(auto& removeTopic:removeTopics){
+        InterfaceManager::interfaceManager.topic2host[removeTopic].erase(host);
       }
     }
   };

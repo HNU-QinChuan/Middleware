@@ -13,10 +13,17 @@ namespace Hnu::Interface {
   void Host::addNode(const std::string& node) {
     nodelist.insert(node);
   }
-  void Host::deleteNode(const std::string& node) {
+  std::vector<std::string> Host::deleteNode(const std::string& node) {
+    std::vector<std::string> res;
     nodelist.erase(node);
     node2pubtopic2type.erase(node);
+    for(auto& [nodeName,topic2type]:node2subtopic2type){
+      for(auto& [topic,type]:topic2type){
+        res.push_back(topic);
+      }
+    }
     node2subtopic2type.erase(node);
+    return res;
   }
   void Host::addSub(const std::string& node, const std::string& topic, const std::string& type) {
     node2subtopic2type[node][topic] = type;

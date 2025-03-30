@@ -15,7 +15,7 @@ namespace Hnu::Interface{
     Host(const std::string& name);
     void setHostInterface(const std::string& interfaceName, const std::shared_ptr<HostInterface> hostInterface);
     void addNode(const std::string& node);
-    void deleteNode(const std::string& node);
+    std::vector<std::string> deleteNode(const std::string& node);
     void addSub(const std::string& node, const std::string& topic, const std::string& type);
     void deleteSub(const std::string& node, const std::string& topic);
     void addPub(const std::string& node, const std::string& topic, const std::string& type);

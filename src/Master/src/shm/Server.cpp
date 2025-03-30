@@ -19,8 +19,9 @@ namespace Hnu::Middleware {
     doRead();
   }
   void Server::doRead() {
-    // m_buffer.clear();
-    // m_request.clear();
+    m_buffer.clear();
+    m_request.clear();
+    m_request.body().clear();
     beast::http::async_read(m_stream, m_buffer, m_request, std::bind_front(&Server::onRead, shared_from_this()));
   }
   void Server::onRead(const boost::system::error_code& ec,std::size_t bytes) {
@@ -28,6 +29,8 @@ namespace Hnu::Middleware {
       spdlog::error("Read Error: {}", ec.message());
       return;
     }
+    m_response.clear();
+    m_response.body().clear();
     UdsRouter::handle(m_request,m_response);
     doWrite();
   }
