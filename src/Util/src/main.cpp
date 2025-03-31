@@ -1,6 +1,7 @@
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
+// #include <boost/program_options/options_description.hpp>
+// #include <boost/program_options/variables_map.hpp>
 #include <iostream>
+#include <csignal>
 #include <jsoncpp/json/reader.h>
 #include <string>
 #include <algorithm>
@@ -42,6 +43,10 @@ T json_list(asio::local::stream_protocol::socket& socket, const std::string& key
     Json::Reader reader;
     Json::Value jsonData;
     std::string errs;
+
+    if (response_body.empty()){
+        return result;
+    }
 
     if (!reader.parse(response_body, jsonData)){
         std::cerr << "Failed to parse json: " << reader.getFormattedErrorMessages() << std::endl;
@@ -116,6 +121,9 @@ std::string send_echo_http(const std::string& host, const std::string& target, c
 
         //读取响应
         type = json_list<std::string>(socket, key);
+        if(type.empty()){
+            std::cerr << "Topic (" << topic_name << ") does not appear to be published yet." << std::endl;
+        }
 
         socket.shutdown(boost::asio::local::stream_protocol::socket::shutdown_both);  // 关闭 socket 连接
         socket.close();
@@ -129,23 +137,24 @@ std::string send_echo_http(const std::string& host, const std::string& target, c
 }
 
 
-void subscribe_and_echo(std::shared_ptr<Hnu::Middleware::Node> node, 
+void subscribe_and_echo(/*std::shared_ptr<Hnu::Middleware::Node> node, */
                         const std::string& topic_name, 
                         const std::string& message_type){
+    auto echo_node = std::make_shared<Hnu::Middleware::Node>("echo_node");
     const google::protobuf::Descriptor* descriptor = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(message_type);
     if (descriptor == nullptr) {
         std::cerr << "[ERROR] Cannot found " << message_type
           << " in DescriptorPool" << std::endl;
         return;
     }
-    auto subscriber = node->createSubscriber<google::protobuf::Message>(topic_name, message_type, [&](std::shared_ptr<google::protobuf::Message> message){
+    auto subscriber = echo_node->createSubscriber<google::protobuf::Message>(topic_name, message_type, [&](std::shared_ptr<google::protobuf::Message> message){
         std::cout << "Received data (" << message_type << "): " << message -> DebugString() << std::endl;
     });
-    node -> run();
+    echo_node -> run();
 }
 
 template <typename T>
-void publish_message(std::shared_ptr<Hnu::Middleware::Node> node, 
+void publish_message(std::shared_ptr<Hnu::Middleware::Node> node,
                      const std::string& topic_name, 
                      const T& message,
                      const std::string& message_type) {
@@ -156,7 +165,7 @@ void publish_message(std::shared_ptr<Hnu::Middleware::Node> node,
               << ": " << message.DebugString() << std::endl;
 }
 
-void create_protobuf_message(std::shared_ptr<Hnu::Middleware::Node> node,
+void create_protobuf_message(/*std::shared_ptr<Hnu::Middleware::Node> node,*/
     const std::string& topic_name,
     const std::string& message_type, 
     const std::string& message_value,
@@ -198,18 +207,19 @@ void create_protobuf_message(std::shared_ptr<Hnu::Middleware::Node> node,
         }
         reflection -> SetString(message.get(), field, it -> asString());
     }
-    //std::cout<<message->DebugString()<<std::endl;
 
+    auto pub_node = std::make_shared<Hnu::Middleware::Node>("publish_node");
     if (rate_flag == 0){
-        publish_message(node, topic_name, *message, message_type);
+        publish_message(pub_node, topic_name, *message, message_type);
+        raise(SIGINT);
+        //return ;
     }
     else{
-        auto timer = node->createTimer(rate, [node, topic_name, message, message_type]() {
-            publish_message(node, topic_name, *message, message_type);
+        auto timer = pub_node->createTimer(rate, [pub_node, topic_name, message, message_type]() {
+            publish_message(pub_node, topic_name, *message, message_type);
         });
     }
-
-    node -> run();
+    pub_node -> run();
     return;
 }
 
@@ -219,32 +229,31 @@ void data_list(const std::string& host, const std::string& target, const std::st
     send_list_http(host, target, key);
 }
 
-void showTopicEcho(std::shared_ptr<Hnu::Middleware::Node> node, 
+void showTopicEcho(/*std::shared_ptr<Hnu::Middleware::Node> node, */
                     const std::string& host, const std::string& target, 
                     const std::string& key, const std::string& topic_name) {
     //获取话题数据类型
     std::string type = send_echo_http(host, target, key, topic_name);
+    if(type.empty()){
+        return ;
+    }
     //创建订阅者并输出话题数据
-    subscribe_and_echo(node, topic_name, type);
+    subscribe_and_echo(topic_name, type);
 }
 
-void publishTopic(std::shared_ptr<Hnu::Middleware::Node> node, 
+void publishTopic(/*std::shared_ptr<Hnu::Middleware::Node> node, */
                     const std::string& topic_name, 
                     const std::string& message_type, 
                     const std::string& message_value, 
                     int rate, bool rate_flag) {
     //std::cout << "Publishing message to topic '" << topicName << "': (%s)" << message_type << message_value << std::endl;
     //创建发布者
-    create_protobuf_message(node, topic_name, message_type, message_value, rate, rate_flag);
+    //create_protobuf_message(node, topic_name, message_type, message_value, rate, rate_flag);
+    create_protobuf_message(topic_name, message_type, message_value, rate, rate_flag);
 }
 
 
 int main(int argc, char* argv[]){
-    //强制注册数据类型
-    //protobuf_Std_2fString_2eproto::AddDescriptors();
-    //protobuf_Std_2fdgps_2eproto::AddDescriptors();
-    //GOOGLE_PROTOBUF_VERIFY_VERSION;
-
     std::string host = "localhost";
     std::string topic_target = "/topic";
     std::string topic_key = "topics";
@@ -277,8 +286,7 @@ int main(int argc, char* argv[]){
         if(tokens[1] == "echo"){
             if (size == 3){
                 if (!tokens[2].empty()) {
-                    auto echo_node = std::make_shared<Hnu::Middleware::Node>("echo_node");
-                    showTopicEcho(echo_node, host, echo_target, echo_key,tokens[2]);
+                    showTopicEcho(host, echo_target, echo_key,tokens[2]);
                 } else {
                     std::cerr << "Error: topic name is required for echo" << std::endl;
                 }
@@ -292,7 +300,7 @@ int main(int argc, char* argv[]){
         } else if (tokens[1] == "pub") {
             if (size >= 5){
                 if (!tokens[2].empty() && !tokens[3].empty() && !tokens[4].empty()) {
-                    auto pub_node = std::make_shared<Hnu::Middleware::Node>("publish_node");
+                    //auto pub_node = std::make_shared<Hnu::Middleware::Node>("publish_node");
                     //确定发布数据的频率
                     if(size == 6){
                         if(tokens[5] == "--once"){
@@ -307,7 +315,7 @@ int main(int argc, char* argv[]){
                             rate = std::stoi(tokens[6]);
                         }
                     }
-                    publishTopic(pub_node, tokens[2], tokens[3], tokens[4], rate, rate_flag);
+                    publishTopic(tokens[2], tokens[3], tokens[4], rate, rate_flag);
                 } else {
                     std::cerr << "Error: topic name, message type, and message value are required for pub" << std::endl;
                 }
