@@ -5,6 +5,7 @@
 
 #include "shm/UdsRouter.hpp"
 #include "MiddlewareManager.hpp"
+#include"InterfaceManager.hpp"
 #include<jsoncpp/json/json.h>
 
 namespace Hnu::Middleware {
@@ -24,6 +25,7 @@ namespace Hnu::Middleware {
         return false;
       }
       MiddlewareManager::middlewareManager.m_nodes[node]=std::make_shared<Node>(node,pid);
+      Interface::InterfaceManager::addNode(node);
       spdlog::debug("Add Node: {}",node);
       return true;
     }
@@ -62,9 +64,11 @@ namespace Hnu::Middleware {
         }
         MiddlewareManager::middlewareManager.m_nodes.erase(node_name);
         res.result(http::status::ok);
+        Interface::InterfaceManager::deleteNode(node_name);
       } else {
         res.result(http::status::bad_request);
       }
+      
     }
   };
   CONTROLLER_REGISTER(NodeController, "/node"

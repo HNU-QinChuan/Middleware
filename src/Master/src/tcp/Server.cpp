@@ -1,16 +1,13 @@
-//
-// Created by yc on 25-2-14.
-//
+#include "tcp/Server.hpp"
+#include"interface/InterfaceRouter.hpp"
+#include<spdlog/spdlog.h>
 
-#include "shm/Server.hpp"
-#include <spdlog/spdlog.h>
-#include "shm/UdsRouter.hpp"
 
-namespace Hnu::Middleware {
+namespace Hnu::Tcp {
   Server::Server(asio::execution_context& ioc):m_stream(static_cast<asio::io_context&>(ioc)) {
   }
 
-  local_stream::socket_type& Server::socket() {
+  beast::tcp_stream::socket_type& Server::socket() {
     return m_stream.socket();
   }
 
@@ -27,12 +24,15 @@ namespace Hnu::Middleware {
   void Server::onRead(const boost::system::error_code& ec,std::size_t bytes) {
     if (ec) {
       spdlog::error("Read Error: {}", ec.message());
+      m_stream.socket().close();
       return;
     }
-    m_response.clear();
-    m_response.body().clear();
-    UdsRouter::handle(m_request,m_response);
-    doWrite();
+    // spdlog::debug("Read data size {}", bytes);
+    // spdlog::debug("Read data {}", m_request.body().size());
+    Interface::InterfaceRouter::handle(m_request);
+
+    doRead();
+    // doWrite();
   }
   void Server::doWrite() {
     m_response.prepare_payload();
@@ -43,9 +43,7 @@ namespace Hnu::Middleware {
       spdlog::error("Write Error: {}", ec.message());
       return;
     }
+    doRead();
   }
-
-
-
 
 }

@@ -17,8 +17,6 @@
 #include <hmw/Node.hpp>
 #include <hmw/Publisher.hpp>
 #include <hmw/Subscriber.hpp>
-#include <Std/String.pb.h>
-#include <Std/dgps.pb.h>
 #include <memory>
 #include <google/protobuf/message.h>
 #include <google/protobuf/dynamic_message.h>
@@ -140,13 +138,13 @@ std::string send_echo_http(const std::string& host, const std::string& target, c
 void subscribe_and_echo(/*std::shared_ptr<Hnu::Middleware::Node> node, */
                         const std::string& topic_name, 
                         const std::string& message_type){
-    auto echo_node = std::make_shared<Hnu::Middleware::Node>("echo_node");
     const google::protobuf::Descriptor* descriptor = google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(message_type);
     if (descriptor == nullptr) {
         std::cerr << "[ERROR] Cannot found " << message_type
           << " in DescriptorPool" << std::endl;
         return;
     }
+    auto echo_node = std::make_shared<Hnu::Middleware::Node>("echo_node");
     auto subscriber = echo_node->createSubscriber<google::protobuf::Message>(topic_name, message_type, [&](std::shared_ptr<google::protobuf::Message> message){
         std::cout << "Received data (" << message_type << "): " << message -> DebugString() << std::endl;
     });

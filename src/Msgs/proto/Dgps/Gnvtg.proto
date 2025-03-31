@@ -1,0 +1,16 @@
+syntax = "proto3";
+import "Header.proto";
+package Dgps;
+
+message Gnvtg {
+    Header header = 1;
+    string gnvtg = 2;
+    double heading1 = 3;          //地面航向，以真北为参考，单位：度
+    double heading2 = 4;         //地面航向，以磁北为参考，单位：度
+    double speed1 = 5;           //水平运动速度，单位：节（海里/小时）
+    double speed2 = 6;           //水平运动速度，单位：千米/小时 heading1 = 6;         //地面航向，以真北为参考，单位：度
+    string status = 7;           //定位状态：
+                                 //A = 单点定位，D = 差分定位， E = 航位推算，
+                                 //F = 浮点 RTK， M = 手动输入， N = 数据无效，
+                                 //P = PPP 模式，R = 固定解，S = 模拟器模式
+}

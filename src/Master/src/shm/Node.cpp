@@ -74,4 +74,18 @@ namespace Hnu::Middleware {
     m_subscribes.clear();
     return res;
   }
+  std::vector<std::pair<std::string, std::string>> Node::getAllPublishTopics() {
+    std::vector<std::pair<std::string, std::string>> res;
+    for (auto& [topic,publish]:m_publishes) {
+      res.push_back({topic,publish->getType()});
+    }
+    return res;
+  }
+  std::vector<std::pair<std::string, std::string>> Node::getAllSubscribeTopics() {
+    std::vector<std::pair<std::string, std::string>> res;
+    for (auto& [topic,subscribe]:m_subscribes) {
+      res.push_back({topic,subscribe->getType()});
+    }
+    return res;
+  }
 }

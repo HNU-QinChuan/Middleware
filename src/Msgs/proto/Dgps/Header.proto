@@ -1,0 +1,14 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+package Dgps;
+
+// Header包含时间戳和坐标系信息
+message Header {
+    // 以秒和纳秒表示的时间戳
+    google.protobuf.Timestamp stamp = 1;
+
+    // 与此数据关联的坐标变换帧
+    string frame_id = 2;
+}
+
+// 导航卫星定位状态消息
