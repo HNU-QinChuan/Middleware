@@ -20,6 +20,7 @@ namespace Hnu::Interface {
       for(auto& removeTopic:removeTopics){
         InterfaceManager::interfaceManager.topic2host[removeTopic].erase(host);
       }
+      spdlog::debug("Host {} delete node {}", host, node);
     }
   };
   CONTROLLER_REGISTER(NodeController,"/node", 

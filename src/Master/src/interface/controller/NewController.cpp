@@ -9,14 +9,15 @@ namespace Hnu::Interface {
   public:
     void handlePost(Request& req){
       std::string host=req["src"].to_string();
-      std::string data=req.body();
+      // std::string data=req.body();
       for(auto& [topic,hostset]:InterfaceManager::interfaceManager.topic2host){
         hostset.erase(host);
       }
       InterfaceManager::interfaceManager.hostlist[host]->clear();
       Json::Value root;
       Json::Reader reader;
-      reader.parse(data, root);
+      reader.parse(req.body(), root);
+      spdlog::debug("new host {}\n{}",host,root.toStyledString());
       for (const auto& node : root["nodes"]) {
         std::string nodeName = node["name"].asString();
         InterfaceManager::interfaceManager.hostlist[host]->addNode(nodeName);
@@ -45,14 +46,15 @@ namespace Hnu::Interface {
     }
     void handlePut(Request& req){
       std::string host=req["src"].to_string();
-      std::string data=req.body();
+      // std::string data=req.body();
       for(auto& [topic,hostset]:InterfaceManager::interfaceManager.topic2host){
         hostset.erase(host);
       }
       InterfaceManager::interfaceManager.hostlist[host]->clear();
       Json::Value root;
       Json::Reader reader;
-      reader.parse(data, root);
+      reader.parse(req.body(), root);
+      spdlog::debug("new response host {}\n{}",host,root.toStyledString());
       for (const auto& node : root["nodes"]) {
         std::string nodeName = node["name"].asString();
         InterfaceManager::interfaceManager.hostlist[host]->addNode(nodeName);

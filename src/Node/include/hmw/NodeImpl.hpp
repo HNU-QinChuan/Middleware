@@ -16,6 +16,7 @@ namespace Hnu::Middleware {
   class NodeImpl {
   public:
     NodeImpl(const std::string& name);
+    ~NodeImpl();
     void run();
     bool containsPublisher(const std::string& topic);
     bool containsSubscriber(const std::string& topic);

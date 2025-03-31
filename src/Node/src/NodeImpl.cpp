@@ -43,8 +43,20 @@ namespace Hnu::Middleware {
       spdlog::error("error on server side");
       throw std::runtime_error("error on server side");
     }
-    m_signalSet.add(SIGINT);
+    m_signalSet.add(SIGINT);//捕获所有崩溃的信号
+    // m_signalSet.add(SIGSEGV);
+    // m_signalSet.add(SIGILL);
+    // m_signalSet.add(SIGFPE);
+    // m_signalSet.add(SIGBUS);
+    // m_signalSet.add(SIGABRT);
+    // m_signalSet.add(SIGKILL);
+    // m_signalSet.add(SIGTERM);
+    // m_signalSet.add(SIGQUIT);
     m_signalSet.async_wait(std::bind_front(&NodeImpl::onSignal,this));
+    // std::set_terminate([](){
+    //   spdlog::error("terminate");
+    //   std::abort();
+    // });
     std::thread t([this](){
       m_ioc.run();
     });
@@ -106,5 +118,35 @@ namespace Hnu::Middleware {
   }
   std::string NodeImpl::getName(){
     return m_name;
+  }
+  NodeImpl::~NodeImpl(){
+    boost::system::error_code ec;
+    m_socket.close();
+    m_socket.connect("/tmp/master",ec);
+    // if(ec){
+    //   spdlog::error("connect error: {}",ec.message());
+    //   throw std::runtime_error("connect error");
+    // }
+    beast::http::request<beast::http::empty_body> request;
+    request.target("/node");
+    request.method(beast::http::verb::delete_);
+    request.set("node",m_name);
+    request.prepare_payload();
+    ec.clear();
+    beast::http::write(m_socket,request,ec);
+    // if(ec){
+    //   spdlog::error("write error: {}",ec.message());
+    //   throw std::runtime_error("write error");
+    // }
+    beast::http::response<beast::http::empty_body> response;
+    beast::flat_buffer buffer;
+    ec.clear();
+    beast::http::read(m_socket,buffer,response,ec);
+    // if(ec){
+    //   spdlog::error("read error: {}",ec.message());
+    //   throw std::runtime_error("read error");
+    // }
+    m_socket.close();
+    std::exit(0);
   }
 }
