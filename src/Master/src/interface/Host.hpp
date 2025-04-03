@@ -21,6 +21,9 @@ namespace Hnu::Interface{
     void addPub(const std::string& node, const std::string& topic, const std::string& type);
     void deletePub(const std::string& node, const std::string& topic);
     void clear();
+    std::unordered_set<std::string> getNodeList();
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> getNode2PubTopic2Type();
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> getNode2SubTopic2Type();
 
   private:
     std::string m_name;

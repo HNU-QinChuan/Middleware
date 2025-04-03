@@ -42,4 +42,13 @@ namespace Hnu::Interface {
     node2pubtopic2type.clear();
     node2subtopic2type.clear();
   }
+  std::unordered_set<std::string> Host::getNodeList() {
+    return nodelist;
+  }
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> Host::getNode2PubTopic2Type() {
+    return node2pubtopic2type;
+  }
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> Host::getNode2SubTopic2Type() {
+    return node2subtopic2type;
+  }
 }

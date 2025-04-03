@@ -1,5 +1,6 @@
 #include "shm/UdsRouter.hpp"
 #include "MiddlewareManager.hpp"
+#include "InterfaceManager.hpp"
 #include<jsoncpp/json/json.h>
 #include <unordered_set>
 
@@ -15,10 +16,6 @@ namespace Hnu::Middleware {
       }
       if(MiddlewareManager::middlewareManager.m_subscribes.contains(topic_name)) {
         subcount = MiddlewareManager::middlewareManager.m_subscribes[topic_name].size();
-      }
-      if(pubcount == 0 && subcount == 0) {
-        res.result(http::status::bad_request);
-        return;
       }
       Json::Value root;
       Json::Value pubnodes(Json::arrayValue);
@@ -39,7 +36,36 @@ namespace Hnu::Middleware {
             topic_type = sub->getType();
           }
         }
-        
+      }
+      for (auto &[hostName,hostPtr]:Interface::InterfaceManager::interfaceManager.hostlist) {
+        auto subtopiclist=hostPtr->getNode2SubTopic2Type();
+        for (auto& [nodeName,topic2type]:subtopiclist) {
+          for (auto& [topic,type]:topic2type) {
+            if (topic==topic_name) {
+              subcount++;
+              subnodes.append(nodeName);
+              if(topic_type.empty()) {
+                topic_type = type;
+              }
+            }
+          }
+        }
+        auto pubtopiclist=hostPtr->getNode2PubTopic2Type();
+        for (auto& [nodeName,topic2type]:pubtopiclist) {
+          for (auto& [topic,type]:topic2type) {
+            if (topic==topic_name) {
+              pubcount++;
+              pubnodes.append(nodeName);
+              if(topic_type.empty()) {
+                topic_type = type;
+              }
+            }
+          }
+        }
+      }
+      if(pubcount == 0 && subcount == 0) {
+        res.result(http::status::bad_request);
+        return;
       }
       root["topic"] = topic_name;
       root["type"] = topic_type;

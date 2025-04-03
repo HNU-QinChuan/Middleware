@@ -1,5 +1,6 @@
 #include "shm/UdsRouter.hpp"
 #include "MiddlewareManager.hpp"
+#include "InterfaceManager.hpp"
 #include<jsoncpp/json/json.h>
 #include <unordered_set>
 
@@ -19,7 +20,28 @@ namespace Hnu::Middleware {
       for (const auto& topic : topics) {
         jsonArray.append(topic);
       }
-      root["topics"] = jsonArray;
+      root[Interface::InterfaceManager::interfaceManager.m_hostName]=jsonArray;
+
+      for (auto &[hostName,hostPtr]:Interface::InterfaceManager::interfaceManager.hostlist) {
+        Json::Value hostArray(Json::arrayValue);
+        topics.clear();
+        auto subtopiclist=hostPtr->getNode2SubTopic2Type();
+        for (auto& [nodeName,topic2type]:subtopiclist) {
+          for (auto& [topic,type]:topic2type) {
+            topics.insert(topic);
+          }
+        }
+        auto pubtopiclist=hostPtr->getNode2PubTopic2Type();
+        for (auto& [nodeName,topic2type]:pubtopiclist) {
+          for (auto& [topic,type]:topic2type) {
+            topics.insert(topic);
+          }
+        }
+        for (const auto& topic : topics) {
+          hostArray.append(topic);
+        }
+        root[hostName]=hostArray;
+      }
       res.result(http::status::ok);
       Json::StreamWriterBuilder writer;
       res.body() = writeString(writer, root);

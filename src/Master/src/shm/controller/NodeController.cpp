@@ -31,11 +31,19 @@ namespace Hnu::Middleware {
     }
     void handleGet(Request& req, Response& res) {
       Json::Value root;
-      Json::Value jsonArray(Json::arrayValue);
+      Json::Value curretHostArray(Json::arrayValue);
       for (auto &pair: MiddlewareManager::middlewareManager.m_nodes) {
-        jsonArray.append(pair.first);
+        curretHostArray.append(pair.first);
       }
-      root["nodes"] = jsonArray;
+      root[Interface::InterfaceManager::interfaceManager.m_hostName]=curretHostArray;
+      for (auto &[hostName,hostPtr]:Interface::InterfaceManager::interfaceManager.hostlist) {
+        Json::Value hostArray(Json::arrayValue);
+        auto nodeList=hostPtr->getNodeList();
+        for (auto &node:nodeList) {
+          hostArray.append(node);
+        }
+        root[hostName]=hostArray;
+      }
       res.result(http::status::ok);
       Json::StreamWriterBuilder writer;
       res.body() = writeString(writer, root);
