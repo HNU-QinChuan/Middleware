@@ -9,6 +9,9 @@ if(NOT Protobuf_FOUND)
     message(FATAL_ERROR "Protobuf not found!")
 endif()
 
+# 设置proto根目录 - 添加这一行
+set(PROTO_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto)
+
 # 公共的 protobuf 处理函数
 function(generate_protobuf_library PROTO_DIR GENERATED_DIR LIB_NAME)
     # 创建输出目录
@@ -33,7 +36,8 @@ function(generate_protobuf_library PROTO_DIR GENERATED_DIR LIB_NAME)
         add_custom_command(
                 OUTPUT ${GENERATED_DIR}/${PROTO_NAME}.pb.cc ${GENERATED_DIR}/${PROTO_NAME}.pb.h
                 COMMAND protobuf::protoc
-                ARGS --proto_path=${PROTO_DIR} --cpp_out=${GENERATED_DIR} ${PROTO_FILE}
+                # 修改这一行，使用PROTO_ROOT_DIR作为proto_path
+                ARGS --proto_path=${PROTO_ROOT_DIR} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src ${PROTO_FILE}
                 DEPENDS ${PROTO_FILE}
                 COMMENT "Generating ${PROTO_NAME}.pb.cc and ${PROTO_NAME}.pb.h"
                 VERBATIM
@@ -46,6 +50,7 @@ function(generate_protobuf_library PROTO_DIR GENERATED_DIR LIB_NAME)
     # 创建库
     add_library(${LIB_NAME} SHARED ${LIB_SOURCES})
     target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(${LIB_NAME} PUBLIC ${Protobuf_LIBRARIES})
 
     # 设置别名
     add_library(${PROJECT_NAME}::${LIB_NAME} ALIAS ${LIB_NAME})
@@ -60,6 +65,8 @@ generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Dgps)
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Std)
 set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Std)
 generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Std)
+add_dependencies(Dgps Std)  # 添加这一行
+target_link_libraries(Dgps PUBLIC Std)
 
 # 导出配置文件
 export(TARGETS Std FILE ${CMAKE_BINARY_DIR}/StdTargets.cmake NAMESPACE ${PROJECT_NAME}::)

@@ -1,5 +1,5 @@
 syntax = "proto3";
-import "Header.proto";
+import "Std/Header.proto";
 package Dgps;
 
 message Gtimu {

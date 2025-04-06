@@ -1,6 +1,6 @@
 syntax = "proto3";
-import "NavSatStatus.proto";
-import "Header.proto";
+import "Dgps/NavSatStatus.proto";
+import "Std/Header.proto";
 package Dgps;
 
 

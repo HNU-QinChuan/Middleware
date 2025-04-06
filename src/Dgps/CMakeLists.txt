@@ -21,6 +21,10 @@ add_library(dgps
 add_executable(dgps-node src/main.cpp)
 add_executable(dgps-test test/test.cpp)
 
-target_link_libraries(dgps Middleware-Node::Middleware-Node  Middleware-Msgs::Std Middleware-Msgs::Dgps yaml-cpp)
+target_link_libraries(dgps
+        Middleware-Node::Middleware-Node
+        Middleware-Msgs::Std
+        Middleware-Msgs::Dgps
+        yaml-cpp)
 target_link_libraries(dgps-node dgps)
 target_link_libraries(dgps-test dgps)
