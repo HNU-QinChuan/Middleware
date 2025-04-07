@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package Builtin_interfaces;
+
+// Equivalent to builtin_interfaces/Time
+message Time {
+    int32 sec = 1;
+    uint32 nanosec = 2;
+}

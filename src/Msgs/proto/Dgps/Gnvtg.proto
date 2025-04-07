@@ -3,7 +3,7 @@ import "Std/Header.proto";
 package Dgps;
 
 message Gnvtg {
-    Header header = 1;
+    Std.Header header = 1;       //时间戳和坐标系信息
     string gnvtg = 2;
     double heading1 = 3;          //地面航向，以真北为参考，单位：度
     double heading2 = 4;         //地面航向，以磁北为参考，单位：度

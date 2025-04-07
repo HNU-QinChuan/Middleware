@@ -7,7 +7,7 @@ package Dgps;
 // 这表示从卫星导航系统获取的定位信息。
 message NavSatFix {
     // Header 指定参考坐标系和时间戳
-    Header header = 1;
+    Std.Header header = 1;
 
     // 卫星导航状态信息
     NavSatStatus status = 2;

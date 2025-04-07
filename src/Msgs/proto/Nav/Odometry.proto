@@ -1,0 +1,9 @@
+syntax = "proto3";
+import "Std/Header.proto";
+import "Nav/MapMetaData.proto";
+package Nav;
+
+message Odometry {
+    Std.Header header = 1;
+    MapMetaData info = 2;
+}

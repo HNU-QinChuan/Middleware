@@ -1,0 +1,9 @@
+syntax = "proto3";
+import "Geometry/Point.proto";
+import "Geometry/Quaternion.proto";
+package Geometry;
+
+message Pose{
+    Point position = 1;
+    Quaternion orientation = 2;
+}

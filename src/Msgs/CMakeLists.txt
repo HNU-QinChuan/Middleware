@@ -27,28 +27,29 @@ function(generate_protobuf_library PROTO_DIR GENERATED_DIR LIB_NAME)
     set(PROTO_SRCS "")
     set(PROTO_HDRS "")
 
-    # 遍历每个 .proto 文件，生成对应的 .cc 和 .h 文件
+    # 遍历每个 .proto 文件，记录生成的文件名
     foreach(PROTO_FILE ${PROTO_FILES})
         get_filename_component(PROTO_NAME ${PROTO_FILE} NAME_WE)
         list(APPEND PROTO_SRCS "${GENERATED_DIR}/${PROTO_NAME}.pb.cc")
         list(APPEND PROTO_HDRS "${GENERATED_DIR}/${PROTO_NAME}.pb.h")
-
-        add_custom_command(
-                OUTPUT ${GENERATED_DIR}/${PROTO_NAME}.pb.cc ${GENERATED_DIR}/${PROTO_NAME}.pb.h
-                COMMAND protobuf::protoc
-                # 修改这一行，使用PROTO_ROOT_DIR作为proto_path
-                ARGS --proto_path=${PROTO_ROOT_DIR} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src ${PROTO_FILE}
-                DEPENDS ${PROTO_FILE}
-                COMMENT "Generating ${PROTO_NAME}.pb.cc and ${PROTO_NAME}.pb.h"
-                VERBATIM
-        )
     endforeach()
 
-    # 将生成的 .pb.cc 和 .pb.h 文件添加到库中
-    set(LIB_SOURCES ${PROTO_SRCS} ${PROTO_HDRS})
+    # 创建一个标记文件，表示所有proto文件的生成
+    set(GENERATION_MARKER "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}_proto_generation_marker")
 
-    # 创建库
-    add_library(${LIB_NAME} SHARED ${LIB_SOURCES})
+    # 一次性生成所有文件，处理内部依赖
+    add_custom_command(
+            OUTPUT ${GENERATION_MARKER} ${PROTO_SRCS} ${PROTO_HDRS}
+            COMMAND protobuf::protoc
+            ARGS --proto_path=${PROTO_ROOT_DIR} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src ${PROTO_FILES}
+            COMMAND ${CMAKE_COMMAND} -E touch ${GENERATION_MARKER}
+            DEPENDS ${PROTO_FILES}
+            COMMENT "Generating protobuf files for ${LIB_NAME}"
+            VERBATIM
+    )
+
+    # 将生成的文件添加到库中
+    add_library(${LIB_NAME} SHARED ${PROTO_SRCS} ${PROTO_HDRS})
     target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(${LIB_NAME} PUBLIC ${Protobuf_LIBRARIES})
 
@@ -56,21 +57,41 @@ function(generate_protobuf_library PROTO_DIR GENERATED_DIR LIB_NAME)
     add_library(${PROJECT_NAME}::${LIB_NAME} ALIAS ${LIB_NAME})
 endfunction()
 
-# 生成 Dgps 库
-set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Dgps)
-set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Dgps)
-generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Dgps)
-
 # 生成 Std 库
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Std)
 set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Std)
 generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Std)
-add_dependencies(Dgps Std)  # 添加这一行
-target_link_libraries(Dgps PUBLIC Std)
+
+# 生成 Builtin_interfaces 库
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Builtin_interfaces)
+set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Builtin_interfaces)
+generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Builtin_interfaces)
+
+# 生成 Dgps 库及其依赖
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Dgps)
+set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Dgps)
+generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Dgps)
+add_dependencies(Dgps Std)  # Dgps 依赖 Std
+target_link_libraries(Dgps PUBLIC Std)  # Dgps 链接 Std
+
+# 生成 Geometry 库及其依赖
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Geometry)
+set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry)
+generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Geometry)
+add_dependencies(Geometry Std)  # Geometry 依赖 Std
+target_link_libraries(Geometry PUBLIC Std)  # Geometry 链接 Std
+
+# 生成 Nav 库及其依赖
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Nav)
+set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Nav)
+generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Nav)
+add_dependencies(Nav Std Builtin_interfaces)
+target_link_libraries(Nav PUBLIC Std Builtin_interfaces)
 
 # 导出配置文件
 export(TARGETS Std FILE ${CMAKE_BINARY_DIR}/StdTargets.cmake NAMESPACE ${PROJECT_NAME}::)
 export(TARGETS Dgps FILE ${CMAKE_BINARY_DIR}/DgpsTargets.cmake NAMESPACE ${PROJECT_NAME}::)
+export(TARGETS Geometry FILE ${CMAKE_BINARY_DIR}/GeometryTargets.cmake NAMESPACE ${PROJECT_NAME}::)
 
 # 配置文件
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in

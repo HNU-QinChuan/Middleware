@@ -3,7 +3,7 @@ import "Std/Header.proto";
 package Dgps;
 
 message Gpfpd {
-    Header header = 1;
+    Std.Header header = 1;
     string gpfpd = 2;             //$GPFPD...
     double heading = 3;           //偏航角（0～359.99）
     double pitch = 4;             //俯仰角（-90～90）

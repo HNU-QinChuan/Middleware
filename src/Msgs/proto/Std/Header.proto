@@ -1,6 +1,6 @@
 syntax = "proto3";
 import "google/protobuf/timestamp.proto";
-package Dgps;
+package Std;
 
 // Header包含时间戳和坐标系信息
 message Header {

@@ -1,0 +1,12 @@
+syntax = "proto3";
+import "Geometry/Pose.proto";
+import "Builtin_interfaces/Time.proto";
+package Nav;
+
+message MapMetaData {
+    Builtin_interfaces.Time map_load_time = 1;
+    float resolution = 2;
+    uint32 width = 3;
+    uint32 height = 4;
+    Geometry.Pose origin = 5;
+}

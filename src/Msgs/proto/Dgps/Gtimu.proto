@@ -3,7 +3,7 @@ import "Std/Header.proto";
 package Dgps;
 
 message Gtimu {
-    Header header = 1;
+    Std.Header header = 1;
     string gtimu = 2;                   // $GTIMU...
     double gyro_x = 3;                  // 陀螺仪 X 轴角速率，单位（度/秒）
     double gyro_y = 4;                  // 陀螺仪 Y 轴角速率，单位（度/秒）
