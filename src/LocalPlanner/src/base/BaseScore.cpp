@@ -98,7 +98,7 @@ namespace DWA
             speed_cost_ = static_cast<float>(std::fabs(traj_.back()->velocity - target_velocity_)*1.6);//+std::fabs(traj_.back()->yawrate)/4;
     }
 
-        void BaseScore::calcObsCost()
+    void BaseScore::calcObsCost()
     {
         std::cout<<"calc obs cost"<<std::endl;
         float cost = 0.0;

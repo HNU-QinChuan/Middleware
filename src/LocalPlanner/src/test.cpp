@@ -1,5 +1,6 @@
 #include <iostream>
 #include <base/ApeLine.hpp>
+#include <base/BaseGeneratePath.hpp>
 
 int main()
 {

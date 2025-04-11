@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(local_planner)
 
 set(CMAKE_CXX_STANDARD 20)
+
 find_package(spdlog REQUIRED)
 find_package(Middleware-Node REQUIRED)
 find_package(Middleware-Msgs REQUIRED)
@@ -30,7 +31,8 @@ target_link_libraries(car_planner
         Middleware-Msgs::Std
         Middleware-Msgs::Dgps
         Middleware-Msgs::Geometry
-        Middleware-Msgs::Builtin_interfaces
+        Middleware-Msgs::BuiltinInterfaces
         Middleware-Msgs::Nav
+        Middleware-Msgs::TaskPlanner
         yaml-cpp
 )
