@@ -1,0 +1,10 @@
+syntax = "proto3";
+import "Geometry/PoseArray.proto";
+package TaskPlanner;
+
+message GlobalPathPlan {
+    Geometry.PoseArray pose_array = 1;
+    bool stop_at_last_point = 2;
+    bool back_up = 3;
+}
+

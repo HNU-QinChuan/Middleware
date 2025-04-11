@@ -19,4 +19,5 @@ add_subdirectory(src/Node)
 add_subdirectory(src/Test)
 add_subdirectory(src/Dgps)
 add_subdirectory(src/Util)
+add_subdirectory(src/LocalPlanner)
 

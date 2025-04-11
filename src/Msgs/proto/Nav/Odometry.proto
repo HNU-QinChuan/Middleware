@@ -1,9 +1,18 @@
 syntax = "proto3";
 import "Std/Header.proto";
-import "Nav/MapMetaData.proto";
+import "Geometry/TwistWithCovariance.proto";
+import "Geometry/PoseWithCovariance.proto";
 package Nav;
 
 message Odometry {
+    // 消息头，指定位姿的父坐标系
     Std.Header header = 1;
-    MapMetaData info = 2;
+    // 速度的坐标系 ID
+    string child_frame_id = 2;
+    // 相对于固定世界坐标系的估计位姿
+    Geometry.PoseWithCovariance pose = 3;
+    // 相对于 child_frame_id 的估计线速度和角速度
+    Geometry.TwistWithCovariance twist = 4;
+
+
 }

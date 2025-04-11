@@ -62,10 +62,10 @@ set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Std)
 set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Std)
 generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Std)
 
-# 生成 Builtin_interfaces 库
-set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Builtin_interfaces)
-set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Builtin_interfaces)
-generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Builtin_interfaces)
+# 生成 BuiltinInterfaces 库
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/BuiltinInterfaces)
+set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/BuiltinInterfaces)
+generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} BuiltinInterfaces)
 
 # 生成 Dgps 库及其依赖
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Dgps)
@@ -85,13 +85,23 @@ target_link_libraries(Geometry PUBLIC Std)  # Geometry 链接 Std
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Nav)
 set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Nav)
 generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Nav)
-add_dependencies(Nav Std Builtin_interfaces)
-target_link_libraries(Nav PUBLIC Std Builtin_interfaces)
+add_dependencies(Nav Std BuiltinInterfaces)
+target_link_libraries(Nav PUBLIC Std BuiltinInterfaces)
+
+# 生成 TaskPlanner 库及其依赖
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/TaskPlanner)
+set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/TaskPlanner)
+generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} TaskPlanner)
+add_dependencies(TaskPlanner Geometry)
+target_link_libraries(TaskPlanner PUBLIC Geometry)
 
 # 导出配置文件
 export(TARGETS Std FILE ${CMAKE_BINARY_DIR}/StdTargets.cmake NAMESPACE ${PROJECT_NAME}::)
 export(TARGETS Dgps FILE ${CMAKE_BINARY_DIR}/DgpsTargets.cmake NAMESPACE ${PROJECT_NAME}::)
 export(TARGETS Geometry FILE ${CMAKE_BINARY_DIR}/GeometryTargets.cmake NAMESPACE ${PROJECT_NAME}::)
+export(TARGETS Nav FILE ${CMAKE_BINARY_DIR}/NavTargets.cmake NAMESPACE ${PROJECT_NAME}::)
+export(TARGETS BuiltinInterfaces FILE ${CMAKE_BINARY_DIR}/BuiltinInterfaces.cmake NAMESPACE ${PROJECT_NAME}::)
+export(TARGETS TaskPlanner FILE ${CMAKE_BINARY_DIR}/TaskPlanner.cmake NAMESPACE ${PROJECT_NAME}::)
 
 # 配置文件
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in

@@ -1,0 +1,8 @@
+syntax = "proto3";
+import "Geometry/Vector3.proto";
+package Geometry;
+
+message Twist {
+    Vector3  linear = 1;
+    Vector3  angular = 2;
+}

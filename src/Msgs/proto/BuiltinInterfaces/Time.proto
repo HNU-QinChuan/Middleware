@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package Builtin_interfaces;
+package BuiltinInterfaces;
 
 // Equivalent to builtin_interfaces/Time
 message Time {
