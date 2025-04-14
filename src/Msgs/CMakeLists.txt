@@ -86,7 +86,7 @@ set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Nav)
 set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Nav)
 generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Nav)
 add_dependencies(Nav Std BuiltinInterfaces)
-target_link_libraries(Nav PUBLIC Std BuiltinInterfaces)
+target_link_libraries(Nav PUBLIC Std BuiltinInterfaces Geometry)
 
 # 生成 TaskPlanner 库及其依赖
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/TaskPlanner)
