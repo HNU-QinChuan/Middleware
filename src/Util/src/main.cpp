@@ -28,13 +28,14 @@ namespace http = beast::http;
 
 template <typename T>
 T json_list(asio::local::stream_protocol::socket& socket, const std::string& key){
+//T json_list(asio::local::stream_protocol::socket& socket){
     //读取响应
     beast::flat_buffer buffer;
     http::response<http::dynamic_body> res;
     http::read(socket, buffer, res);
 
     std::string response_body = beast::buffers_to_string(res.body().data());
-    // std::cout << "HTTP Resoponse : \n" << response_body << std::endl;
+    //std::cout << "HTTP Resoponse : \n" << response_body << std::endl;
 
     T result;
     //解析json响应
@@ -51,20 +52,28 @@ T json_list(asio::local::stream_protocol::socket& socket, const std::string& key
         return result;
     }
 
-    if (!jsonData.isMember(key)) {
-        std::cerr << key << " not found in json" << std::endl;
-        return result;
-    }
-
     //在编译期间检查数据类型
-    if constexpr (std::is_same_v<T, std::vector<std::string>>) {
-        // 处理数组
-        if (jsonData[key].isArray()) {
-            for (const auto& item : jsonData[key]) {
-                result.push_back(item.asString());
+    // if constexpr (std::is_same_v<T, std::vector<std::string>>) {
+    //     // 处理数组
+    //     if (jsonData[key].isArray()) {
+    //         for (const auto& item : jsonData[key]) {
+    //             result.push_back(item.asString());
+    //         }
+    //     } 
+    // } 
+    if constexpr (std::is_same_v<T,std::map<std::string, std::vector<std::string>>>) {
+        for (const auto& member : jsonData.getMemberNames()) {
+            const Json::Value& array = jsonData[member];
+            std::vector<std::string> items;
+
+            if (array.isArray()) {
+                for (const auto& item : array) {
+                    items.push_back(item.asString());
+                }
             }
-        } 
-    } 
+            result[member] = items;
+        }
+    }
     else if constexpr (std::is_same_v<T, std::string>) {
         // 处理单个字符串
         result = jsonData[key].asString();
@@ -88,10 +97,23 @@ void send_list_http(const std::string& host, const std::string& target, const st
         http::write(socket, req);
 
         //读取响应
-        std::vector<std::string> response = json_list<std::vector<std::string>>(socket, key);
-        std::cout << key << ":" <<std::endl;
-        for (const auto& item : response){
-            std::cout << item << std::endl;
+        // std::vector<std::string> response = json_list<std::vector<std::string>>(socket, key);
+        std::map<std::string, std::vector<std::string>> response = json_list<std::map<std::string, std::vector<std::string>>>(socket,key);
+
+        // 输出每个 host 的结果
+        for (const auto& [host_name, items] : response) {
+            std::cout << host_name << ": \n";
+            if (!items.empty()) {
+                std::cout << "  ";
+                for (size_t i = 0; i < items.size(); ++i) {
+                    std::cout << items[i];
+                    if (i < items.size() - 1) std::cout << ", ";
+                }
+                std::cout << "\n";
+            } else {
+                std::cout << " ";
+            }
+            std::cout << "\n";
         }
 
         socket.shutdown(boost::asio::local::stream_protocol::socket::shutdown_both);  // 关闭 socket 连接
