@@ -11,6 +11,7 @@
 #include <jsoncpp/json/value.h>
 #include<unordered_map>
 #include<vector>
+#include"ProcessManager.hpp"
 
 
 namespace Hnu::Middleware {
@@ -35,10 +36,9 @@ namespace Hnu::Middleware {
     // static MiddlewareManager& getInstance();
     static MiddlewareManager middlewareManager;
   private:
-    MiddlewareManager()=default;
-
-
+    MiddlewareManager();
     boost::asio::io_context m_ioc;
+    ProcessManager processManager;
 
   };
 

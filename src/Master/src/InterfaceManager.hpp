@@ -6,6 +6,7 @@
 #include<unordered_map>
 #include <unordered_set>
 #include <memory>
+#include <jsoncpp/json/json.h>
 #include<boost/beast.hpp>
 
 
@@ -35,6 +36,7 @@ namespace Hnu::Interface {
     std::unordered_map<std::string, std::pair<std::string, std::string>> route;//desthost interface nextinterface
     std::unordered_map<std::string, std::shared_ptr<Host>> hostlist;
     std::unordered_map<std::string, std::shared_ptr<Interface>> interfaceList;
+    Json::Value launch{Json::arrayValue};
   private:
     InterfaceManager()=default;
 

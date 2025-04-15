@@ -14,12 +14,15 @@ namespace Hnu::Middleware {
   //   // static MiddlewareManager middlewareManager;
   //   return middlewareManager;
   // }
+  MiddlewareManager::MiddlewareManager() : processManager(m_ioc) {
+  }
   asio::io_context& MiddlewareManager::getIoc() {
     return middlewareManager.m_ioc;
   }
   void MiddlewareManager::run() {
     Acceptor acceptor(middlewareManager.m_ioc);
     acceptor.run();
+    middlewareManager.processManager.run();
     middlewareManager.m_ioc.run();
   }
   void MiddlewareManager::transferMessage(const std::string& topic, const std::string& message) {

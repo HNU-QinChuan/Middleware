@@ -25,6 +25,8 @@ add_executable(${PROJECT_NAME} src/main.cpp
     src/MiddlewareManager.hpp
     src/InterfaceManager.cpp
     src/InterfaceManager.hpp
+    src/ProcessManager.cpp
+    src/ProcessManager.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog rt jsoncpp)

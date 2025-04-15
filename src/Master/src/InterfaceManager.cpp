@@ -1,5 +1,5 @@
 #include "InterfaceManager.hpp"
-#include <jsoncpp/json/json.h>
+
 #include <spdlog/spdlog.h>
 #include<filesystem>
 #include <fstream>
@@ -83,6 +83,7 @@ namespace Hnu::Interface {
     for (const auto& [key, value] : route) {
       spdlog::debug("Route: {} -> {} -> {}", key, value.first, value.second);
     }
+    launch = root["launch"];
   }
   void InterfaceManager::run(){
     for(const auto&[key,value]:interfaceList){
