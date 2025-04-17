@@ -27,7 +27,7 @@ namespace DWA
 	class BaseDwaPlanner : public Hnu::Middleware::Node
 	{
 	public:
-		BaseDwaPlanner();
+		explicit BaseDwaPlanner(const std::string &name);  
 		virtual ~BaseDwaPlanner();
 		// main process
 		virtual void plan();  /*!< 主要进程 规划全过程*/

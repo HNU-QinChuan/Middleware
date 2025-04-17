@@ -15,15 +15,11 @@ include_directories(
 )
 
 aux_source_directory(src/base base)
+aux_source_directory(src/car car)
 
 add_executable(car_planner
-        src/test.cpp
+        src/car/CarDwaNode.cpp
         ${base}
-#        src/BaseDwaPlanner.cpp
-#        src/BaseScore.cpp
-#        src/BaseGeneratePath.cpp
-#        src/CarDwaPlanner.cpp
-#        src/CarDwaNode.cpp
 )
 
 target_link_libraries(car_planner

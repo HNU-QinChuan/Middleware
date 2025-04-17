@@ -7,7 +7,7 @@ using namespace DWA;
 
 namespace DWA
 {
-	BaseDwaPlanner::BaseDwaPlanner() : Node("base_dwa")
+	BaseDwaPlanner::BaseDwaPlanner(const std::string &name) : Node(name)
 	{
 		spdlog::set_level(spdlog::level::debug);
 		// 期望频率 单位hz
