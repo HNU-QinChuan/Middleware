@@ -214,7 +214,7 @@ namespace DWA
                 {
                     min_cost = final_cost;
                     best_traj = traj;
-                    // best_traj_index = mark_trajs.markers.size();
+                    best_traj_index = x;
                 }
             }
         }
