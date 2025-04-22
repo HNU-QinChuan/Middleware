@@ -14,8 +14,6 @@ namespace Hnu::Middleware {
   //   // static MiddlewareManager middlewareManager;
   //   return middlewareManager;
   // }
-  MiddlewareManager::MiddlewareManager() : processManager(m_ioc) {
-  }
   asio::io_context& MiddlewareManager::getIoc() {
     return middlewareManager.m_ioc;
   }

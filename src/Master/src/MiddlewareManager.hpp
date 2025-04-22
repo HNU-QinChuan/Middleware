@@ -36,7 +36,7 @@ namespace Hnu::Middleware {
     // static MiddlewareManager& getInstance();
     static MiddlewareManager middlewareManager;
   private:
-    MiddlewareManager();
+    MiddlewareManager() = default;
     boost::asio::io_context m_ioc;
     ProcessManager processManager;
 
