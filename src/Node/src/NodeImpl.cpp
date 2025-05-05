@@ -44,14 +44,17 @@ namespace Hnu::Middleware {
       throw std::runtime_error("error on server side");
     }
     m_signalSet.add(SIGINT);//捕获所有崩溃的信号
-    // m_signalSet.add(SIGSEGV);
-    // m_signalSet.add(SIGILL);
-    // m_signalSet.add(SIGFPE);
-    // m_signalSet.add(SIGBUS);
-    // m_signalSet.add(SIGABRT);
-    // m_signalSet.add(SIGKILL);
-    // m_signalSet.add(SIGTERM);
-    // m_signalSet.add(SIGQUIT);
+    m_signalSet.add(SIGTERM);
+    m_signalSet.add(SIGQUIT);
+    m_signalSet.add(SIGABRT);
+    m_signalSet.add(SIGSEGV);
+    m_signalSet.add(SIGFPE);
+    m_signalSet.add(SIGILL);
+    m_signalSet.add(SIGBUS);
+    m_signalSet.add(SIGHUP);
+    m_signalSet.add(SIGPIPE);
+    m_signalSet.add(SIGXCPU);
+    m_signalSet.add(SIGSYS);
     m_signalSet.async_wait(std::bind_front(&NodeImpl::onSignal,this));
     // std::set_terminate([](){
     //   spdlog::error("terminate");
