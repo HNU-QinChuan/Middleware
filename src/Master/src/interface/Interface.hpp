@@ -16,7 +16,7 @@ namespace Hnu::Interface{
     virtual ~Interface() = default;
     int getSegment();
     void setHostInterface(const std::string& name, std::shared_ptr<HostInterface> hostInterface);
-    void send(std::string nextInterface,http::request<http::string_body>& req);
+    void send(const std::string& nextInterface,http::request<http::string_body>& req);
     // void send(std::string nextInterface,http::request<http::string_body>& req,std::function<void(http::response<http::string_body>&)>& cb);
 
     virtual void run(asio::io_context& ioc) = 0;

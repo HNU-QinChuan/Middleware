@@ -23,5 +23,18 @@ namespace Hnu::Interface {
     };
     req.body()=Middleware::MiddlewareManager::getAllNodeInfo();
     InterfaceManager::broadcast(req);
+    InterfaceManager::setInitWeight(hostName);
+    fail_times=0;
+  }
+  void HostInterface::onFail() {
+    if(fail_times>5){
+      return;
+    }
+    ++fail_times;
+    if(fail_times>5){
+      InterfaceManager::setMaxWeight(hostName);
+    }
+      
+
   }
 }

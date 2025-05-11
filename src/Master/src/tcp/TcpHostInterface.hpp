@@ -20,6 +20,7 @@ namespace Hnu::Tcp{
     void onConnect(const beast::error_code& ec);
     void doWrite();
     void onWrite(const beast::error_code& ec, std::size_t bytes_transferred);
+    void onTimeout(const beast::error_code& ec);
     // void doRead();
     // void onRead(const beast::error_code& ec, std::size_t bytes_transferred);
 
@@ -28,6 +29,7 @@ namespace Hnu::Tcp{
     unsigned m_port;
     asio::ip::tcp::endpoint m_endpoint;
     std::unique_ptr<beast::tcp_stream> m_stream;
+    std::unique_ptr<asio::steady_timer> m_timer;
     bool isConnected = false;
     bool isReady = true;
     bool isConnecting=false;

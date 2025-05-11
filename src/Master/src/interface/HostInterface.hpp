@@ -14,12 +14,14 @@ namespace Hnu::Interface {
     virtual void run(boost::asio::io_context& ioc)=0;
     virtual void send(http::request<http::string_body>& req) = 0;
     void onNew();
+    void onFail();
     // virtual void send(http::request<http::string_body>& req,std::function<void(http::response<http::string_body>&)>& cb);
 
   protected:
     std::string m_name;
     std::string hostName;
     int m_segment;
+    int fail_times=0;
     std::string m_type;
     // bool hasCallback = false;
     // http::response<http::string_body> response;

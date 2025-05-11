@@ -24,13 +24,6 @@
           "ip":"172.17.0.2",
           "port":8080,
           "segment":1
-        },
-        {
-          "name":"interface3",
-          "type":"tcp",
-          "ip":"172.17.0.2",
-          "port":8081,
-          "segment":2
         }
       ]
     },
@@ -39,17 +32,21 @@
       "interfaces":
       [
         {
-          "name":"interface4",
+          "name":"interface3",
           "type":"tcp",
           "ip":"172.17.0.3",
           "port":8080,
-          "segment":2
+          "segment":1
         }
       ]
     }
   ],
+  "map":[
+    ["host1","host2",1],
+    ["host2","host3",1],
+    ["host1","host3",3]
+  ],
   "launch":[
-    "sub"
   ]
 
 

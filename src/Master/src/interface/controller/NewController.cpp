@@ -17,7 +17,7 @@ namespace Hnu::Interface {
       Json::Value root;
       Json::Reader reader;
       reader.parse(req.body(), root);
-      spdlog::debug("new host {}\n{}",host,root.toStyledString());
+      // spdlog::debug("new host {}\n{}",host,root.toStyledString());
       for (const auto& node : root["nodes"]) {
         std::string nodeName = node["name"].asString();
         InterfaceManager::interfaceManager.hostlist[host]->addNode(nodeName);
@@ -54,7 +54,7 @@ namespace Hnu::Interface {
       Json::Value root;
       Json::Reader reader;
       reader.parse(req.body(), root);
-      spdlog::debug("new response host {}\n{}",host,root.toStyledString());
+      // spdlog::debug("new response host {}\n{}",host,root.toStyledString());
       for (const auto& node : root["nodes"]) {
         std::string nodeName = node["name"].asString();
         InterfaceManager::interfaceManager.hostlist[host]->addNode(nodeName);

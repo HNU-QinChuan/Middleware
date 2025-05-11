@@ -12,6 +12,8 @@ namespace Hnu::Tcp{
   }
   void TcpHostInterface::run(asio::io_context& ioc) {
     m_stream = std::make_unique<beast::tcp_stream>(ioc);
+
+    m_timer = std::make_unique<asio::steady_timer>(ioc);
     doConnect();
   }
   void TcpHostInterface::doConnect() {
@@ -20,16 +22,29 @@ namespace Hnu::Tcp{
     }
     isConnected = false;
     isConnecting=true;
+    m_timer->expires_after(std::chrono::seconds(1));
+    m_timer->async_wait(std::bind_front(&TcpHostInterface::onTimeout, shared_from_this()));
     m_stream->async_connect(m_endpoint, std::bind_front(&TcpHostInterface::onConnect, shared_from_this()));
+  }
+  void TcpHostInterface::onTimeout(const beast::error_code& ec) {
+    if (ec) {
+      // spdlog::warn("Timeout error: {}", ec.message());
+      return;
+    }
+    m_stream->cancel();
   }
   void TcpHostInterface::onConnect(const beast::error_code& ec) {
     isConnecting=false;
+    m_timer->cancel();
     if (ec) {
+      onFail();
       m_stream->close();
-      spdlog::warn("Connect to {} error: {} errorcode: {},and will reconnect next time",hostName, ec.message(),ec.value());
+      spdlog::warn("Connect to {} error: {} ,and will reconnect next time",hostName, ec.message());
       return;
     }
     isConnected = true;
+    boost::asio::socket_base::send_buffer_size send_option(1);
+    m_stream->socket().set_option(send_option);
     doWrite();
     onNew();
   }
@@ -38,6 +53,8 @@ namespace Hnu::Tcp{
       isReady=false;
       request=m_requestQueue.front();
       m_requestQueue.pop();
+      m_timer->expires_after(std::chrono::seconds(1));
+      m_timer->async_wait(std::bind_front(&TcpHostInterface::onTimeout, shared_from_this()));
       beast::http::async_write(*m_stream, request,
         std::bind_front(&TcpHostInterface::onWrite, shared_from_this()));
     }
@@ -53,7 +70,9 @@ namespace Hnu::Tcp{
   }
   void TcpHostInterface::onWrite(const beast::error_code& ec, std::size_t bytes_transferred) {
     isReady=true;
+    m_timer->cancel();
     if (ec) {
+      onFail();
       spdlog::warn("Write to {} error: {}", hostName, ec.message());
       m_stream->close();
       doConnect();

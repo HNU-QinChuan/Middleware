@@ -78,11 +78,8 @@ namespace Hnu::Interface {
         hostlist[hostName] = hostInstance;
       }
     }
-    map.init(hosts, m_hostName);
+    map.init(root, m_hostName);
     route = map.getRoute();
-    for (const auto& [key, value] : route) {
-      spdlog::debug("Route: {} -> {} -> {}", key, value.first, value.second);
-    }
     launch = root["launch"];
   }
   void InterfaceManager::run(){
@@ -187,5 +184,39 @@ namespace Hnu::Interface {
       InterfaceManager::interfaceManager.interfaceList[interfaceName]->send(nextInterface,req);
     }
 
+  }
+  void InterfaceManager::setMaxWeight(const std::string &host){
+    interfaceManager.map.setMaxWeight(interfaceManager.m_hostName,host);
+    interfaceManager.route=InterfaceManager::interfaceManager.map.getRoute();
+    http::request<http::string_body> req{
+      http::verb::post,
+      "/weight",
+      11
+    };
+    req.set("host1",interfaceManager.m_hostName);
+    req.set("host2",host);
+    req.set("type","max");
+    broadcast(req);
+  }
+  void InterfaceManager::setInitWeight(const std::string &host){
+    InterfaceManager::interfaceManager.map.setInitWeight(interfaceManager.m_hostName,host);
+    InterfaceManager::interfaceManager.route=InterfaceManager::interfaceManager.map.getRoute();
+    http::request<http::string_body> req{
+      http::verb::post,
+      "/weight",
+      11
+    };
+    req.set("host1",interfaceManager.m_hostName);
+    req.set("host2",host);
+    req.set("type","init");
+    broadcast(req);
+  }
+  void InterfaceManager::setMaxWeight(const std::string &host1, const std::string &host2){
+    interfaceManager.map.setMaxWeight(host1,host2);
+    interfaceManager.route=InterfaceManager::interfaceManager.map.getRoute();
+  }
+  void InterfaceManager::setInitWeight(const std::string &host1, const std::string &host2){
+    interfaceManager.map.setInitWeight(host1,host2);
+    interfaceManager.route=InterfaceManager::interfaceManager.map.getRoute();
   }
 }

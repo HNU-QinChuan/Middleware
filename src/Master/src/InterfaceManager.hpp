@@ -31,6 +31,10 @@ namespace Hnu::Interface {
     static void addPub(const std::string& node, const std::string& topic, const std::string& type);
     static void deletePub(const std::string& node, const std::string& topic);
     static void publish(const std::string& topic, const std::string& data);
+    static void setMaxWeight(const std::string& host);
+    static void setInitWeight(const std::string& host);
+    static void setMaxWeight(const std::string& host1, const std::string& host2);
+    static void setInitWeight(const std::string& host, const std::string& host2);
     std::string m_hostName;
     std::unordered_map<std::string, std::unordered_set<std::string>> topic2host;//topic对host的映射
     std::unordered_map<std::string, std::pair<std::string, std::string>> route;//desthost interface nextinterface

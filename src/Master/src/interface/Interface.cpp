@@ -21,7 +21,7 @@ namespace Hnu::Interface {
     }
 
   }
-  void Interface::send(std::string nextInterface,http::request<http::string_body>& req){
+  void Interface::send(const std::string& nextInterface,http::request<http::string_body>& req){
     // spdlog::debug("Send to {}", nextInterface);
     name2hostInterface[nextInterface]->send(req); 
   }
