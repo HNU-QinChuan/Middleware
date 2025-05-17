@@ -20,4 +20,5 @@ add_subdirectory(src/Test)
 add_subdirectory(src/Dgps)
 add_subdirectory(src/Util)
 add_subdirectory(src/LocalPlanner)
+add_subdirectory(src/Gazebo)
 

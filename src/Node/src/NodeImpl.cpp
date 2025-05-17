@@ -55,7 +55,7 @@ namespace Hnu::Middleware {
     m_signalSet.add(SIGPIPE);
     m_signalSet.add(SIGXCPU);
     m_signalSet.add(SIGSYS);
-    m_signalSet.async_wait(std::bind_front(&NodeImpl::onSignal,this));
+    m_signalSet.async_wait(std::bind(&NodeImpl::onSignal,this,std::placeholders::_1,std::placeholders::_2));
     // std::set_terminate([](){
     //   spdlog::error("terminate");
     //   std::abort();
@@ -67,10 +67,10 @@ namespace Hnu::Middleware {
     spdlog::debug("Create Node:{}",m_name);
   }
   bool NodeImpl::containsPublisher(const std::string& topic){
-    return m_publishes.contains(topic);
+    return m_publishes.find(topic) != m_publishes.end();
   }
   bool NodeImpl::containsSubscriber(const std::string& topic){
-    return m_subscribes.contains(topic);
+    return m_subscribes.find(topic) != m_subscribes.end();
   }
   void NodeImpl::addPublisher(const std::string& topic,std::shared_ptr<PublisherInterface> publisher){
     m_publishes[topic]=publisher;

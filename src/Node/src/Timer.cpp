@@ -9,7 +9,7 @@ namespace Hnu::Middleware {
     m_callback = callback;
     m_interval = std::chrono::milliseconds(interval);
     m_timer.expires_after(m_interval);
-    m_timer.async_wait(std::bind_front(&Timer::onTime, shared_from_this()));
+    m_timer.async_wait(std::bind(&Timer::onTime, shared_from_this(),std::placeholders::_1));
   }
   void Timer::onTime(const boost::system::error_code& error) {
     if (error) {
@@ -17,7 +17,7 @@ namespace Hnu::Middleware {
     }
     m_callback();
     m_timer.expires_after(m_interval);
-    m_timer.async_wait(std::bind_front(&Timer::onTime, shared_from_this()));
+    m_timer.async_wait(std::bind(&Timer::onTime, shared_from_this(),std::placeholders::_1));
   }
   void Timer::cancel() {
     m_timer.cancel();

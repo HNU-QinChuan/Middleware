@@ -65,7 +65,7 @@ namespace Hnu::Middleware {
     return true;
   }
   void Publish::doEventfdRead() {
-    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Publish::onEventfdRead,shared_from_this()));
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind(&Publish::onEventfdRead,shared_from_this(),std::placeholders::_1,std::placeholders::_2));
   }
   void Publish::onEventfdRead(const boost::system::error_code& ec,std::size_t bytes) {
     if(ec){

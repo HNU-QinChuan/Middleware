@@ -27,10 +27,10 @@ namespace Hnu::Middleware {
     return m_pid;
   }
   bool Node::containsPublish(const std::string& topic) {
-    return m_publishes.contains(topic);
+    return m_publishes.find(topic) != m_publishes.end();
   }
   bool Node::containsSubscribe(const std::string& topic) {
-    return m_subscribes.contains(topic);
+    return m_subscribes.find(topic) != m_subscribes.end();
   }
   void Node::addPublish(std::shared_ptr<Publish> publish) {
     m_publishes[publish->getName()]=publish;

@@ -23,7 +23,7 @@ namespace Hnu::Middleware {
     }
     m_signalSet.add(SIGINT);
     m_signalSet.add(SIGCHLD);
-    m_signalSet.async_wait(std::bind_front(&ProcessManager::onSignal,this));
+    m_signalSet.async_wait(std::bind(&ProcessManager::onSignal,this,std::placeholders::_1,std::placeholders::_2));
     std::thread{
       [&]{
         ioc.run();
