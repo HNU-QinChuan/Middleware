@@ -1,5 +1,10 @@
 <sdf version='1.7'>
   <world name='default'>
+
+    <gui>
+      <plugin name="gui_mouse_click_goal" filename="libgui_mouse_click_goal.so"/>
+    </gui>
+
     <model name='HnuRobot'>
       <plugin name="my_robot_plugin" filename="libd_drive_car.so">
         <wheelSeparation>0.2</wheelSeparation>
@@ -222,6 +227,8 @@
           </geometry>
         </visual>
       </link>
+      <plugin name="pose_publisher_plugin" filename="libpose_publisher.so" />
+      <plugin name="odom_publisher_plugin" filename="libodom_publisher_plugin.so" />
     </model>
     <light name='sun' type='directional'>
       <cast_shadows>1</cast_shadows>

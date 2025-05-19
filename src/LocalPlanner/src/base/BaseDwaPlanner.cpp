@@ -9,24 +9,19 @@ namespace DWA
 {
 	BaseDwaPlanner::BaseDwaPlanner(const std::string &name) : Node(name)
 	{
-		spdlog::set_level(spdlog::level::debug);
-		// 期望频率 单位hz
-		control_freq_ = 20;
-		//  yaml文件路径
-		std::string filename;
-		// yaml文件默认路径 但如果launch文件里有声明会加载launch中内容
-		char *buffer = getcwd(nullptr, 0);
-		std::stringstream ss;
-		ss << buffer;
-		ss >> filename;
-		filename = filename + "/src/local_planner/config/BaseParam.yaml";
-		std::cout << "default param file: " << filename << std::endl;
-		// 读取yaml
-		yaml_file_name_ = filename;
+		std::string yamlPath;
+		char buffer[1024];
+		ssize_t count = readlink("/proc/self/exe", buffer, 1024);
+		if (count != -1) {
+			buffer[count] = '\0';
+      yamlPath = std::string(dirname(buffer)) + "/LocalPlannerConfig/BaseParam.yaml";
+  	}
+
+		yaml_file_name_ = yamlPath;
 		// 初始化参数
 		readYaml();
 		current_step_ = 0;
-		GP = new BaseGeneratePath(filename);
+		GP = new BaseGeneratePath(yamlPath);
 		max_vel_from_global_ = 0.0;
 		odom_update_ = false;
 		map_update_ = false;

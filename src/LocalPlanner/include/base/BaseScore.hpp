@@ -8,6 +8,7 @@
 #include <yaml-cpp/yaml.h>
 #include "Geometry/PoseStamped.pb.h"
 #include "ApeLine.hpp"
+#include <spdlog/spdlog.h>
 
 namespace DWA
 {

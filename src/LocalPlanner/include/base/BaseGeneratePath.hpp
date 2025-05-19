@@ -11,6 +11,7 @@
 #include <hmw/Node.hpp>
 #include <memory>
 #include <yaml-cpp/yaml.h> //read yaml
+#include <spdlog/spdlog.h>
 
 namespace DWA
 {
