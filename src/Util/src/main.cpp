@@ -187,7 +187,7 @@ void publish_message(std::shared_ptr<Hnu::Middleware::Node> node,
         start_time = now;   //如果是第一次写入则记录当前时间点为初始时间
     }
     double elapsed_sec = std::chrono::duration<double>(now - start_time).count();  //计算每次发布的消息与第一条消息的间隔以便play
-    ////测试用
+    ////消息以JSON格式写入
     std::ofstream log_file(log_file_dir, std::ios::app);
     if (log_file.is_open()) {
         log_file << elapsed_sec << "|" << message_value << "\n";
