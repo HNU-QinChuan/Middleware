@@ -21,6 +21,8 @@
 #include <unistd.h>
 #include <chrono>
 #include <thread>
+#include <libgen.h>
+#include <limits.h>
 
 namespace DWA
 {

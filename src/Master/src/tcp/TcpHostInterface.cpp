@@ -23,8 +23,8 @@ namespace Hnu::Tcp{
     isConnected = false;
     isConnecting=true;
     m_timer->expires_after(std::chrono::seconds(1));
-    m_timer->async_wait(std::bind_front(&TcpHostInterface::onTimeout, shared_from_this()));
-    m_stream->async_connect(m_endpoint, std::bind_front(&TcpHostInterface::onConnect, shared_from_this()));
+    m_timer->async_wait(std::bind(&TcpHostInterface::onTimeout, shared_from_this(),std::placeholders::_1));
+    m_stream->async_connect(m_endpoint, std::bind(&TcpHostInterface::onConnect, shared_from_this(),std::placeholders::_1));
   }
   void TcpHostInterface::onTimeout(const beast::error_code& ec) {
     if (ec) {
@@ -54,9 +54,9 @@ namespace Hnu::Tcp{
       request=m_requestQueue.front();
       m_requestQueue.pop();
       m_timer->expires_after(std::chrono::seconds(1));
-      m_timer->async_wait(std::bind_front(&TcpHostInterface::onTimeout, shared_from_this()));
+      m_timer->async_wait(std::bind(&TcpHostInterface::onTimeout, shared_from_this(),std::placeholders::_1));
       beast::http::async_write(*m_stream, request,
-        std::bind_front(&TcpHostInterface::onWrite, shared_from_this()));
+        std::bind(&TcpHostInterface::onWrite, shared_from_this(),std::placeholders::_1,std::placeholders::_2));
     }
   }
   void TcpHostInterface::send(boost::beast::http::request<boost::beast::http::string_body>& req) {

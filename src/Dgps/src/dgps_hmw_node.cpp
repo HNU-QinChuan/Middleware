@@ -27,15 +27,15 @@
 // #define SERVICE_GPS 1
 // #define COVARIANCE_TYPE_DIAGONAL_KNOWN  2
 
-std::string getExecutablePath() {
-    char buffer[1024];
-    ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
-    if (len != -1) {
-        buffer[len] = '\0';
-        return std::string(dirname(buffer));
-    }
-    return "";
-}
+// std::string getExecutablePath() {
+//     char buffer[1024];
+//     ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+//     if (len != -1) {
+//         buffer[len] = '\0';
+//         return std::string(dirname(buffer));
+//     }
+//     return "";
+// }
 
 
 namespace Dgps_hmw_node{
@@ -48,8 +48,15 @@ public:
         : Hnu::Middleware::Node(name)
     {
         spdlog::info("dgps_ros2_node start...");
-        std::string exeDir = getExecutablePath();
-        std::string yamlPath = exeDir + "/../src/Dgps/yaml/dgps.yaml";
+        // std::string exeDir = getExecutablePath();
+        // std::string yamlPath = exeDir;
+        std::string yamlPath;
+        char buffer[1024];
+        ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+        if (len != -1) {
+            buffer[len] = '\0';
+            yamlPath = std::string(dirname(buffer)) + "DgpsConfig/dgps.yaml";
+        }
         YAML::Node config = YAML::LoadFile(yamlPath);
         serverName = config["serverName"].as<std::string>();
         serverPort = config["serverPort"].as<std::string>();

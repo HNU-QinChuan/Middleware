@@ -13,6 +13,7 @@ namespace DWA
 		yaml_file_path_ = filename;
 		try
 		{
+			spdlog::debug("Actual BaseGeneratePath param file: {}", filename);
 			YAML::Node config = YAML::LoadFile(filename);
 			max_vel_x_ = config["kinematic"]["max_vel"]["max_vel_x"].as<double>();
 			min_vel_x_ = config["kinematic"]["min_vel"]["min_vel_x"].as<double>();
@@ -33,10 +34,10 @@ namespace DWA
 			num_steps_ = config["simulate"]["num_steps"].as<int>();
 			sim_time_ = config["simulate"]["sim_time"].as<double>();
 			allow_pub_ = config["simulate"]["allow_pub"].as<bool>();
-		}
+		}		
 		catch (const YAML::Exception &ex)
 		{
-			std::cout << "error while reading para file in BaseGeneratePath.cpp\n";
+			spdlog::warn("error while reading para file in BaseGeneratePath.cpp");
 			max_vel_x_ = 1;
 			min_vel_x_ = 0;
 			max_vel_y_ = 0;
@@ -62,12 +63,12 @@ namespace DWA
 	BaseGeneratePath::BaseGeneratePath(std::string filename)
 	{
 		readYaml(filename);
-		std::cout << "finish BaseGeneratePath construtor\n";
+		spdlog::debug("finish BaseGeneratePath construtor");
 	}
 
 	BaseGeneratePath::~BaseGeneratePath()
 	{
-		std::cout << "  finish BaseGeneratePath destructor\n";
+		spdlog::debug("finish BaseGeneratePath destructor");
 	}
 	/// @brief 获取score类 主要是三维和二维的评价函数不一样
 	/// @param current 当前位置（x,y,yaw) 或 （ X,  Y,  Z,  YAW,  VELOCITY,  YAWRATE,  PITCH,  PITCHRATE)
@@ -79,6 +80,7 @@ namespace DWA
 		const Eigen::Vector3d local_goal, const std::vector<std::vector<float>> *obs_list)
 	{
 		sc_ = new BaseScore(yaml_file_path_, last_goal, local_goal, current, obs_list);
+		spdlog::debug("finish getScoreClass");
 		return 1;
 	}
 	/// @brief 生成路径
@@ -108,7 +110,7 @@ namespace DWA
 		{
 			max_vel_x = std::min(max_vel_x, max_velocity);
 			// 为了调试 之后删除
-			std::cout << "judge ok!\n";
+			spdlog::debug("judge ok!");
 		}
 		double max_vel_theta = std::min(max_vel_theta_, vel_theta + acc_lim_theta_ * sim_time_);
 		double min_vel_x = std::min(std::max(min_vel_x_, vel_x + deacc_lim_x_ * sim_time_), max_vel_x);
@@ -150,6 +152,7 @@ namespace DWA
             // 发布轨迹
             if (allow_pub_)
             {
+							spdlog::debug("allow_pub_");
                 // mark.header.stamp = rclcpp::Time();
                 //
                 // mark.id = mark_trajs.markers.size();
@@ -225,7 +228,7 @@ namespace DWA
         std::shared_ptr<State> temp(new State(current));
         temp->velocity = 0.0;
         temp->yawrate = 0.0;
-        std::cout << "could not generate a valid path\n";
+				spdlog::debug("could not generate a valid path");
         best_traj.push_back(temp);
     }
     // if (allow_pub_)

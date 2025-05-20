@@ -21,7 +21,7 @@ int main(){
   {
     spdlog::info("str: {}", dgps->tpr());
   });
-  auto sub_gnvtg = node->createSubscriber<Dgps::Gnvtg>("_dgps_gpfpd",[](std::shared_ptr<Dgps::Gnvtg> dgps)
+  auto sub_gnvtg = node->createSubscriber<Dgps::Gnvtg>("_dgps_gnvtg",[](std::shared_ptr<Dgps::Gnvtg> dgps)
   {
     spdlog::info("str: {}", dgps->status());
   });

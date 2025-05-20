@@ -1,0 +1,9 @@
+syntax = "proto3";
+package Geometry;
+import "Std/Header.proto";
+import "Geometry/Point.proto";
+
+message PointStamped {
+    Std.Header header = 1;
+    Point point = 2;
+}

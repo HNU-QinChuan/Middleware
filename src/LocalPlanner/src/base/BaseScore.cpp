@@ -17,7 +17,7 @@ namespace DWA
         const Eigen::Vector2d s2(last_goal[0], last_goal[1]);
         // line_->update(s1, s2);
         this->line_ = new apeLine(s1, s2);
-        std::cout << "   finish BaseScore construct" << std::endl;
+        spdlog::debug("finish BaseScore construct");
     }
 
     void BaseScore::readYaml(const std::string filename)
@@ -43,7 +43,7 @@ namespace DWA
         }
         catch (const YAML::Exception &ex)
         {
-            std::cout << "error while reading param file in BaseScore.cpp\n";
+            spdlog::error("error while reading param file in BaseScore.cpp\n");
 
             goal_bias_ = path_bias_= speed_bias_= obs_bias_ = 1;
             semi_width = semi_length = 0.5;
@@ -77,19 +77,31 @@ namespace DWA
         calcPathCost();
         if(obs_list_!=nullptr)calcObsCost();
 
-        if ((obs_cost_ == 1e6) || (speed_cost_ == 1e6))
+        if (obs_cost_ == 1e6){
+            spdlog::debug("collision detected (obs_cost = 1e6)");
             return -1;
+        }
+
+        if(speed_cost_ == 1e6)
+        {
+            spdlog::debug("invalid speed (speed_cost = 1e6)");
+            return -1;
+        }
+
+        spdlog::debug("goal_cost: {}, path_cost: {}, speed_cost: {}, obs_cost: {}", goal_cost_, path_cost_, speed_cost_, obs_cost_);
         return obs_cost_ * obs_bias_ + speed_cost_ * speed_bias_ + path_bias_ * path_cost_ + goal_bias_ * goal_cost_;
     }
 
     void BaseScore::calcGoalCost()
     {
+        spdlog::debug("calc goal cost");
         Eigen::Vector3d last_position(traj_.back()->x, traj_.back()->y, traj_.back()->yaw);
         goal_cost_ = (last_position.segment(0, 2) - local_goal_.segment(0, 2)).norm();
     }
 
     void BaseScore::calcSpeedCost()
     {
+        spdlog::debug("calc speed cost");
         // if ((traj_.back()->velocity == 0) && (traj_.back()->yawrate != 0))
         //    speed_cost_ = 1e6;
         if (traj_.back()->velocity >= 0)
@@ -100,7 +112,7 @@ namespace DWA
 
     void BaseScore::calcObsCost()
     {
-        std::cout<<"calc obs cost"<<std::endl;
+        spdlog::debug("calc obs cost");
         float cost = 0.0;
         float min_dist = 1e6;
         double oriented_footprint[footprint_.size()][2];

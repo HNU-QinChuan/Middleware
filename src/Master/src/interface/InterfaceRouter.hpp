@@ -34,7 +34,7 @@ namespace Hnu::Interface {
     }
     template<typename... Args>
     void doRegister(http::verb verb,void (T::*funcPtr)(Request&),Args&&... args){
-      InterfaceRouter::registerController(path,verb,std::bind_front(funcPtr,controller));
+      InterfaceRouter::registerController(path,verb,std::bind(funcPtr,controller,std::placeholders::_1));
       doRegister(args...);
     }
     void doRegister(){}

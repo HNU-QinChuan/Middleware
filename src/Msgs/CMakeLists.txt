@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(Middleware-Msgs)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 # 查找并检查 Protobuf
 find_package(Protobuf REQUIRED)

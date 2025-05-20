@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fishbot">v
+<!-- 基础部分 base_link -->
+<xacro:include filename="base.urdf.xacro"/>
+<!--执行器部分-->
+<xacro:include filename="wheel.urdf.xacro"/>
+<xacro:include filename="caster.urdf.xacro"/>
+
+<xacro:base_xacro length="0.12" radius="0.10"/>
+
+<xacro:wheel_xacro wheel_name="left_wheel" xyz="0 0.10 -0.06"/>
+<xacro:wheel_xacro wheel_name="right_wheel" xyz="0 -0.10 -0.06"/>
+<xacro:caster_xacro caster_name="front_caster" xyz="0.08 0.0 -0.076"/>
+<xacro:caster_xacro caster_name="back_caster" xyz="-0.08 0.0 -0.076"/>
+
+</robot> 

@@ -3,9 +3,13 @@ cmake_minimum_required(VERSION 3.16)
 
 project(dgps)
 
-    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD 17)
 
 include_directories(src)
+
+set(CONFIG_DIR ${CMAKE_SOURCE_DIR}/src/Dgps/yaml)
+set(DEST_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DgpsConfig) 
+file(MAKE_DIRECTORY ${DEST_DIR})
 
 find_package(Middleware-Node REQUIRED)
 find_package(Middleware-Msgs REQUIRED)
@@ -28,3 +32,9 @@ target_link_libraries(dgps
         yaml-cpp)
 target_link_libraries(dgps-node dgps)
 target_link_libraries(dgps-test dgps)
+
+add_custom_command(
+    TARGET dgps POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CONFIG_DIR} ${DEST_DIR}
+)

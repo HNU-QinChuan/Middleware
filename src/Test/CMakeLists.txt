@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(Middleware-Test)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 # file(GLOB PROTO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.proto")
 # execute_process(COMMAND protoc ${PROTO_FILES} --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src -I=${CMAKE_CURRENT_SOURCE_DIR})

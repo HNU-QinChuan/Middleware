@@ -22,7 +22,7 @@ namespace Hnu::Middleware {
     m_buffer.clear();
     m_request.clear();
     m_request.body().clear();
-    beast::http::async_read(m_stream, m_buffer, m_request, std::bind_front(&Server::onRead, shared_from_this()));
+    beast::http::async_read(m_stream, m_buffer, m_request, std::bind(&Server::onRead, shared_from_this(),std::placeholders::_1,std::placeholders::_2));
   }
   void Server::onRead(const boost::system::error_code& ec,std::size_t bytes) {
     if (ec) {
@@ -36,7 +36,7 @@ namespace Hnu::Middleware {
   }
   void Server::doWrite() {
     m_response.prepare_payload();
-    beast::http::async_write(m_stream, m_response, std::bind_front(&Server::onWrite, shared_from_this()));
+    beast::http::async_write(m_stream, m_response, std::bind(&Server::onWrite, shared_from_this(), std::placeholders::_1,std::placeholders::_2));
   }
   void Server::onWrite(const boost::system::error_code& ec,std::size_t bytes) {
     if (ec) {

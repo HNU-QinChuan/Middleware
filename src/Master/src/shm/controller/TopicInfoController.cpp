@@ -11,10 +11,10 @@ namespace Hnu::Middleware {
       std::string topic_name = req["topic"].to_string();
       int pubcount = 0;
       int subcount = 0;
-      if(MiddlewareManager::middlewareManager.m_publishes.contains(topic_name)) {
+      if(MiddlewareManager::middlewareManager.m_publishes.find(topic_name) != MiddlewareManager::middlewareManager.m_publishes.end()) {
         pubcount = MiddlewareManager::middlewareManager.m_publishes[topic_name].size();
       }
-      if(MiddlewareManager::middlewareManager.m_subscribes.contains(topic_name)) {
+      if(MiddlewareManager::middlewareManager.m_subscribes.find(topic_name) != MiddlewareManager::middlewareManager.m_subscribes.end()) {
         subcount = MiddlewareManager::middlewareManager.m_subscribes[topic_name].size();
       }
       Json::Value root;

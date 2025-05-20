@@ -79,7 +79,7 @@ namespace Hnu::Middleware {
     }
     queue=res.first;
     m_callback=callback;
-    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscriber::onRead,std::static_pointer_cast<Subscriber<Message>>(shared_from_this())));
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind(&Subscriber::onRead,std::static_pointer_cast<Subscriber<Message>>(shared_from_this()),std::placeholders::_1,std::placeholders::_2));
     return true;
   }
   template<typename Message>
@@ -97,7 +97,7 @@ namespace Hnu::Middleware {
       }
     }
     // m_eventfdValue=0;
-    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind_front(&Subscriber::onRead,std::static_pointer_cast<Subscriber<Message>>(shared_from_this())));
+    m_eventfdStream->async_read_some(asio::buffer(&m_eventfdValue,sizeof(m_eventfdValue)),std::bind(&Subscriber::onRead,std::static_pointer_cast<Subscriber<Message>>(shared_from_this()),std::placeholders::_1,std::placeholders::_2));
 
   }
 }

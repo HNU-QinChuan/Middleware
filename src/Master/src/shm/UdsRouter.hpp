@@ -38,7 +38,7 @@ namespace Hnu::Middleware {
     }
     template<typename... Args>
     void doRegister(http::verb verb,void (T::*funcPtr)(Request&,Response&),Args&&... args){
-      UdsRouter::registerController(path,verb,std::bind_front(funcPtr,controller));
+      UdsRouter::registerController(path,verb,std::bind(funcPtr,controller,std::placeholders::_1,std::placeholders::_2));
       doRegister(args...);
     }
     void doRegister(){}

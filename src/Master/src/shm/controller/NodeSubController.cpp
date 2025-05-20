@@ -23,7 +23,7 @@ namespace Hnu::Middleware {
     }
     bool addSubscrie(const std::string& node, const std::string& topic, int eventfd,const std::string& type) {
       // MiddlewareManager& middlewareManager = getInstance();
-      if (!MiddlewareManager::middlewareManager.m_nodes.contains(node)) {
+      if (MiddlewareManager::middlewareManager.m_nodes.find(node) == MiddlewareManager::middlewareManager.m_nodes.end()) {
         return false;
       }
       if (MiddlewareManager::middlewareManager.m_nodes[node]->containsSubscribe(topic)) {

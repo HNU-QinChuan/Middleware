@@ -1,0 +1,50 @@
+dwa:
+  goal_tolerance_: 2.0
+topic:
+  odom_topic: odom_chassis
+  map_topic: gridMap
+  goal_topic: global_path
+  speed_topic: cmd_vel
+  feedback_topic: global_path_plan_feedback
+  pose_topic: pose
+  global_traj_topic: global_traj
+  local_traj_topic: local_traj
+kinematic:
+  max_vel:
+    max_vel_x: 1
+    max_vel_y: 0
+  max_acc:
+    max_acc_x: 1
+    max_acc_y: 0
+  max_w: 0.5
+  min_vel:
+    min_vel_x: 0
+    min_vel_y: 0
+  deacc_v:
+    deacc_v_x: -1
+    deacc_v_y: 0
+  min_w: -0.5
+  acc_w: 0.15
+  deacc_w: -0.15
+  max_back: 1
+  allow_back: false
+simulate:
+  sim_time: 3.0
+  n: 20
+  num_vel: 20
+  num_w: 20
+  num_steps: 30
+  target_vel: 0.8
+  dt_ref: 0.3
+  min_obs_dist: 0.2
+  allow_pub: true
+  thresh_vel: 3.0
+robot:
+  width: 0.8
+  length: 1.0
+  wheelbase: 0.1
+evaluate:
+  path_bias: 2
+  goal_bias: 2
+  obs_bias: 2
+  speed_bias: 1
