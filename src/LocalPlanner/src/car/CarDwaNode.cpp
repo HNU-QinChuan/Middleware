@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
   spdlog::set_level(spdlog::level::debug);
-  auto car_local_planner_node = std::make_shared<DWA::BaseDwaPlanner>("node");
+  auto car_local_planner_node = std::make_shared<DWA::CarDwaPlanner>("node");
   car_local_planner_node -> run();
   return 0;
 }

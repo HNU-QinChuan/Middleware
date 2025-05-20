@@ -30,6 +30,10 @@ add_library(gui_mouse_click_goal SHARED
   plugin/gui_mouse_click_goal.cpp
 )
 
+add_library(gui_mouse_click_path_plan_plugin SHARED
+  plugin/gui_mouse_click_path_plan_plugin.cpp
+)
+
 add_library(pose_publisher SHARED
   plugin/pose_publisher_plugin.cpp
 )
@@ -46,6 +50,10 @@ add_executable(gazebo_publisher
   test/publisher.cpp
 )
 
+add_executable(fake_map_publisher
+  test/map_publisher_test.cpp
+)
+
 add_executable(gazebo_subscriber
   test/subscriber.cpp
 )
@@ -59,6 +67,13 @@ target_link_libraries(gui_mouse_click_goal
   ${GAZEBO_LIBRARIES}
   Qt5::Core
   Middleware-Msgs::Geometry
+  Middleware-Node::Middleware-Node
+)
+
+target_link_libraries(gui_mouse_click_path_plan_plugin
+  ${GAZEBO_LIBRARIES}
+  Qt5::Core
+  Middleware-Msgs::TaskPlanner
   Middleware-Node::Middleware-Node
 )
 
@@ -83,9 +98,15 @@ target_link_libraries(gazebo_subscriber
   Middleware-Msgs::Geometry
   Middleware-Msgs::Nav
   Middleware-Node::Middleware-Node
+   Middleware-Msgs::TaskPlanner
 )
 
 target_link_libraries(odom_publisher_plugin
+  Middleware-Msgs::Nav
+  Middleware-Node::Middleware-Node
+)
+
+target_link_libraries(fake_map_publisher
   Middleware-Msgs::Nav
   Middleware-Node::Middleware-Node
 )

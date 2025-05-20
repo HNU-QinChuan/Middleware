@@ -1,12 +1,12 @@
 dwa:
   goal_tolerance_: 4
 topic:
-  odom_topic: /odom_chassis
-  map_topic: /gridMap
-  goal_topic: /global_path
-  speed_topic: /cmd_vel
-  feedback_topic: /global_path_plan_feedback
-  pose_topic: /pose
+  odom_topic: odom_chassis
+  map_topic: gridMap
+  goal_topic: global_path
+  speed_topic: cmd_vel
+  feedback_topic: global_path_plan_feedback
+  pose_topic: pose
   global_traj_topic: global_traj
   local_traj_topic: local_traj
 kinematic:

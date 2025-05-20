@@ -22,7 +22,7 @@ namespace gazebo
         last_publish_time_ = world_->SimTime();
 
         this->node_ = std::make_shared<Hnu::Middleware::Node>("gazebo_pose_publisher_plugin_node");
-        this->pose_pub_ = node_->createPublisher<Geometry::PoseStamped>("gazebo_pose_publisher");
+        this->pose_pub_ = node_->createPublisher<Geometry::PoseStamped>("pose");
 
         this->link_ = model_->GetLink("base_footprint");
 

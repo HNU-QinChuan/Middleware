@@ -30,15 +30,27 @@ namespace DWA
 		current_pose_ = std::make_shared<Geometry::PoseStamped>();
 		// goal_ = std::make_shared<geometry_msgs::msg::PoseStamped>();
 		odom_ = std::make_shared<Nav::Odometry>();
-		current_pose_sub_ = createSubscriber<Geometry::PoseStamped>(pose_topic_,std::bind(&BaseDwaPlanner::poseCallback, this, std::placeholders::_1));
-		max_vel_sub_= createSubscriber<Std::Float64>("/max_vel_adjust", std::bind(&BaseDwaPlanner::maxVelCallback, this, std::placeholders::_1));
-		replan_msg_sub_ = createSubscriber<Std::Bool>("/a_server_replan",std::bind(&BaseDwaPlanner::replanCallback, this, std::placeholders::_1));
-		goals_sub_ = createSubscriber<TaskPlanner::GlobalPathPlan>(goal_topic_, std::bind(&BaseDwaPlanner::goalCallback,this,std::placeholders::_1));
-		odom_sub_ = createSubscriber<Nav::Odometry>(odom_topic_, std::bind(&BaseDwaPlanner::odomCallback, this,std::placeholders::_1));
+
+		current_pose_sub_ = createSubscriber<Geometry::PoseStamped>(pose_topic_,
+			std::bind(&BaseDwaPlanner::poseCallback, this, std::placeholders::_1));
+			
+		max_vel_sub_= createSubscriber<Std::Float64>("max_vel_adjust", 
+			std::bind(&BaseDwaPlanner::maxVelCallback, this, std::placeholders::_1));
+
+		replan_msg_sub_ = createSubscriber<Std::Bool>("a_server_replan",
+			std::bind(&BaseDwaPlanner::replanCallback, this, std::placeholders::_1));
+
+		goals_sub_ = createSubscriber<TaskPlanner::GlobalPathPlan>(goal_topic_, 
+			std::bind(&BaseDwaPlanner::goalCallback,this,std::placeholders::_1));
+
+		odom_sub_ = createSubscriber<Nav::Odometry>(odom_topic_, 
+			std::bind(&BaseDwaPlanner::odomCallback, this,std::placeholders::_1));
+
 		cmd_vel_pub_ = this->createPublisher<Geometry::Twist>(cmd_vel_topic_);
 		// traj_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(local_traj_topic_, 1);
 		replan_pub_ = this->createPublisher<TaskPlanner::GlobalPathPlanFeedback>(replan_feedback_topic_);
-		std::cout << " finish BaseDwaPlanner constructor" << std::endl;
+
+		spdlog::debug("BaseDwaPlanner constructor");
 		timer_ = createTimer(50, std::bind(&BaseDwaPlanner::on_timer, this));
 	}
 
@@ -92,7 +104,7 @@ namespace DWA
 	{
 		try
 		{
-			std::cout << "Actual param file: " << yaml_file_name_ << std::endl;
+			spdlog::debug("Actual BaseDwaPlanner param file: {}", yaml_file_name_);
 			// 获取配置项
 			YAML::Node config = YAML::LoadFile(yaml_file_name_);
 			goal_topic_ = config["topic"]["goal_topic"].as<std::string>(); //目标话题信息
@@ -108,7 +120,7 @@ namespace DWA
 		catch (const YAML::Exception &ex)
 		{
 			// 如果出现异常，则意味着读取和解析YAML文件失败
-			std::cerr << "YAML file reading or parsing failed in DWAPLANNER.CPP. Error message: " << ex.what() << std::endl;
+			spdlog::error("YAML file reading or parsing failed in DWAPLANNER.CPP. Error message: {}", ex.what());
 
 			goal_tolerance_ = 1.0;
 			odom_topic_ = "/odom";
@@ -131,12 +143,14 @@ namespace DWA
 	void BaseDwaPlanner::poseCallback(std::shared_ptr<Geometry::PoseStamped> pose)
 	{
 		current_pose_ = std::move(pose);
+		watch_cnt[2] = 0;
 	}
 
 	void BaseDwaPlanner::goalCallback(const std::shared_ptr<TaskPlanner::GlobalPathPlan> msg)
 	{
 		//goal_update_ = false;
 		// points_ = msg->pose_array().poses;
+		// points_.clear();
 		for (const auto& pose : msg->pose_array().poses()) {
 			points_.push_back(pose);  // 可能还需要手动转换类型
 		}
@@ -190,7 +204,7 @@ namespace DWA
 
 	void BaseDwaPlanner::replanCallback(const std::shared_ptr<Std::Bool> msg)
 	{
-		std::cout<<"replan occur"<<std::endl;
+		spdlog::debug("replan occur");
 		Geometry::Twist cmd_vel;
 		cmd_vel.mutable_linear()->set_x(0);
 		cmd_vel.mutable_linear()->set_y(0);
@@ -241,14 +255,16 @@ namespace DWA
 
 	void BaseDwaPlanner::plan()
 	{
+		spdlog::info("BaseDwaPlanner::plan() start");
     int current_temp;
     auto thread_start = std::chrono::steady_clock::now(); // 获取系统时间
     current_temp = current_step_ - 1;
     while (true)
     {
-      if (goal_update_ && odom_update_ && pose_update_ && map_update_)
+			if (goal_update_ && odom_update_ && pose_update_ && map_update_)
       {
-       auto single_start = std::chrono::steady_clock::now(); // 获取系统时间
+				spdlog::debug("BaseDwaPlanner::plan() checking...");
+      	auto single_start = std::chrono::steady_clock::now(); // 获取系统时间
 
 				spdlog::debug("===dwa planner=== ");
 				spdlog::debug("current pose : {},{}", current_pose_->pose().position().x(), current_pose_->pose().position().y());

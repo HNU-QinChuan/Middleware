@@ -13,6 +13,7 @@ namespace DWA
 		yaml_file_path_ = filename;
 		try
 		{
+			spdlog::debug("Actual BaseGeneratePath param file: {}", filename);
 			YAML::Node config = YAML::LoadFile(filename);
 			max_vel_x_ = config["kinematic"]["max_vel"]["max_vel_x"].as<double>();
 			min_vel_x_ = config["kinematic"]["min_vel"]["min_vel_x"].as<double>();
@@ -33,7 +34,7 @@ namespace DWA
 			num_steps_ = config["simulate"]["num_steps"].as<int>();
 			sim_time_ = config["simulate"]["sim_time"].as<double>();
 			allow_pub_ = config["simulate"]["allow_pub"].as<bool>();
-		}
+		}		
 		catch (const YAML::Exception &ex)
 		{
 			spdlog::warn("error while reading para file in BaseGeneratePath.cpp");
@@ -151,6 +152,7 @@ namespace DWA
             // 发布轨迹
             if (allow_pub_)
             {
+							spdlog::debug("allow_pub_");
                 // mark.header.stamp = rclcpp::Time();
                 //
                 // mark.id = mark_trajs.markers.size();

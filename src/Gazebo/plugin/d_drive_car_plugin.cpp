@@ -35,7 +35,7 @@ namespace gazebo
         }
 
         node = std::make_shared<Hnu::Middleware::Node>("drive_car_plugin_node");
-        subscriber = node->createSubscriber<Geometry::Twist>("gazebo_d_drive_car",std::bind(&DiffDriveCarPlugin::CmdCallback, this, std::placeholders::_1));
+        subscriber = node->createSubscriber<Geometry::Twist>("cmd_vel",std::bind(&DiffDriveCarPlugin::CmdCallback, this, std::placeholders::_1));
 
 
         running = true;

@@ -18,7 +18,7 @@ namespace gazebo {
       last_publish_time_ = world_->SimTime();
 
       this->node_ = std::make_shared<Hnu::Middleware::Node>("gazebo_odom_publisher_plugin_node");
-      this->odom_pub_ = node_->createPublisher<Nav::Odometry>("gazebo_odom_topic");
+      this->odom_pub_ = node_->createPublisher<Nav::Odometry>("odom_chassis");
 
       this->link_ = model_->GetLink("base_footprint");
 
@@ -55,7 +55,6 @@ namespace gazebo {
       msg.mutable_twist()->mutable_twist()->mutable_angular()->set_z(angular_vel_.Z());
 
       this->odom_pub_->publish(msg);
-      gzmsg << "[OdomPublisherPlugin] Published odometry data." << std::endl;
 
 
     }

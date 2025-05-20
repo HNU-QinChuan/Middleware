@@ -4,18 +4,17 @@ namespace DWA
 {
   CarDwaPlanner::CarDwaPlanner(const std::string &name) : BaseDwaPlanner(name)
   {
-    spdlog::set_level(spdlog::level::debug);
-    std::cout << "finish car constructor" << std::endl;
     // car 无需接收pose map包含pos
     grid_map_sub_ = this->createSubscriber<Nav::OccupancyGrid>(
       map_topic_, std::bind(&CarDwaPlanner::mapCallback, this, std::placeholders::_1));
     process_thread_ = std::make_shared<std::thread>(std::bind(&CarDwaPlanner::plan, this));
     replan_pub_ = this->createPublisher<TaskPlanner::GlobalPathPlanFeedback>(replan_feedback_topic_);
+    spdlog::debug("finish CarDwaPlanner constructor");
   }
 
   CarDwaPlanner::~CarDwaPlanner()
   {
-    std::cout << "finish car destructor" << std::endl;
+    spdlog::debug("finish car destructor");
   }
   // local goal 更新 ,本版本为前看
   // 9-17  取消前看

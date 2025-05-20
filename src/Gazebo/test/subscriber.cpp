@@ -4,12 +4,15 @@
 #include <hmw/Subscriber.hpp>
 #include <Geometry/PoseStamped.pb.h>
 #include <Nav/Odometry.pb.h>
+#include <TaskPlanner/GlobalPathPlan.pb.h>
+#include <Nav/OccupancyGrid.pb.h>
 
 int main()
 {
   auto node = std::make_shared<Hnu::Middleware::Node>("subscriber_node");
-  auto subscriber = node->createSubscriber<Nav::Odometry>("gazebo_odom_topic", [](std::shared_ptr<Nav::Odometry> msg) {
-    std::cout << "Received message: " << msg->DebugString() << std::endl;
+  auto subscriber = node->createSubscriber<Nav::OccupancyGrid>("gridMap", [](std::shared_ptr<Nav::OccupancyGrid> msg) {
+    // std::cout << "Received message: " << msg->DebugString() << std::endl;
+    std::cout << "Received message: " << msg->info().width() << " " << msg->info().height() << std::endl;
   });
   node->run();
 }

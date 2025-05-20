@@ -2,7 +2,7 @@
   <world name='default'>
 
     <gui>
-      <plugin name="gui_mouse_click_goal" filename="libgui_mouse_click_goal.so"/>
+      <plugin name="gui_mouse_click_goal" filename="libgui_mouse_click_path_plan_plugin.so"/>
     </gui>
 
     <model name='HnuRobot'>
