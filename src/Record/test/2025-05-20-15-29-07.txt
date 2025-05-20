@@ -1,0 +1,3 @@
+message_type: Std.String
+0|{"data":"123"}
+0.100822|{"data":"123"}
