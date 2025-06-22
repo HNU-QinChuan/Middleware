@@ -14,6 +14,9 @@ namespace Hnu::Tcp{
     m_stream = std::make_unique<beast::tcp_stream>(ioc);
 
     m_timer = std::make_unique<asio::steady_timer>(ioc);
+    m_reconnectTimer = std::make_unique<asio::steady_timer>(ioc);
+    m_reconnectTimer->expires_after(std::chrono::seconds(60));
+    m_reconnectTimer->async_wait(std::bind(&TcpHostInterface::onReconnectTimeout, shared_from_this(), std::placeholders::_1));
     doConnect();
   }
   void TcpHostInterface::doConnect() {
@@ -80,6 +83,18 @@ namespace Hnu::Tcp{
     }
     doWrite();
     // doRead();
+  }
+  void TcpHostInterface::onReconnectTimeout(const beast::error_code& ec) {
+    if (ec) {
+      spdlog::warn("Reconnect timeout error: {}", ec.message());
+      return;
+    }
+    if (!isConnected) {
+      spdlog::info("Reconnecting to {}...", hostName);
+      doConnect();
+    }
+    m_reconnectTimer->expires_after(std::chrono::seconds(60));
+    m_reconnectTimer->async_wait(std::bind(&TcpHostInterface::onReconnectTimeout, shared_from_this(), std::placeholders::_1));
   }
   // void TcpHostInterface::doRead() {
   //   buffer.clear();
