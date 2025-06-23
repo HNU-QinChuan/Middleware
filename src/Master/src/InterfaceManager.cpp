@@ -5,6 +5,8 @@
 #include <fstream>
 #include "tcp/TcpInterface.hpp"
 #include "tcp/TcpHostInterface.hpp"
+#include "uwb/UwbInterface.hpp"
+#include "uwb/UwbHostInterface.hpp"
 #include "MiddlewareManager.hpp"
 
 namespace Hnu::Interface {
@@ -47,6 +49,14 @@ namespace Hnu::Interface {
             unsigned port = interface["port"].asUInt();
             interfacePtr = std::make_shared<Tcp::TcpInterface>(interfaceName, type, segment, ip, port); 
           }
+          else if(type=="uwb"){
+            //添加初始化
+            std::string device = interface["device"].asString();
+            unsigned baudrate = interface["baudrate"].asUInt();
+            interfacePtr = std::make_shared<Uwb::UwbInterface>(interfaceName, type, segment, device, baudrate);
+            auto uwbInterface = std::dynamic_pointer_cast<Uwb::UwbInterface>(interfacePtr);
+            m_uwbHandle = uwbInterface->getHandle();
+          }
           interfaceList[interfaceName] = interfacePtr;
         }
         break;  
@@ -66,6 +76,10 @@ namespace Hnu::Interface {
             std::string ip = interface["ip"].asString();
             unsigned port = interface["port"].asUInt();
             hostInterface = std::make_shared<Tcp::TcpHostInterface>(interfaceName,hostName, type, segment, ip, port);
+          }
+          else if(type=="uwb"){
+            //添加初始化
+            hostInterface = std::make_shared<Uwb::UwbHostInterface>(interfaceName,hostName, type, segment, m_uwbHandle);
           }
           hostInstance->setHostInterface(interfaceName, hostInterface);
           for(auto& [key,value]:interfaceList){

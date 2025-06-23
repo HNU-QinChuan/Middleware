@@ -13,6 +13,7 @@ aux_source_directory(src/shm/controller shm_controller)
 aux_source_directory(src/interface interface)
 aux_source_directory(src/interface/controller interface_controller)
 aux_source_directory(src/tcp tcp)
+aux_source_directory(src/uwb uwb)
 
 
 add_executable(${PROJECT_NAME} src/main.cpp
@@ -21,6 +22,7 @@ add_executable(${PROJECT_NAME} src/main.cpp
     ${interface}
     ${interface_controller}
     ${tcp}
+    ${uwb}
     src/MiddlewareManager.cpp
     src/MiddlewareManager.hpp
     src/InterfaceManager.cpp

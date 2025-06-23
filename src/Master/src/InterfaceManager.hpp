@@ -8,6 +8,7 @@
 #include <memory>
 #include <jsoncpp/json/json.h>
 #include<boost/beast.hpp>
+#include <uwb/UwbHandle.hpp>
 
 
 namespace Hnu::Interface {
@@ -43,6 +44,7 @@ namespace Hnu::Interface {
     Json::Value launch{Json::arrayValue};
   private:
     InterfaceManager()=default;
+    std::shared_ptr<Uwb::Handle> m_uwbHandle;
 
     Map map;
 

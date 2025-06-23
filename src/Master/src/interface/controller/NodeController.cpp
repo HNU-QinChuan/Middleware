@@ -8,6 +8,7 @@ namespace Hnu::Interface {
   class NodeController {
   public:
     void handlePost(Request& req){
+      spdlog::info("here is NodeController handlePost");
       std::string node = std::string(req["node"]);
       std::string host=req["src"].to_string();
       InterfaceManager::interfaceManager.hostlist[host]->addNode(node);
