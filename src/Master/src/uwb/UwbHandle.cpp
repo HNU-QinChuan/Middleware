@@ -25,16 +25,17 @@ namespace Hnu::Uwb {
   }
 
   void Handle::doRead() {
+    auto self = shared_from_this();
     beast::http::async_read(m_serial, m_buffer, m_request,
-    [this](beast::error_code ec, std::size_t bytes) {
+    [self](beast::error_code ec, std::size_t bytes) {
         if (!ec) {
             spdlog::debug("Received HTTP request");
-            Interface::InterfaceRouter::handle(m_request);
+            Interface::InterfaceRouter::handle(self->m_request);
         } else {
             spdlog::error("Failed to read from serial port");
             spdlog::error("HTTP parse error: {}", ec.message());
         }
-        doRead();  // 继续监听
+        self->doRead();  // 继续监听
     });
   }
 

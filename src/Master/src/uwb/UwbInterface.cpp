@@ -1,4 +1,5 @@
 #include "uwb/UwbInterface.hpp"
+#include "spdlog/spdlog.h"
 
 
 namespace Hnu::Uwb{
@@ -8,9 +9,13 @@ namespace Hnu::Uwb{
   }
   
   void UwbInterface::run(asio::io_context& ioc){
+    if (m_handle) {
+        spdlog::warn("UwbInterface::run() called more than once, ignoring.");
+        return;
+    }
     m_handle = std::make_shared<Hnu::Uwb::Handle >(ioc, m_device, m_baudrate);
     m_handle->run();
-  }
+}
   
   std::shared_ptr<Hnu::Uwb::Handle> UwbInterface::getHandle() const {
     return m_handle;

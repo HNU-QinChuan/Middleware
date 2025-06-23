@@ -54,6 +54,7 @@ namespace Hnu::Interface {
             std::string device = interface["device"].asString();
             unsigned baudrate = interface["baudrate"].asUInt();
             interfacePtr = std::make_shared<Uwb::UwbInterface>(interfaceName, type, segment, device, baudrate);
+            interfacePtr->run(Middleware::MiddlewareManager::getIoc());
             auto uwbInterface = std::dynamic_pointer_cast<Uwb::UwbInterface>(interfacePtr);
             m_uwbHandle = uwbInterface->getHandle();
           }
