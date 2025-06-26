@@ -32,7 +32,7 @@ namespace Hnu::Uwb {
             spdlog::debug("Received HTTP request");
             Interface::InterfaceRouter::handle(self->m_request);
         } else {
-            spdlog::error("Failed to read from serial port");
+            spdlog::error("Failed to read from serial port!");
             spdlog::error("HTTP parse error: {}", ec.message());
         }
         self->doRead();  // 继续监听
