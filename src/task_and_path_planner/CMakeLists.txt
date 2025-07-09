@@ -45,3 +45,12 @@ target_link_libraries(PathCalculatorTest
     Middleware-Msgs::TaskPlanner
     spdlog::spdlog
 )
+
+# Standalone test (doesn't require middleware infrastructure)
+add_executable(StandaloneTest
+    test/StandaloneTest.cpp
+)
+
+target_link_libraries(StandaloneTest
+    spdlog::spdlog
+)
