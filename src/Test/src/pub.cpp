@@ -21,7 +21,7 @@ public:
   void onTimer() {
     i++;
     Std::String str;
-    str.set_data("hello world"+std::to_string(i));
+    str.set_data("from node1"+std::to_string(i));
     publisher->publish(str);
   }
 };
