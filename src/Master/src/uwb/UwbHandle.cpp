@@ -456,19 +456,26 @@ bool Handle::parse_http_request(const std::string& data, http::request<http::str
 }
 
 std::string Handle::serialize_http_request(const http::request<http::string_body>& req) {
+    // 先用标准方法序列化
     std::ostringstream oss;
+    oss << req;
+    std::string original = oss.str();
     
-    // 构建HTTP请求，但替换换行符为转义序列
-    oss << req.method_string() << " " << req.target() << " HTTP/1.1\\r\\n";
-    
-    // 序列化headers
-    for (const auto& header : req) {
-        oss << header.name_string() << ": " << header.value() << "\\r\\n";
+    // 然后转义所有特殊字符
+    std::string escaped;
+    for (char c : original) {
+        switch (c) {
+            case '\r': escaped += "\\r"; break;
+            case '\n': escaped += "\\n"; break;
+            case '\\': escaped += "\\\\"; break;
+            default: escaped += c; break;
+        }
     }
     
-    oss << "\\r\\n" << req.body();
+    spdlog::debug("HTTP serialization - Original length: {}, Escaped length: {}", original.length(), escaped.length());
+    spdlog::debug("HTTP serialization - First 100 chars: {}", escaped.substr(0, 100));
     
-    return oss.str();
+    return escaped;
 }
 
 void Handle::doRead() {
