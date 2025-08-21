@@ -135,4 +135,4 @@ uint16_t FrameCodec::from_hex_word(const std::string& hex_str) {
     return static_cast<uint16_t>(std::stoul(hex_str, nullptr, 16));
 }
 
-} // namespace Hnu::Uwb
+} // namespace Hnu::Uwb 
