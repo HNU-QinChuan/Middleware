@@ -6,7 +6,6 @@ namespace Hnu::Uwb {
 
 Handle::Handle(asio::io_context& ioc, const std::string& device, unsigned baudrate, uint8_t node_id)
     : m_ioc(ioc), m_device(device), m_baudrate(baudrate), m_node_id(node_id), m_serial(ioc) {
-    
     m_slot_manager = std::make_unique<SimpleTimeSlotManager>(node_id);
     spdlog::info("UWB Handle created for node {} on device {}", static_cast<int>(node_id), device);
 }
@@ -17,41 +16,42 @@ Handle::~Handle() {
 
 void Handle::run() {
     if (m_running.load()) return;
-    
+
     if (!init_serial()) {
         spdlog::error("Failed to initialize serial port for node {}", static_cast<int>(m_node_id));
         return;
     }
-    
+
     m_running = true;
-    
+
     // 设置时隙回调
-    m_slot_manager->set_my_slot_callback([this]() { on_my_slot(); });
-    
+    m_slot_manager->set_my_slot_callback([this]() {
+        on_my_slot();
+    });
+
     // 启动时隙管理器
     m_slot_manager->start();
-    
+
     // 启动异步读取
     start_async_read();
-    
+
     // 启动后台线程
     m_timeout_thread = std::thread(&Handle::timeout_worker, this);
     m_heartbeat_thread = std::thread(&Handle::heartbeat_worker, this);
-    
+
     spdlog::info("UWB Handle started for node {}", static_cast<int>(m_node_id));
 }
 
 void Handle::stop() {
     if (!m_running.load()) return;
-    
+
     m_running = false;
-    
     m_slot_manager->stop();
-    
+
     if (m_serial.is_open()) {
         m_serial.close();
     }
-    
+
     // 等待后台线程结束
     if (m_timeout_thread.joinable()) {
         m_timeout_thread.join();
@@ -59,7 +59,7 @@ void Handle::stop() {
     if (m_heartbeat_thread.joinable()) {
         m_heartbeat_thread.join();
     }
-    
+
     // 通知所有等待的回调失败
     {
         std::lock_guard<std::mutex> lock(m_pending_mutex);
@@ -70,32 +70,37 @@ void Handle::stop() {
         }
         m_pending_acks.clear();
     }
-    
     m_send_cv.notify_all();
-    
+
     spdlog::info("UWB Handle stopped for node {}", static_cast<int>(m_node_id));
 }
 
-void Handle::send_http_reliable(const http::request<http::string_body>& req, 
-                               uint8_t dst_id, 
-                               std::function<void(bool)> callback) {
+void Handle::send_http_reliable(const http::request<http::string_body>& req, uint8_t dst_id, std::function<void(bool)> callback) {
     if (!m_running.load()) {
         if (callback) callback(false);
         return;
     }
-    
+
     std::string serialized = serialize_http_request(req);
+    
+    // 检查payload大小限制
+    if (serialized.size() > 65535) {
+        spdlog::error("HTTP request too large: {} bytes, max: 65535", serialized.size());
+        if (callback) callback(false);
+        return;
+    }
+
     uint8_t seq = m_next_seq++;
     if (m_next_seq == 0) m_next_seq = 1; // 避免序列号0
-    
+
     TimeSlotFrame frame(m_node_id, dst_id, seq, FrameType::DATA, serialized);
-    
+
     // 添加到发送队列
     {
         std::lock_guard<std::mutex> lock(m_send_mutex);
         m_send_queue.push(frame);
     }
-    
+
     // 如果需要ACK确认，添加到等待列表
     if (dst_id != FrameCodec::BROADCAST_ID) {
         std::lock_guard<std::mutex> lock(m_pending_mutex);
@@ -104,16 +109,14 @@ void Handle::send_http_reliable(const http::request<http::string_body>& req,
         // 广播不需要ACK，直接成功回调
         if (callback) callback(true);
     }
-    
+
     {
         std::lock_guard<std::mutex> lock(m_stats_mutex);
         m_stats.http_requests_sent++;
     }
-    
     m_send_cv.notify_one();
-    
-    spdlog::debug("HTTP request queued reliably to node {}, seq {}", 
-                 static_cast<int>(dst_id), static_cast<int>(seq));
+
+    spdlog::debug("HTTP request queued reliably to node {}, seq {}", static_cast<int>(dst_id), static_cast<int>(seq));
 }
 
 void Handle::send_http(const http::request<http::string_body>& req, uint8_t dst_id) {
@@ -133,16 +136,15 @@ bool Handle::init_serial() {
             spdlog::error("Failed to open serial device {}: {}", m_device, ec.message());
             return false;
         }
-        
+
         m_serial.set_option(asio::serial_port_base::baud_rate(m_baudrate));
         m_serial.set_option(asio::serial_port_base::character_size(8));
         m_serial.set_option(asio::serial_port_base::parity(asio::serial_port_base::parity::none));
         m_serial.set_option(asio::serial_port_base::stop_bits(asio::serial_port_base::stop_bits::one));
         m_serial.set_option(asio::serial_port_base::flow_control(asio::serial_port_base::flow_control::none));
-        
+
         spdlog::info("Serial port {} initialized for node {}", m_device, static_cast<int>(m_node_id));
         return true;
-        
     } catch (const std::exception& e) {
         spdlog::error("Serial initialization error: {}", e.what());
         return false;
@@ -151,7 +153,6 @@ bool Handle::init_serial() {
 
 void Handle::start_async_read() {
     auto self = shared_from_this();
-    
     asio::async_read_until(m_serial, m_read_buffer, '\n',
         [this, self](const boost::system::error_code& ec, std::size_t bytes) {
             handle_read(ec, bytes);
@@ -160,17 +161,17 @@ void Handle::start_async_read() {
 
 void Handle::handle_read(const boost::system::error_code& ec, std::size_t bytes) {
     if (!m_running.load()) return;
-    
+
     if (!ec) {
         std::istream is(&m_read_buffer);
         std::string line;
         std::getline(is, line);
-        
+
         // 移除回车换行
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
-        
+
         // 解码并处理帧
         TimeSlotFrame frame;
         if (FrameCodec::decode(line, frame)) {
@@ -178,15 +179,16 @@ void Handle::handle_read(const boost::system::error_code& ec, std::size_t bytes)
         } else {
             std::lock_guard<std::mutex> lock(m_stats_mutex);
             m_stats.serial_errors++;
-            spdlog::debug("Failed to decode frame: {}", line);
+            spdlog::debug("Failed to decode frame (length: {}): {}", 
+                         line.length(), 
+                         line.length() > 100 ? line.substr(0, 100) + "..." : line);
         }
-        
     } else {
         std::lock_guard<std::mutex> lock(m_stats_mutex);
         m_stats.serial_errors++;
         spdlog::error("Serial read error: {}", ec.message());
     }
-    
+
     // 继续读取
     start_async_read();
 }
@@ -196,16 +198,16 @@ void Handle::handle_received_frame(const TimeSlotFrame& frame) {
     if (frame.dst_id != m_node_id && frame.dst_id != FrameCodec::BROADCAST_ID) {
         return;
     }
-    
+
     {
         std::lock_guard<std::mutex> lock(m_stats_mutex);
         m_stats.frames_received++;
     }
-    
-    spdlog::debug("Received frame from node {} to {}, seq {}, type {}", 
-                 static_cast<int>(frame.src_id), static_cast<int>(frame.dst_id),
-                 static_cast<int>(frame.seq_no), static_cast<int>(frame.type));
-    
+
+    spdlog::debug("Received frame from node {} to {}, seq {}, type {}",
+                  static_cast<int>(frame.src_id), static_cast<int>(frame.dst_id),
+                  static_cast<int>(frame.seq_no), static_cast<int>(frame.type));
+
     if (frame.type == FrameType::ACK) {
         // 处理ACK
         std::lock_guard<std::mutex> lock(m_pending_mutex);
@@ -215,15 +217,12 @@ void Handle::handle_received_frame(const TimeSlotFrame& frame) {
                 it->second.callback(true); // 成功回调
             }
             m_pending_acks.erase(it);
-            
             {
                 std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
                 m_stats.acks_received++;
             }
-            
             spdlog::debug("ACK processed for seq {}", static_cast<int>(frame.seq_no));
         }
-        
     } else if (frame.type == FrameType::DATA || frame.type == FrameType::HEARTBEAT) {
         // 检查重复帧
         bool is_duplicate = false;
@@ -236,38 +235,34 @@ void Handle::handle_received_frame(const TimeSlotFrame& frame) {
                 m_last_received_seq[frame.src_id] = frame.seq_no;
             }
         }
-        
+
         if (is_duplicate) {
-            spdlog::debug("Duplicate frame filtered from node {}, seq {}", 
-                         static_cast<int>(frame.src_id), static_cast<int>(frame.seq_no));
+            spdlog::debug("Duplicate frame filtered from node {}, seq {}",
+                          static_cast<int>(frame.src_id), static_cast<int>(frame.seq_no));
             return;
         }
-        
+
         // 发送ACK（如果不是广播且不是心跳）
         if (frame.dst_id != FrameCodec::BROADCAST_ID && frame.type != FrameType::HEARTBEAT) {
             TimeSlotFrame ack_frame(m_node_id, frame.src_id, frame.seq_no, FrameType::ACK);
-            
             {
                 std::lock_guard<std::mutex> lock(m_ack_mutex);
                 m_ack_queue.push(ack_frame);
             }
         }
-        
+
         // 处理数据
         if (frame.type == FrameType::DATA) {
             std::string payload(frame.payload.begin(), frame.payload.end());
             http::request<http::string_body> req;
-            
             if (parse_http_request(payload, req)) {
                 {
                     std::lock_guard<std::mutex> lock(m_stats_mutex);
                     m_stats.http_requests_received++;
                 }
-                
                 Interface::InterfaceRouter::handle(req);
             } else {
-                spdlog::warn("Failed to parse HTTP request from node {}", 
-                            static_cast<int>(frame.src_id));
+                spdlog::warn("Failed to parse HTTP request from node {}", static_cast<int>(frame.src_id));
             }
         }
     }
@@ -275,13 +270,12 @@ void Handle::handle_received_frame(const TimeSlotFrame& frame) {
 
 void Handle::send_frame_immediately(const TimeSlotFrame& frame) {
     if (!m_serial.is_open()) return;
-    
+
     std::string encoded = FrameCodec::encode(frame);
     encoded += "\n"; // 添加换行符
-    
+
     try {
         asio::write(m_serial, asio::buffer(encoded));
-        
         {
             std::lock_guard<std::mutex> lock(m_stats_mutex);
             m_stats.frames_sent++;
@@ -289,11 +283,9 @@ void Handle::send_frame_immediately(const TimeSlotFrame& frame) {
                 m_stats.acks_sent++;
             }
         }
-        
-        spdlog::debug("Frame sent to node {}, seq {}, type {}", 
-                     static_cast<int>(frame.dst_id), static_cast<int>(frame.seq_no), 
-                     static_cast<int>(frame.type));
-        
+        spdlog::debug("Frame sent to node {}, seq {}, type {}",
+                      static_cast<int>(frame.dst_id), static_cast<int>(frame.seq_no),
+                      static_cast<int>(frame.type));
     } catch (const std::exception& e) {
         std::lock_guard<std::mutex> lock(m_stats_mutex);
         m_stats.serial_errors++;
@@ -310,7 +302,7 @@ void Handle::on_my_slot() {
             m_send_queue.pop();
         }
     }
-    
+
     // 发送所有排队的ACK帧
     {
         std::lock_guard<std::mutex> lock(m_ack_mutex);
@@ -332,46 +324,39 @@ void Handle::timeout_worker() {
 
 void Handle::check_timeouts() {
     auto now = std::chrono::steady_clock::now();
-    
     std::lock_guard<std::mutex> lock(m_pending_mutex);
-    
+
     for (auto it = m_pending_acks.begin(); it != m_pending_acks.end();) {
         auto& pending = it->second;
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - pending.send_time);
-        
+
         if (elapsed.count() >= ACK_TIMEOUT_MS) {
             if (pending.retry_count < MAX_RETRIES) {
                 // 重传
                 pending.retry_count++;
                 pending.send_time = now;
-                
                 {
                     std::lock_guard<std::mutex> send_lock(m_send_mutex);
                     m_send_queue.push(pending.frame);
                 }
-                
                 {
                     std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
                     m_stats.retransmissions++;
                 }
-                
-                spdlog::debug("Retransmitting seq {}, attempt {}/{}", 
-                            static_cast<int>(pending.frame.seq_no), 
-                            pending.retry_count, MAX_RETRIES);
+                spdlog::debug("Retransmitting seq {}, attempt {}/{}",
+                              static_cast<int>(pending.frame.seq_no), pending.retry_count, MAX_RETRIES);
                 ++it;
             } else {
                 // 超过最大重传次数，失败
                 if (pending.callback) {
                     pending.callback(false);
                 }
-                
                 {
                     std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
                     m_stats.timeouts++;
                 }
-                
-                spdlog::warn("Frame seq {} timed out after {} retries", 
-                           static_cast<int>(pending.frame.seq_no), MAX_RETRIES);
+                spdlog::warn("Frame seq {} timed out after {} retries",
+                             static_cast<int>(pending.frame.seq_no), MAX_RETRIES);
                 it = m_pending_acks.erase(it);
             }
         } else {
@@ -383,21 +368,17 @@ void Handle::check_timeouts() {
 void Handle::heartbeat_worker() {
     while (m_running.load()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(HEARTBEAT_INTERVAL_MS));
-        
         if (m_running.load()) {
             std::string heartbeat_data = "HB:" + std::to_string(m_node_id);
             TimeSlotFrame hb_frame(m_node_id, FrameCodec::BROADCAST_ID, 0, FrameType::HEARTBEAT, heartbeat_data);
-            
             {
                 std::lock_guard<std::mutex> lock(m_send_mutex);
                 m_send_queue.push(hb_frame);
             }
-            
             {
                 std::lock_guard<std::mutex> lock(m_stats_mutex);
                 m_stats.heartbeats_sent++;
             }
-            
             spdlog::debug("Heartbeat queued from node {}", static_cast<int>(m_node_id));
         }
     }
@@ -405,47 +386,58 @@ void Handle::heartbeat_worker() {
 
 bool Handle::parse_http_request(const std::string& data, http::request<http::string_body>& req) {
     try {
-        std::istringstream iss(data);
+        // 先还原换行符
+        std::string decoded;
+        for (size_t i = 0; i < data.length(); ++i) {
+            if (i + 1 < data.length() && data.substr(i, 2) == "\\r") {
+                decoded += '\r';
+                i++;
+            } else if (i + 1 < data.length() && data.substr(i, 2) == "\\n") {
+                decoded += '\n';
+                i++;
+            } else {
+                decoded += data[i];
+            }
+        }
+
+        std::istringstream iss(decoded);
         std::string line;
         bool first_line = true;
-        
+
         // 解析请求行和头部
         while (std::getline(iss, line) && !line.empty()) {
             if (line.back() == '\r') line.pop_back();
-            
+
             if (first_line) {
                 // 解析请求行
                 std::istringstream line_stream(line);
                 std::string method, path, version;
                 line_stream >> method >> path >> version;
-                
+
                 // 设置HTTP方法
                 if (method == "GET") req.method(http::verb::get);
                 else if (method == "POST") req.method(http::verb::post);
                 else if (method == "PUT") req.method(http::verb::put);
                 else if (method == "DELETE") req.method(http::verb::delete_);
                 else req.method(http::verb::unknown);
-                
+
                 req.target(path);
                 req.version(11);
                 first_line = false;
-                
             } else {
                 // 解析头部
                 auto colon_pos = line.find(':');
                 if (colon_pos != std::string::npos) {
                     std::string key = line.substr(0, colon_pos);
                     std::string value = line.substr(colon_pos + 1);
-                    
                     // 去掉前后空格
                     while (!value.empty() && value[0] == ' ') value.erase(0, 1);
                     while (!value.empty() && value.back() == ' ') value.pop_back();
-                    
                     req.set(key, value);
                 }
             }
         }
-        
+
         // 读取body
         std::string body;
         std::string remaining_line;
@@ -453,12 +445,10 @@ bool Handle::parse_http_request(const std::string& data, http::request<http::str
             body += remaining_line + "\n";
         }
         if (!body.empty() && body.back() == '\n') body.pop_back();
-        
         req.body() = body;
         req.prepare_payload();
-        
+
         return true;
-        
     } catch (const std::exception& e) {
         spdlog::error("HTTP parse error: {}", e.what());
         return false;
@@ -467,7 +457,17 @@ bool Handle::parse_http_request(const std::string& data, http::request<http::str
 
 std::string Handle::serialize_http_request(const http::request<http::string_body>& req) {
     std::ostringstream oss;
-    oss << req;
+    
+    // 构建HTTP请求，但替换换行符为转义序列
+    oss << req.method_string() << " " << req.target() << " HTTP/1.1\\r\\n";
+    
+    // 序列化headers
+    for (const auto& header : req) {
+        oss << header.name_string() << ": " << header.value() << "\\r\\n";
+    }
+    
+    oss << "\\r\\n" << req.body();
+    
     return oss.str();
 }
 
