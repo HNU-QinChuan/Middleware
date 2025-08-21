@@ -461,6 +461,10 @@ std::string Handle::serialize_http_request(const http::request<http::string_body
     oss << req;
     std::string original = oss.str();
     
+    // 检查原始字符串是否包含真实的换行符
+    bool has_real_newline = (original.find('\n') != std::string::npos);
+    bool has_real_carriage = (original.find('\r') != std::string::npos);
+    
     // 然后转义所有特殊字符
     std::string escaped;
     for (char c : original) {
@@ -472,8 +476,13 @@ std::string Handle::serialize_http_request(const http::request<http::string_body
         }
     }
     
-    spdlog::debug("HTTP serialization - Original length: {}, Escaped length: {}", original.length(), escaped.length());
-    spdlog::debug("HTTP serialization - First 100 chars: {}", escaped.substr(0, 100));
+    // 检查转义后的字符串
+    bool escaped_has_backslash_r = (escaped.find("\\r") != std::string::npos);
+    bool escaped_has_backslash_n = (escaped.find("\\n") != std::string::npos);
+    
+    spdlog::debug("Original has \\r: {}, \\n: {}", has_real_carriage, has_real_newline);
+    spdlog::debug("Escaped has \\\\r: {}, \\\\n: {}", escaped_has_backslash_r, escaped_has_backslash_n);
+    spdlog::debug("Escaped length: {}, sample: [{}]", escaped.length(), escaped.substr(0, 50));
     
     return escaped;
 }
