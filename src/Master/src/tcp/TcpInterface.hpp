@@ -13,5 +13,6 @@ namespace Hnu::Tcp{
     std::string m_ip;
     unsigned m_port;
     std::shared_ptr<Hnu::Tcp::Acceptor> m_acceptor;
+    std::string m_type = "tcp";
   };
 }

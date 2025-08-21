@@ -53,9 +53,10 @@ namespace Hnu::Interface {
             //添加初始化
             std::string device = interface["device"].asString();
             unsigned baudrate = interface["baudrate"].asUInt();
-            interfacePtr = std::make_shared<Uwb::UwbInterface>(interfaceName, type, segment, device, baudrate);
+            uint8_t node_id = interface["node_id"].asUInt(); 
+            interfacePtr = std::make_shared<Uwb::UwbInterface>(interfaceName, type, segment, device, baudrate, node_id); //新增 node_id 参数
             interfacePtr->run(Middleware::MiddlewareManager::getIoc());
-            auto uwbInterface = std::dynamic_pointer_cast<Uwb::UwbInterface>(interfacePtr);
+            auto uwbInterface = std::dynamic_pointer_cast<Uwb::UwbInterface>(interfacePtr);//等待优化 此处为了获取handle必须先run起来 等待优化
             m_uwbHandle = uwbInterface->getHandle();
           }
           interfaceList[interfaceName] = interfacePtr;
@@ -79,8 +80,9 @@ namespace Hnu::Interface {
             hostInterface = std::make_shared<Tcp::TcpHostInterface>(interfaceName,hostName, type, segment, ip, port);
           }
           else if(type=="uwb"){
+            uint8_t node_id = interface["node_id"].asUInt();
             //添加初始化
-            hostInterface = std::make_shared<Uwb::UwbHostInterface>(interfaceName,hostName, type, segment, m_uwbHandle);
+            hostInterface = std::make_shared<Uwb::UwbHostInterface>(interfaceName,hostName, type, segment, m_uwbHandle, node_id);
           }
           hostInstance->setHostInterface(interfaceName, hostInterface);
           for(auto& [key,value]:interfaceList){
@@ -111,7 +113,7 @@ namespace Hnu::Interface {
       std::string interfaceName=InterfaceManager::interfaceManager.route[host].first;
       std::string nextInterface=InterfaceManager::interfaceManager.route[host].second;
       // spdlog::debug("Broadcast to {} via {}:{}",host,interfaceName,nextInterface);
-      InterfaceManager::interfaceManager.interfaceList[interfaceName]->send(nextInterface,req);
+      InterfaceManager::interfaceManager.interfaceList[interfaceName]->send(nextInterface,req);//修改分为tcp uwb两个部分，uwb自带广播
     }
   }
 

@@ -1,0 +1,43 @@
+{
+  "hosts": [
+    {
+      "name": "host1",
+      "interfaces": [
+        {
+          "name": "interface1",
+          "type": "uwb",
+          "device": "/dev/ttyUSB0",
+          "baudrate": 115200,
+          "node_id": 1,
+          "segment": 1
+        }
+      ]
+    },
+    {
+      "name": "host2",
+      "interfaces": [
+        {
+          "name": "interface2",
+          "type": "uwb",
+          "device": "/dev/ttyUSB1",
+          "baudrate": 115200,
+          "node_id": 2,
+          "segment": 1
+        }
+      ]
+    },
+    {
+      "name": "host3",
+      "interfaces": [
+        {
+          "name": "interface3",
+          "type": "uwb",
+          "device": "/dev/ttyUSB2",
+          "baudrate": 115200,
+          "node_id": 3,
+          "segment": 1
+        }
+      ]
+    }
+  ]
+}
