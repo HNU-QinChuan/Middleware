@@ -13,7 +13,7 @@ public:
     // Create a publisher
     publisher = createPublisher<Std::String>("topic1");
     // Create a timer
-    timer = createTimer(100, [this] { onTimer(); });
+    timer = createTimer(1000, [this] { onTimer(); });
   }
   std::shared_ptr<Hnu::Middleware::Publisher<Std::String>> publisher;
   std::shared_ptr<Hnu::Middleware::Timer> timer;

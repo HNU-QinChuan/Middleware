@@ -386,6 +386,10 @@ void Handle::heartbeat_worker() {
 
 bool Handle::parse_http_request(const std::string& data, http::request<http::string_body>& req) {
     try {
+        // 调试：显示接收到的原始数据
+        spdlog::debug("Received raw data length: {}", data.length());
+        spdlog::debug("Received raw data first 150 chars: {}", data.substr(0, 150));
+        
         // 先还原换行符
         std::string decoded;
         for (size_t i = 0; i < data.length(); ++i) {
@@ -395,18 +399,40 @@ bool Handle::parse_http_request(const std::string& data, http::request<http::str
             } else if (i + 1 < data.length() && data.substr(i, 2) == "\\n") {
                 decoded += '\n';
                 i++;
+            } else if (i + 1 < data.length() && data.substr(i, 2) == "\\\\") {
+                decoded += '\\';
+                i++;
             } else {
                 decoded += data[i];
             }
         }
+        
+        // 调试：显示还原后的数据
+        spdlog::debug("Decoded data length: {}", decoded.length());
+        spdlog::debug("Decoded data first 150 chars: {}", decoded.substr(0, 150));
 
-        std::istringstream iss(decoded);
+        // 找到headers和body的分界点 (\r\n\r\n)
+        size_t body_start = decoded.find("\r\n\r\n");
+        if (body_start == std::string::npos) {
+            spdlog::warn("No body separator found in HTTP request");
+            return false;
+        }
+        
+        std::string headers_part = decoded.substr(0, body_start);
+        std::string body_part = decoded.substr(body_start + 4); // 跳过 \r\n\r\n
+        
+        spdlog::debug("Headers part length: {}", headers_part.length());
+        spdlog::debug("Body part length: {}", body_part.length());
+        spdlog::debug("Body content: '{}'", body_part);
+
+        std::istringstream iss(headers_part);
         std::string line;
         bool first_line = true;
 
         // 解析请求行和头部
-        while (std::getline(iss, line) && !line.empty()) {
-            if (line.back() == '\r') line.pop_back();
+        while (std::getline(iss, line)) {
+            if (!line.empty() && line.back() == '\r') line.pop_back();
+            if (line.empty()) break;
 
             if (first_line) {
                 // 解析请求行
@@ -438,15 +464,11 @@ bool Handle::parse_http_request(const std::string& data, http::request<http::str
             }
         }
 
-        // 读取body
-        std::string body;
-        std::string remaining_line;
-        while (std::getline(iss, remaining_line)) {
-            body += remaining_line + "\n";
-        }
-        if (!body.empty() && body.back() == '\n') body.pop_back();
-        req.body() = body;
+        // 设置body
+        req.body() = body_part;
         req.prepare_payload();
+        
+        spdlog::debug("Final parsed body: '{}'", req.body());
 
         return true;
     } catch (const std::exception& e) {
@@ -461,9 +483,9 @@ std::string Handle::serialize_http_request(const http::request<http::string_body
     oss << req;
     std::string original = oss.str();
     
-    // 检查原始字符串是否包含真实的换行符
-    bool has_real_newline = (original.find('\n') != std::string::npos);
-    bool has_real_carriage = (original.find('\r') != std::string::npos);
+    // 调试：检查原始HTTP请求的body
+    spdlog::debug("Original HTTP body: '{}'", req.body());
+    spdlog::debug("Original HTTP full request length: {}", original.length());
     
     // 然后转义所有特殊字符
     std::string escaped;
@@ -475,14 +497,6 @@ std::string Handle::serialize_http_request(const http::request<http::string_body
             default: escaped += c; break;
         }
     }
-    
-    // 检查转义后的字符串
-    bool escaped_has_backslash_r = (escaped.find("\\r") != std::string::npos);
-    bool escaped_has_backslash_n = (escaped.find("\\n") != std::string::npos);
-    
-    spdlog::debug("Original has \\r: {}, \\n: {}", has_real_carriage, has_real_newline);
-    spdlog::debug("Escaped has \\\\r: {}, \\\\n: {}", escaped_has_backslash_r, escaped_has_backslash_n);
-    spdlog::debug("Escaped length: {}, sample: [{}]", escaped.length(), escaped.substr(0, 50));
     
     return escaped;
 }
