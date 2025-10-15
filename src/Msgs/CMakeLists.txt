@@ -95,6 +95,12 @@ generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} TaskPlanner)
 add_dependencies(TaskPlanner Geometry)
 target_link_libraries(TaskPlanner PUBLIC Geometry)
 
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto/Sensor)
+set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Sensor)
+generate_protobuf_library(${PROTO_DIR} ${GENERATED_DIR} Sensor)
+add_dependencies(Sensor Std)
+target_link_libraries(Sensor PUBLIC Std)
+
 # 导出配置文件
 export(TARGETS Std FILE ${CMAKE_BINARY_DIR}/StdTargets.cmake NAMESPACE ${PROJECT_NAME}::)
 export(TARGETS Dgps FILE ${CMAKE_BINARY_DIR}/DgpsTargets.cmake NAMESPACE ${PROJECT_NAME}::)
@@ -102,6 +108,7 @@ export(TARGETS Geometry FILE ${CMAKE_BINARY_DIR}/GeometryTargets.cmake NAMESPACE
 export(TARGETS Nav FILE ${CMAKE_BINARY_DIR}/NavTargets.cmake NAMESPACE ${PROJECT_NAME}::)
 export(TARGETS BuiltinInterfaces FILE ${CMAKE_BINARY_DIR}/BuiltinInterfaces.cmake NAMESPACE ${PROJECT_NAME}::)
 export(TARGETS TaskPlanner FILE ${CMAKE_BINARY_DIR}/TaskPlanner.cmake NAMESPACE ${PROJECT_NAME}::)
+export(TARGETS Sensor FILE ${CMAKE_BINARY_DIR}/SensorTargets.cmake NAMESPACE ${PROJECT_NAME}::)
 
 # 配置文件
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in

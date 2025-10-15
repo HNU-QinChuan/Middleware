@@ -1,0 +1,15 @@
+syntax = "proto3";
+import "Std/Header.proto";
+package Sensor;
+
+
+message Image{
+  Std.Header header = 1;
+  uint32 height=2;
+  uint32 width=3;
+  string encoding=4;
+  bool is_bigendian=5;
+  uint32 step=6;
+  bytes data=7;
+
+}
