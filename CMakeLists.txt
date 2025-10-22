@@ -21,4 +21,5 @@ add_subdirectory(src/Dgps)
 add_subdirectory(src/Util)
 add_subdirectory(src/LocalPlanner)
 add_subdirectory(src/Gazebo)
+add_subdirectory(src/LocalMap)
 
