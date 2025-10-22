@@ -90,7 +90,7 @@ namespace DWA
         }
         //   need test
         // 我咋觉得要用height 算了，时间来不及了，不敢改 先放着吧
-        if (costmap_->data(j * map_width + i) == 100)
+        if (costmap_->data()[j * map_width + i] == 100)
         {
           // std::cout<<"obstacle (X,Y) :"<<x<<","<<y<<'\n';
           std::vector<float> obs_state = {x + current_pose_x, y + current_pose_y};

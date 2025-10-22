@@ -36,9 +36,9 @@ int main()
     origin->mutable_orientation()->set_z(0.0);
 
     // Data 全为 0（自由空间）
-    map->mutable_data()->Reserve(100 * 100);
+    map->mutable_data()->reserve(100 * 100);
     for (int i = 0; i < 100 * 100; ++i) {
-        map->mutable_data()->Add(0);
+        map->mutable_data()->push_back(0);
     }
 
     while(true)
