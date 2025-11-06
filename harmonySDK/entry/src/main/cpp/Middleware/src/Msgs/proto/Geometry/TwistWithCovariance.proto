@@ -1,0 +1,8 @@
+syntax = "proto3";
+import "Geometry/Twist.proto";
+package Geometry;
+
+message TwistWithCovariance {
+    Twist twist = 1;
+    repeated double covariance = 2; // 36 elements
+}

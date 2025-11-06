@@ -1,0 +1,16 @@
+{
+  "hosts": [
+    {
+      "name": "host1",
+      "interfaces": [
+        {
+          "name": "interface1",
+          "type": "tcp",
+          "ip": "127.0.0.1",
+          "port": 8081,
+          "segment": 1
+        }
+      ]
+    }
+  ]
+}
