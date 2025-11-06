@@ -1,8 +1,0 @@
-.cache
-.idea
-bin
-build
-cmake-build-debug
-*.pb.cc
-*.pb.h
-.vscode

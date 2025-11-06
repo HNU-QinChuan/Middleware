@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package Std;
-
-message Bool {
-    bool data=1;
-}
