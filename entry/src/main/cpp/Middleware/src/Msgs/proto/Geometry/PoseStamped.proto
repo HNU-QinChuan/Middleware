@@ -1,0 +1,9 @@
+syntax = "proto3";
+import "Std/Header.proto";
+import "Geometry/Pose.proto";
+package Geometry;
+
+message PoseStamped {
+    Std.Header header = 1;
+    Pose pose = 2;
+}

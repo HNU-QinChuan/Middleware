@@ -1,0 +1,10 @@
+syntax = "proto3";
+import "Std/Header.proto";
+import "Nav/MapMetaData.proto";
+package Nav;
+
+message OccupancyGrid {
+    Std.Header header = 1;
+    MapMetaData info = 2;
+    repeated int32 data = 3;
+}

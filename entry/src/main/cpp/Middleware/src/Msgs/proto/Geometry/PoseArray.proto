@@ -1,0 +1,9 @@
+syntax = "proto3";
+package Geometry;
+import "Std/Header.proto";
+import "Geometry/Pose.proto";
+
+message PoseArray {
+    Std.Header header = 1;
+    repeated Pose poses = 2;
+}
