@@ -1,0 +1,53 @@
+{
+  "hosts":
+  [
+    {
+      "name":"host1",
+      "interfaces":
+      [
+        {
+          "name":"interface1",
+          "type":"tcp",
+          "ip":"172.17.0.1",
+          "port":8080,
+          "segment":1
+        }
+      ]
+    },
+    {
+      "name":"host2",
+      "interfaces":
+      [
+        {
+          "name":"interface2",
+          "type":"tcp",
+          "ip":"172.17.0.2",
+          "port":8080,
+          "segment":1
+        }
+      ]
+    },
+    {
+      "name":"host3",
+      "interfaces":
+      [
+        {
+          "name":"interface3",
+          "type":"tcp",
+          "ip":"172.17.0.3",
+          "port":8080,
+          "segment":1
+        }
+      ]
+    }
+  ],
+  "map":[
+    ["host1","host2",1],
+    ["host2","host3",1],
+    ["host1","host3",3]
+  ],
+  "launch":[
+  ]
+
+
+}

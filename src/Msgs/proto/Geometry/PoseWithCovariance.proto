@@ -1,0 +1,10 @@
+syntax = "proto3";
+import "Geometry/Pose.proto";
+package Geometry;
+
+message PoseWithCovariance {
+    Pose pose = 1;
+    // 6x6 协方差矩阵，行优先存储，36 个浮点数
+    // 顺序为：(x, y, z, 绕 X 轴旋转, 绕 Y 轴旋转, 绕 Z 轴旋转)
+    repeated double covariance = 2 [packed = true]; // 长度固定为 36
+}
