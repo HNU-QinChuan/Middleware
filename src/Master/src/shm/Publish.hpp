@@ -36,6 +36,7 @@ namespace Hnu::Middleware {
     std::unique_ptr<asio::posix::stream_descriptor> m_eventfdStream;
     uint64_t m_eventfdValue;
     std::string m_type;
+    int pid=-1;
 
   };
 

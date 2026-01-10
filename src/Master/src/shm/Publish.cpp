@@ -8,6 +8,7 @@
 #include <sys/syscall.h>
 #include "shm/Node.hpp"
 #include "MiddlewareManager.hpp"
+#include <sys/resource.h>
 
 
 #ifndef SYS_pidfd_getfd
@@ -40,7 +41,8 @@ namespace Hnu::Middleware {
   }
 
   bool Publish::run() {
-    auto pidfd = syscall(SYS_pidfd_open, m_node.lock()->getPid(), 0);
+    pid=m_node.lock()->getPid();
+    auto pidfd = syscall(SYS_pidfd_open, pid, 0);
     if(pidfd==-1){
       spdlog::error("pidfd open error: {}",strerror(errno));
       return false;
@@ -81,6 +83,15 @@ namespace Hnu::Middleware {
       queue->pop(message);
       std::string messageStr(message.data(),message.size());
       MiddlewareManager::transferMessage(m_topic_name,messageStr);
+    }
+    int ret=-1;
+    if(queue->read_available()<QUEUE_SIZE/2){
+      ret=setpriority(PRIO_PROCESS, pid, 5);
+    }else{
+      ret=setpriority(PRIO_PROCESS, pid, -5);
+    }
+    if(ret==-1){
+      spdlog::error("set pid {} priority error: {}",pid,strerror(errno));
     }
     doEventfdRead();
   }

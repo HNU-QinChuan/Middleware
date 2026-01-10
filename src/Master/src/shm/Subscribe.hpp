@@ -34,6 +34,7 @@ namespace Hnu::Middleware {
     lock_free_queue* queue;
     std::unique_ptr<asio::posix::stream_descriptor> m_eventfdStream;
     std::string m_type;
+    int pid=-1;
   };
 
 } // Middleware

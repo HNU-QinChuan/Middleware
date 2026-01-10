@@ -7,6 +7,7 @@
 #include "MiddlewareManager.hpp"
 #include<spdlog/spdlog.h>
 #include <sys/syscall.h>
+#include <sys/resource.h>
 
 #ifndef SYS_pidfd_getfd
 #define SYS_pidfd_getfd 438
@@ -38,7 +39,8 @@ namespace Hnu::Middleware {
     m_node = node;
   }
   bool Subscribe::run() {
-    auto pidfd = syscall(SYS_pidfd_open, m_node.lock()->getPid(), 0);
+    pid=m_node.lock()->getPid();
+    auto pidfd = syscall(SYS_pidfd_open, pid, 0);
     if(pidfd==-1){
       spdlog::error("pidfd open error: {}",strerror(errno));
       return false;
@@ -66,6 +68,15 @@ namespace Hnu::Middleware {
       uint64_t value=1;
       m_eventfdStream->write_some(asio::buffer(&value,sizeof(value)));
     }
+    int ret=-1;
+    if(queue->write_available()>QUEUE_SIZE/2){
+      ret=setpriority(PRIO_PROCESS, pid, -5);
+    }else{
+      ret=setpriority(PRIO_PROCESS, pid, 5);
+    }
+    if(ret==-1){
+      spdlog::error("set pid {} priority error: {}",pid,strerror(errno));
+    }
   }
   std::string Subscribe::getType() {
     return m_type;
@@ -74,5 +85,5 @@ namespace Hnu::Middleware {
     return m_node_name;
   }
 
-
+  
 }
