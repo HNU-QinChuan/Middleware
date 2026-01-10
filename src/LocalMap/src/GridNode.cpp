@@ -7,7 +7,7 @@ GridNode::GridNode():Hnu::Middleware::Node{"Grid_node"},point_sub_msg{100},pose_
   point_sub_msg.push_back(std::make_shared<Sensor::PointCloud2>());
   point_sub=createSubscriber<Sensor::PointCloud2>("/ls128/lslidar_point_cloud", std::bind(&GridNode::onPointSub,shared_from_this(),std::placeholders::_1));
   pose_sub=createSubscriber<Geometry::PoseStamped>("/pose", std::bind(&GridNode::onPoseSub,shared_from_this(),std::placeholders::_1));
-
+  other_grid_sub=createSubscriber<Nav::OccupancyGrid>("/otherGrid", std::bind(&GridNode::onOtherGridSub,shared_from_this(),std::placeholders::_1));
   grid_pub=createPublisher<Nav::OccupancyGrid>("/gridMap");
   timer=createTimer(50, std::bind(&GridNode::onTime,shared_from_this()));
   std::thread t{&GridNode::runFusion,shared_from_this()};
@@ -40,6 +40,12 @@ void GridNode::onPoseSub(std::shared_ptr<Geometry::PoseStamped> pose_message){
   pose_sub_msg.push_back(pose_message);
 }
 
+void GridNode::onOtherGridSub(std::shared_ptr<Nav::OccupancyGrid> other_grid_message){
+  //std::cout<<"sub mmw\n";
+  std::lock_guard<std::mutex> lock(other_grid_mutex);
+  other_grid_sub_msg.push_back(other_grid_message);
+}
+
 
 void GridNode::runFusion(){
   std::this_thread::sleep_for(std::chrono::seconds{1});
@@ -54,7 +60,11 @@ void GridNode::runFusion(){
     auto point_message=point_sub_msg.back();
     point_mutex.unlock();
 
-    algo.setMessage(point_message, pose_message);
+    other_grid_mutex.lock();
+    auto other_grid_message=other_grid_sub_msg.back();
+    other_grid_mutex.unlock();
+
+    algo.setMessage(point_message, pose_message, other_grid_message);
     algo.run();
 
     grid_mutex.lock();

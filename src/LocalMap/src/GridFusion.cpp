@@ -24,7 +24,8 @@ void GridFusion::run(){
   // if(!bool_msg->data){
     point_handle.setMessage(point_msg, pose_msg);
     point_handle.run();
-    map=point_handle.getMap();
+    auto map1=point_handle.getMap();
+    auto map2=other_grid_msg->data().data();
   // }else{
   //   mmw_handle.setMessage(mmw_msg, pose_msg);
   //   mmw_handle.run();
@@ -51,11 +52,11 @@ void GridFusion::run(){
   // int8_t** map3=mmw_handle.getMap();
 
 
-  // for(int j=0;j<height;++j){
-  //   for(int i=0;i<width;++i){
-  //     map[j][i]=map1[j][i]|map2[j][i]|map3[j][i];
-  //   }
-  // }
+  for(int j=0;j<height;++j){
+    for(int i=0;i<width;++i){
+      map[j][i]=map1[j][i]|map2[j*width+i];
+    }
+  }
   //history_handle.LocalToGlobal(map);
   setGrid();
 

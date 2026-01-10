@@ -24,17 +24,20 @@ private:
 
   std::shared_ptr<Hnu::Middleware::Subscriber<Sensor::PointCloud2>> point_sub;
   std::shared_ptr<Hnu::Middleware::Subscriber<Geometry::PoseStamped>> pose_sub;
+  std::shared_ptr<Hnu::Middleware::Subscriber<Nav::OccupancyGrid>> other_grid_sub;
 
   std::shared_ptr<Hnu::Middleware::Timer> timer;
 
   boost::circular_buffer<std::shared_ptr<Sensor::PointCloud2>> point_sub_msg;
   boost::circular_buffer<std::shared_ptr<Geometry::PoseStamped>> pose_sub_msg;
+  boost::circular_buffer<std::shared_ptr<Nav::OccupancyGrid>> other_grid_sub_msg;
 
   std::mutex point_mutex;
   std::mutex pose_mutex;
   std::mutex mmw_mutex;
   std::mutex grid_mutex;
   std::mutex bool_mutex;
+  std::mutex other_grid_mutex;
 
   std::shared_ptr<Nav::OccupancyGrid> grid_pub_msg;
 
@@ -43,6 +46,7 @@ private:
 private:
   void onPointSub(std::shared_ptr<Sensor::PointCloud2> point_message);
   void onPoseSub(std::shared_ptr<Geometry::PoseStamped> pose_message);
+  void onOtherGridSub(std::shared_ptr<Nav::OccupancyGrid> other_grid_message);
   void onTime();
   void runFusion();
 
