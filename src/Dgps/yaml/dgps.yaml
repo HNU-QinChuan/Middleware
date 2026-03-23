@@ -1,7 +1,0 @@
-serverName: "rtk.ntrip.qxwz.com"
-serverPort: "8002"
-userName: "qxwnlp001"
-password: "e194992"
-serialPort: "/dev/ttyS0"
-topic: "dgps"
-frame_id: "gps"

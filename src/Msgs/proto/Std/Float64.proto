@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package Std;
-
-message Float64 {
-    double data = 1;
-}
-
